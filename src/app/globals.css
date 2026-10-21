@@ -86,3 +86,9 @@ html:not(.dark) main input::placeholder,
 html:not(.dark) main textarea::placeholder { color: #77736A; opacity: 1; }
 html.dark main input::placeholder,
 html.dark main textarea::placeholder { color: #B8B3A5; opacity: 1; }
+
+html:not(.dark) .status-badge-open{background:#E0F2FE!important;color:#0C4A6E!important;border-color:#7DD3FC!important}
+html:not(.dark) .status-badge-review{background:#FEF3C7!important;color:#78350F!important;border-color:#FCD34D!important}
+html:not(.dark) .status-badge-approved{background:#EDE9FE!important;color:#4C1D95!important;border-color:#C4B5FD!important}
+html:not(.dark) .status-badge-rejected{background:#FFE4E6!important;color:#881337!important;border-color:#FDA4AF!important}
+html:not(.dark) .status-badge-completed{background:#D1FAE5!important;color:#064E3B!important;border-color:#6EE7B7!important}
