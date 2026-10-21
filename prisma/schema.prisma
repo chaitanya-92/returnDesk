@@ -1,0 +1,80 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RequestStatus {
+  OPEN
+  IN_REVIEW
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+enum ResolutionType {
+  REFUND
+  REPLACEMENT
+  STORE_CREDIT
+}
+
+enum RequestEventType {
+  CREATED
+  DETAILS_UPDATED
+  STATUS_CHANGED
+  NOTE_ADDED
+  ARCHIVED
+}
+
+model ReturnRequest {
+  id               String          @id @default(cuid())
+  reference        String          @unique
+  orderNumber      String
+  orderItemId      String
+  itemName         String
+  itemSku          String
+  quantity         Int             @default(1)
+  customerName     String
+  customerEmail    String
+  reason           String
+  description      String
+  status           RequestStatus  @default(OPEN)
+  resolution       ResolutionType?
+  refundAmount     Decimal?        @db.Decimal(10, 2)
+  archivedAt       DateTime?
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  notes            RequestNote[]
+  events           RequestEvent[]
+
+  @@index([status, archivedAt, createdAt])
+  @@index([orderNumber, orderItemId])
+  @@index([customerEmail])
+}
+
+model RequestNote {
+  id         String        @id @default(cuid())
+  requestId  String
+  body       String
+  author     String        @default("Operations team")
+  createdAt  DateTime      @default(now())
+  request    ReturnRequest @relation(fields: [requestId], references: [id], onDelete: Restrict)
+
+  @@index([requestId, createdAt])
+}
+
+model RequestEvent {
+  id          String           @id @default(cuid())
+  requestId   String
+  type        RequestEventType
+  fromStatus  RequestStatus?
+  toStatus    RequestStatus?
+  message     String
+  createdAt   DateTime         @default(now())
+  request     ReturnRequest    @relation(fields: [requestId], references: [id], onDelete: Restrict)
+
+  @@index([requestId, createdAt])
+}
