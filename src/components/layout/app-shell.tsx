@@ -61,7 +61,7 @@ function WorkspaceNavbar() {
     <div className="flex min-w-0 items-center gap-3">
       {!isMobile && <Button variant="ghost" size="icon" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed(!collapsed)}><PanelLeft size={18} /></Button>}
       {isMobile && <SidebarTrigger><Menu size={18} /></SidebarTrigger>}
-      <div className="hidden items-center gap-2 text-xs text-[#777164] dark:text-[#B8B3A5] sm:flex"><span>Workspace</span><span className="text-[#C5BFAF]">/</span><span className="font-semibold text-[#23221E] dark:text-[#F5F2EA]">Overview</span></div>
+      
       <div className="sm:hidden"><Brand /></div>
     </div>
     <div className="flex items-center gap-2 sm:gap-3">
