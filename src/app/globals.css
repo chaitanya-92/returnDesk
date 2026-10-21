@@ -8,9 +8,9 @@
   --foreground: 35 34 30;
   --card: 255 255 255;
   --card-foreground: 35 34 30;
-  --muted: 248 248 246;
-  --muted-foreground: 115 111 100;
-  --border: 229 229 224;
+  --muted: 255 249 220;
+  --muted-foreground: 89 82 61;
+  --border: 242 224 151;
   --primary: 242 183 25;
   --primary-foreground: 35 34 30;
   --sidebar: 255 255 255;
