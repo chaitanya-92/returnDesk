@@ -8,7 +8,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const input = noteSchema.parse(await request.json());
+    const input = await noteSchema.validate(await request.json(), { abortEarly: false, stripUnknown: true });
     await getRequest(id);
     return apiSuccess(await addNote(id, input.body, input.author), 201);
   } catch (error) {
