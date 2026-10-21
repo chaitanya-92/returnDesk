@@ -60,29 +60,29 @@ export default function HomePage() {
   const counts = data ?? { total: 0, open: 0, inReview: 0, approved: 0, completed: 0, recent: [] };
   return (
     <AppShell>
-      <div id="overview" className="space-y-8">
-        <section className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
+      <div id="overview" className="space-y-6">
+        <section className="flex flex-col justify-between gap-4 border-b border-[rgb(var(--border))] pb-5 sm:flex-row sm:items-end">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#9A7900] dark:text-[#EABF24]">Returns operations <span className="mx-1 text-[rgb(var(--muted-foreground))]">/</span> Overview</p>
-            <h1 className="text-3xl font-semibold tracking-[-0.04em] text-[rgb(var(--foreground))] sm:text-[34px]">Returns overview</h1>
+            <h1 className="text-[30px] font-semibold tracking-[-0.045em] text-[rgb(var(--foreground))] sm:text-[32px]">Returns overview</h1>
             <p className="mt-2 max-w-xl text-sm leading-6 text-[rgb(var(--muted-foreground))]">A clear view of incoming requests and their current status.</p>
           </div>
-          <a href="#requests" className="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-lg bg-[#EABF24] px-4 py-2.5 text-sm font-semibold text-[#202735] transition-colors hover:bg-[#DDB21A] sm:self-auto">View requests <ArrowUpRight size={16} /></a>
+          <a href="#requests" className="inline-flex min-h-10 items-center justify-center gap-2 self-start rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] shadow-sm transition-colors hover:bg-[#DFAE12] sm:self-auto">View requests <ArrowUpRight size={16} /></a>
         </section>
 
-        <section id="workflow" className="grid grid-cols-1 gap-4 min-[480px]:grid-cols-2 xl:grid-cols-4">
+        <section id="workflow" className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
           {statusMeta.map((item) => {
             const Icon = item.icon;
-            return <article key={item.key} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-5 transition-shadow hover:shadow-[0_8px_24px_rgba(20,25,35,0.06)]">
+            return <article key={item.key} className="rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] p-4 transition-shadow hover:shadow-[0_6px_18px_rgba(48,42,26,0.05)] sm:p-5">
               <div className="flex items-center justify-between"><span className="text-sm font-medium text-[rgb(var(--muted-foreground))]">{item.label}</span><span className="grid size-9 place-items-center rounded-lg bg-[rgb(var(--muted))] text-[rgb(var(--foreground))]"><Icon size={17} strokeWidth={1.8} /></span></div>
-              <p className="mt-5 text-3xl font-semibold tracking-tight text-[rgb(var(--foreground))]">{data ? counts[item.key] : "—"}</p>
+              <p className="mt-4 text-[30px] font-semibold tracking-tight text-[rgb(var(--foreground))]">{data ? counts[item.key] : "—"}</p>
               <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{item.detail}</p>
             </article>;
           })}
         </section>
 
-        <section id="requests" className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--card))]">
-          <div className="flex flex-col gap-3 border-b border-[rgb(var(--border))] px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <section id="requests" className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--card))] shadow-[0_2px_8px_rgba(48,42,26,0.025)]">
+          <div className="flex flex-col gap-3 border-b border-[rgb(var(--border))] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div><div className="flex items-center gap-2"><h2 className="text-base font-semibold text-[rgb(var(--card-foreground))]">Recent requests</h2><span className="rounded-md bg-[#FBF3C7] px-2 py-1 text-[10px] font-semibold text-[#735B00] dark:bg-[#433819] dark:text-[#F4D76B]">{data ? counts.total : "…" } total</span></div><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">The latest return requests submitted by customers.</p></div>
             <a href="#requests" className="inline-flex min-h-9 items-center justify-center gap-2 rounded-lg border border-[rgb(var(--border))] px-3 text-xs font-semibold text-[rgb(var(--foreground))] transition-colors hover:bg-[rgb(var(--muted))]">All requests <ArrowUpRight size={14} /></a>
           </div>
@@ -97,14 +97,14 @@ export default function HomePage() {
                   <td className="px-4 py-4 text-xs text-[rgb(var(--muted-foreground))]">{row.date}</td>
                 </tr>)}
                 {!data && !loadError && <tr><td colSpan={5} className="px-6 py-14 text-center text-sm text-[rgb(var(--muted-foreground))]">Loading requests…</td></tr>}
-                {data && counts.recent.length === 0 && <tr><td colSpan={5} className="px-6 py-14 text-center"><Inbox className="mx-auto mb-3 size-8 text-[rgb(var(--muted-foreground))]" /><p className="text-sm font-medium text-[rgb(var(--foreground))]">No return requests yet</p><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">New requests will appear here when submitted.</p></td></tr>}
+                {data && counts.recent.length === 0 && <tr><td colSpan={5} className="px-6 py-9 text-center"><Inbox className="mx-auto mb-2 size-7 text-[rgb(var(--muted-foreground))]" /><p className="text-sm font-semibold text-[rgb(var(--foreground))]">No return requests yet</p><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">Create a request to start tracking returns.</p></td></tr>}
                 {loadError && <tr><td colSpan={5} className="px-6 py-14 text-center"><p className="text-sm font-medium text-[rgb(var(--foreground))]">Couldn’t load requests</p><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">Check the API connection and refresh this page.</p></td></tr>}
               </tbody>
             </table>
           </div>
           <div className="flex flex-col gap-2 border-t border-[rgb(var(--border))] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"><p className="text-xs text-[rgb(var(--muted-foreground))]">{data ? `Showing ${counts.recent.length} of ${counts.total} requests` : "Loading live request data"}</p><span className="inline-flex items-center gap-2 text-xs text-[rgb(var(--muted-foreground))]"><span className={`size-1.5 rounded-full ${data ? "bg-[#EABF24]" : "bg-[rgb(var(--muted-foreground))]"}`} />{data ? "Live request data" : loadError ? "API unavailable" : "Connecting to API"}</span></div>
         </section>
-        <footer className="flex flex-col justify-between gap-2 pb-2 text-xs text-[rgb(var(--muted-foreground))] sm:flex-row"><span>ReturnDesk · Returns operations workspace</span><span>Built for clearer, faster resolutions.</span></footer>
+        <footer className="flex flex-col justify-between gap-2 pb-2 pt-1 text-xs text-[rgb(var(--muted-foreground))] sm:flex-row"><span>ReturnDesk · Returns operations workspace</span><span>Built for clearer, faster resolutions.</span></footer>
       </div>
     </AppShell>
   );
