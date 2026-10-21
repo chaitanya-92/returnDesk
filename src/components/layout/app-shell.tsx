@@ -45,7 +45,7 @@ function WorkspaceSidebar() {
       </SidebarGroup>
     </SidebarContent>
     {!compact && <SidebarFooter>
-      <div className="rounded-xl border border-[#E7E2D6] bg-[#F7F4EC] p-4 dark:border-[#434037] dark:bg-[#2F2E29]">
+      <div className="rounded-xl border border-[#E5E5E0] bg-[#F7F7F5] p-4 dark:border-[#434037] dark:bg-[#2F2E29]">
         <div className="flex items-center gap-2 text-xs font-semibold"><span className="size-2 rounded-full bg-[#F2B719]" /> Operations workspace</div>
         <p className="mt-2 text-xs leading-5 text-[#777164] dark:text-[#B8B3A5]">Review requests and keep resolutions moving.</p>
       </div>
@@ -57,7 +57,7 @@ function WorkspaceNavbar() {
   const dispatch = useAppDispatch();
   const dark = useAppSelector((state) => state.theme.mode === "dark");
   const { collapsed, isMobile, setCollapsed } = useSidebar();
-  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[#E7E2D6]/70 bg-[#FFFEFB]/95 px-4 text-[#23221E] backdrop-blur-md dark:border-[#434037]/70 dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
+  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[#E7E2D6]/70 bg-white/95 px-4 text-[#23221E] backdrop-blur-md dark:border-[#434037]/70 dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
     <div className="flex min-w-0 items-center gap-3">
       {!isMobile && <Button variant="ghost" size="icon" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed(!collapsed)}><PanelLeft size={18} /></Button>}
       {isMobile && <SidebarTrigger><Menu size={18} /></SidebarTrigger>}
@@ -65,7 +65,7 @@ function WorkspaceNavbar() {
       <div className="sm:hidden"><Brand /></div>
     </div>
     <div className="flex items-center gap-2 sm:gap-3">
-      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777164] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#E7E2D6] bg-[#F7F4EC] pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
+      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777164] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#E7E2D6] bg-[#F7F7F5] pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
       <Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
       <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /></Button>
       <DropdownMenu>
