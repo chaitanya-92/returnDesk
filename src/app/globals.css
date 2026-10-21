@@ -72,3 +72,17 @@ html:not(.dark) main a { text-decoration-thickness: 1px; text-underline-offset: 
 html:not(.dark) select,
 html:not(.dark) select option { color-scheme: light; background-color: #FFFFFF; color: #23221E; }
 html:not(.dark) select option:checked { background-color: #FFF0A6; color: #23221E; }
+
+/* Keep table hover/focus readable in both themes; avoid dark text on dark hover rows. */
+html:not(.dark) main table tbody tr:hover { background-color: #FFFCF0 !important; color: #23221E !important; }
+html.dark main table tbody tr:hover { background-color: #302F2A !important; color: #F5F2EA !important; }
+html.dark main table tbody tr:hover td,
+html.dark main table tbody tr:hover td p,
+html.dark main table tbody tr:hover td a { color: #F5F2EA; }
+html:not(.dark) main table tbody tr,
+html:not(.dark) main table tbody tr td { color: #23221E; }
+html:not(.dark) main table tbody tr:hover td a { color: #7A5B00; }
+html:not(.dark) main input::placeholder,
+html:not(.dark) main textarea::placeholder { color: #77736A; opacity: 1; }
+html.dark main input::placeholder,
+html.dark main textarea::placeholder { color: #B8B3A5; opacity: 1; }
