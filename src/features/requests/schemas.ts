@@ -17,9 +17,18 @@ export const requestDraftSchema = yup.object({
   description: requiredText("Description", 2000),
 });
 
-export const requestDetailsUpdateSchema = requestDraftSchema
-  .noUnknown()
-  .test("at-least-one-field", "Provide at least one field to update", (value) => !!value && Object.keys(value).length > 0);
+export const requestDetailsUpdateSchema = yup.object({
+  orderNumber: requiredText("Order number", 80).optional(),
+  orderItemId: requiredText("Order item ID", 100).optional(),
+  itemName: requiredText("Item name").optional(),
+  itemSku: requiredText("Item SKU", 100).optional(),
+  quantity: yup.number().integer().min(1).max(1000).optional(),
+  customerName: requiredText("Customer name").optional(),
+  customerEmail: yup.string().trim().email("Enter a valid customer email").max(254).optional(),
+  reason: yup.mixed<"DAMAGED" | "WRONG_ITEM" | "WRONG_SIZE" | "NOT_AS_DESCRIBED" | "CHANGED_MIND" | "MISSING_PARTS" | "OTHER">()
+    .oneOf(["DAMAGED", "WRONG_ITEM", "WRONG_SIZE", "NOT_AS_DESCRIBED", "CHANGED_MIND", "MISSING_PARTS", "OTHER"]).optional(),
+  description: requiredText("Description", 2000).optional(),
+}).noUnknown().test("at-least-one-field", "Provide at least one field to update", (value) => !!value && Object.keys(value).length > 0);
 
 export const transitionSchema = yup.object({
   status: yup.mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED">()
