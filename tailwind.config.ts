@@ -6,13 +6,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#17211d",
-        muted: "#69766f",
-        canvas: "#f5f7f4",
-        brand: { DEFAULT: "#245e4a", light: "#e3eee8", dark: "#174432" },
-        line: "#e3e8e4",
+        ink: "#23221E",
+        muted: "#777164",
+        canvas: "#FAF8F2",
+        brand: { DEFAULT: "#F2B719", light: "#FBEFC0", dark: "#DFAE12" },
+        line: "#E7E2D6",
       },
-      boxShadow: { panel: "0 8px 30px rgba(20, 45, 32, 0.06)" },
+      boxShadow: { panel: "0 8px 30px rgba(48, 42, 26, 0.06)" },
     },
   },
   plugins: [forms],

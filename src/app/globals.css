@@ -4,15 +4,78 @@
 
 :root {
   color-scheme: light;
-  background: #f5f7f4;
-  color: #17211d;
+  --background: 255 255 255;
+  --foreground: 35 34 30;
+  --card: 255 255 255;
+  --card-foreground: 35 34 30;
+  --muted: 255 255 255;
+  --muted-foreground: 89 82 61;
+  --border: 229 229 229;
+  --primary: 242 183 25;
+  --primary-foreground: 35 34 30;
+  --sidebar: 255 255 255;
+  --sidebar-foreground: 35 34 30;
+  background: #FFFFFF;
+  color: #23221E;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-
+.dark {
+  color-scheme: dark;
+  --background: 28 28 26;
+  --foreground: 245 242 234;
+  --card: 37 37 33;
+  --card-foreground: 245 242 234;
+  --muted: 47 46 41;
+  --muted-foreground: 184 179 165;
+  --border: 67 64 55;
+  --primary: 242 183 25;
+  --primary-foreground: 35 34 30;
+  --sidebar: 28 28 26;
+  --sidebar-foreground: 245 242 234;
+  background: #1C1C1A;
+  color: #F5F2EA;
+}
 * { box-sizing: border-box; }
-body { margin: 0; min-height: 100vh; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-height: 100vh; background: rgb(var(--background)); color: rgb(var(--foreground)); }
 button, input, select, textarea { font: inherit; }
-::selection { background: #cbe0d4; color: #174432; }
+::selection { background: #F2B719; color: #23221E; }
+
+
+/* Light theme: white surfaces, readable charcoal text, restrained yellow accents. */
+html:not(.dark) body,
+html:not(.dark) [data-sidebar="provider"],
+html:not(.dark) [data-sidebar="sidebar"] { background: #FFFFFF; color: #23221E; }
+html:not(.dark) header.sticky { background: rgba(255,255,255,.98); color: #23221E; border-color: #EAEAEA; }
+html:not(.dark) header.sticky button,
+html:not(.dark) header.sticky a,
+html:not(.dark) header.sticky svg { color: #38362F; }
+html:not(.dark) header.sticky input { background: #FFFFFF; color: #23221E; border-color: #E6E6E6; }
+html:not(.dark) [data-sidebar="menu-button"] { color: #595959; }
+html:not(.dark) [data-sidebar="menu-button"][data-active="true"] { background: #FFF0A6; color: #23221E; }
+html:not(.dark) [data-sidebar="menu-button"]:not([data-active="true"]):hover { background: #FFF9DC; color: #23221E; }
+html:not(.dark) [data-sidebar="group-label"] { color: #777777; }
+html:not(.dark) [data-sidebar="footer"] > div { background: #FFFFFF; border-color: #E8E8E8; color: #23221E; }
+html:not(.dark) [data-sidebar="footer"] p { color: #666666; }
+html:not(.dark) main { color: #23221E; }
+html:not(.dark) main h1,
+html:not(.dark) main h2,
+html:not(.dark) main article p,
+html:not(.dark) main section#requests p { color: #23221E; }
+html:not(.dark) main article,
+html:not(.dark) main section#requests { background: #FFFFFF; border-color: #E8E8E8; }
+html:not(.dark) main table thead tr { background: #FFF9DC; color: #5B4A10; }
+html:not(.dark) main section#requests a:not([class*="bg-[#F2B719"]) { border-color: #E5E5E5; color: #23221E; }
+html:not(.dark) main .text-\\[rgb\\(var\\(--muted-foreground\\)\\)\\] { color: #666666; }
+
+/* Give the application shell a subtle separation from the white workspace content. */
+html:not(.dark) [data-sidebar="provider"] { background: #F7F7F5; }
+html:not(.dark) [data-sidebar="sidebar"] { background: #F7F7F5; }
+html:not(.dark) header.sticky { background: #F7F7F5; border-bottom-color: #E8E8E3; }
+html:not(.dark) main { background: #FFFFFF; border-radius: 0; }
+html:not(.dark) main article,
+html:not(.dark) main section#requests { background: #FFFFFF; }
+html:not(.dark) [data-sidebar="footer"] > div { background: #FFFFFF; }
