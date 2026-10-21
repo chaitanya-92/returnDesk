@@ -20,7 +20,7 @@ function Brand() {
   const compact = collapsed && !isMobile;
   return <a href="#overview" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
     <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#F2B719] text-[#23221E]"><Command size={21} strokeWidth={2.2} /></span>
-    {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#777164] dark:text-[#B8B3A5]">Returns workspace</span></span>}
+    {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#59523D] dark:text-[#B8B3A5]">Returns workspace</span></span>}
   </a>;
 }
 
@@ -45,9 +45,9 @@ function WorkspaceSidebar() {
       </SidebarGroup>
     </SidebarContent>
     {!compact && <SidebarFooter>
-      <div className="rounded-xl border border-[#E5E5E0] bg-[#F7F7F5] p-4 dark:border-[#434037] dark:bg-[#2F2E29]">
+      <div className="rounded-xl border border-[#F2E097] bg-white p-4 dark:border-[#434037] dark:bg-[#2F2E29]">
         <div className="flex items-center gap-2 text-xs font-semibold"><span className="size-2 rounded-full bg-[#F2B719]" /> Operations workspace</div>
-        <p className="mt-2 text-xs leading-5 text-[#777164] dark:text-[#B8B3A5]">Review requests and keep resolutions moving.</p>
+        <p className="mt-2 text-xs leading-5 text-[#59523D] dark:text-[#B8B3A5]">Review requests and keep resolutions moving.</p>
       </div>
     </SidebarFooter>}
   </Sidebar>;
@@ -57,7 +57,7 @@ function WorkspaceNavbar() {
   const dispatch = useAppDispatch();
   const dark = useAppSelector((state) => state.theme.mode === "dark");
   const { collapsed, isMobile, setCollapsed } = useSidebar();
-  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[#E7E2D6]/70 bg-white/95 px-4 text-[#23221E] backdrop-blur-md dark:border-[#434037]/70 dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
+  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[#F2E097]/70 bg-white/95 px-4 text-[#23221E] backdrop-blur-md dark:border-[#434037]/70 dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
     <div className="flex min-w-0 items-center gap-3">
       {!isMobile && <Button variant="ghost" size="icon" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed(!collapsed)}><PanelLeft size={18} /></Button>}
       {isMobile && <SidebarTrigger><Menu size={18} /></SidebarTrigger>}
@@ -65,11 +65,11 @@ function WorkspaceNavbar() {
       <div className="sm:hidden"><Brand /></div>
     </div>
     <div className="flex items-center gap-2 sm:gap-3">
-      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777164] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#E7E2D6] bg-[#F7F7F5] pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
+      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#59523D] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#F2E097] bg-white pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
       <Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
       <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /></Button>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-auto gap-2 rounded-lg p-1.5"><Avatar><AvatarFallback>OP</AvatarFallback></Avatar><span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Operations</span><span className="block text-[10px] text-[#777164] dark:text-[#B8B3A5]">Administrator</span></span><ChevronDown size={14} className="hidden sm:block" /></Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-auto gap-2 rounded-lg p-1.5"><Avatar><AvatarFallback>OP</AvatarFallback></Avatar><span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Operations</span><span className="block text-[10px] text-[#59523D] dark:text-[#B8B3A5]">Administrator</span></span><ChevronDown size={14} className="hidden sm:block" /></Button></DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52"><DropdownMenuLabel>Operations account</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem><Bell size={15} /> Notification preferences</DropdownMenuItem></DropdownMenuContent>
       </DropdownMenu>
     </div>
