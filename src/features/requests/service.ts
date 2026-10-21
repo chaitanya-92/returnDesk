@@ -116,7 +116,7 @@ export async function transitionRequest(id: string, input: RequestTransitionInpu
       await tx.requestNote.create({ data: { requestId: id, body: input.note.trim(), author: "Operations team" } });
       await tx.requestEvent.create({ data: { requestId: id, type: RequestEventType.NOTE_ADDED, message: "A note was added during status change." } });
     }
-    return tx.returnRequest.findUniqueOrThrow({ where: { id }, include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } });
+    return tx.returnRequest.findUniqueOrThrow({ where: { id }, include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } } });
   });
 }
 
