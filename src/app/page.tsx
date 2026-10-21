@@ -67,8 +67,8 @@ function MetricCard({ label, value, detail, icon: Icon, tone }: {
   );
 }
 
-function Panel({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  return <section className={`min-w-0 rounded-2xl border border-[#EAE8E1] bg-white shadow-[0_2px_8px_rgba(35,34,30,0.025)] ${className}`}>{children}</section>;
+function Panel({ children, className = "", id }: { children: React.ReactNode; className?: string; id?: string }) {
+  return <section id={id} className={`min-w-0 rounded-2xl border border-[#EAE8E1] bg-white shadow-[0_2px_8px_rgba(35,34,30,0.025)] ${className}`}>{children}</section>;
 }
 function PanelHeading({ title, description, action }: { title: string; description: string; action?: React.ReactNode }) {
   return <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#F0EEE8] px-5 py-4 sm:px-6"><div><h2 className="text-[15px] font-semibold tracking-[-0.02em] text-[#23221E]">{title}</h2><p className="mt-1 text-xs leading-5 text-[#777469]">{description}</p></div>{action}</div>;
