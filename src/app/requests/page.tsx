@@ -14,6 +14,8 @@ export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [status, setStatus] = useState("ALL");
   const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -35,6 +37,7 @@ export default function RequestsPage() {
   }, [status, query]);
 
   useEffect(() => { void load(); }, [load]);
+  useEffect(() => { setPage(1); }, [query, status]);
   useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(null), 3600); return () => window.clearTimeout(timer); }, [toast]);
 
   async function createRequest(event: FormEvent<HTMLFormElement>) {
@@ -51,10 +54,12 @@ export default function RequestsPage() {
     finally { setSaving(false); }
   }
 
+  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
+  const visibleRows = rows.slice((page - 1) * pageSize, page * pageSize);
   const field = "w-full rounded-lg border border-[rgb(var(--border))] bg-white px-3 py-2.5 text-sm text-[#23221E] outline-none focus:border-[#D7A400] focus:ring-2 focus:ring-[#F2B719]/20";
   return <AppShell><div className="space-y-6">
     <header className="flex flex-col justify-between gap-4 border-b border-[rgb(var(--border))] pb-5 sm:flex-row sm:items-end">
-      <div><p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#806000]">Returns operations / Workspace</p><h1 className="text-3xl font-semibold tracking-tight">Return requests</h1><p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">Search, review, and create return requests from your operations queue.</p></div>
+      <div><h1 className="text-3xl font-semibold tracking-tight">Return requests</h1><p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">Search, review, and create return requests from your operations queue.</p></div>
       <div className="flex gap-2"><button onClick={() => void load()} className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-sm"><RefreshCw size={15}/> Refresh</button><button onClick={() => setShowCreate(!showCreate)} className="inline-flex items-center gap-2 rounded-lg bg-[#F2B719] px-4 py-2 text-sm font-semibold text-[#23221E]"><Plus size={16}/> New request</button></div>
     </header>
     {error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</div>}
@@ -76,11 +81,11 @@ export default function RequestsPage() {
     <section className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white">
       <div className="flex flex-col gap-3 border-b border-[rgb(var(--border))] p-4 sm:flex-row"><div className="relative flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search reference, customer, order, item…" className="w-full rounded-lg border border-[rgb(var(--border))] bg-white py-2.5 pl-9 pr-3 text-sm text-[#23221E] outline-none focus:border-[#D7A400] [color-scheme:light]"/></div><select aria-label="Filter by status" value={status} onChange={e => setStatus(e.target.value)} className="rounded-lg border border-[rgb(var(--border))] bg-white px-3 py-2 text-sm text-[#23221E] [color-scheme:light]">{statuses.map(s => <option key={s} value={s}>{s === "ALL" ? "All statuses" : pretty(s)}</option>)}</select></div>
       <div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10]"><tr><th className="px-4 py-3">Request</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Created</th><th className="px-4 py-3"></th></tr></thead><tbody className="divide-y divide-[rgb(var(--border))]">
-      {rows.map(r => <tr key={r.id} className="hover:bg-[#FFFCF0]"><td className="px-4 py-4"><p className="font-semibold">{r.reference}</p><p className="mt-1 text-xs text-gray-500">{r.orderNumber} · {r.itemName}</p></td><td className="px-4 py-4"><p>{r.customerName}</p><p className="text-xs text-gray-500">{r.customerEmail}</p></td><td className="px-4 py-4">{pretty(r.reason)}</td><td className="px-4 py-4"><span className="rounded-md border px-2 py-1 text-xs">{pretty(r.status)}</span></td><td className="px-4 py-4 text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString("en-IN")}</td><td className="px-4 py-4"><a href={"/requests/" + r.id} className="inline-flex items-center gap-1 text-xs font-semibold text-[#7A5B00]">Details <ArrowUpRight size={13}/></a></td></tr>)}
+      {visibleRows.map(r => <tr key={r.id} className="hover:bg-[#FFFCF0]"><td className="px-4 py-4"><p className="font-semibold">{r.reference}</p><p className="mt-1 text-xs text-gray-500">{r.orderNumber} · {r.itemName}</p></td><td className="px-4 py-4"><p>{r.customerName}</p><p className="text-xs text-gray-500">{r.customerEmail}</p></td><td className="px-4 py-4">{pretty(r.reason)}</td><td className="px-4 py-4"><span className={"inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium " + (statusStyle[r.status] ?? "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200")}>{pretty(r.status)}</span></td><td className="px-4 py-4 text-xs text-gray-500">{new Date(r.createdAt).toLocaleDateString("en-IN")}</td><td className="px-4 py-4"><a href={"/requests/" + r.id} className="inline-flex items-center gap-1 text-xs font-semibold text-[#7A5B00]">Details <ArrowUpRight size={13}/></a></td></tr>)}
       {!loading && rows.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center"><Inbox className="mx-auto mb-2 text-gray-400"/><p className="font-medium">{error ? "Requests unavailable" : "No requests found"}</p><p className="mt-1 text-xs text-gray-500">{query || status !== "ALL" ? "Try changing the search or status filter." : "Create your first return request to get started."}</p></td></tr>}
       {loading && <tr><td colSpan={6} className="px-4 py-10 text-center text-xs text-gray-500">Loading requests…</td></tr>}
       </tbody></table></div>
-      <div className="border-t border-[rgb(var(--border))] px-4 py-3 text-xs text-gray-500">{rows.length} request{rows.length === 1 ? "" : "s"} shown</div>
+      <div className="flex flex-col gap-3 border-t border-[rgb(var(--border))] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs text-[rgb(var(--muted-foreground))">Showing {rows.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, rows.length)} of {rows.length} requests</p><nav aria-label="Request table pagination" className="flex items-center gap-1.5"><button type="button" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Previous</button><span className="px-2 text-xs text-[rgb(var(--muted-foreground))">Page {page} of {pageCount}</span><button type="button" disabled={page >= pageCount} onClick={() => setPage(p => Math.min(pageCount, p + 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Next</button></nav></div>
     </section>
   </div></AppShell>;
 }
