@@ -41,7 +41,8 @@ function ReasonSelect() {
 export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [status, setStatus] = useState("ALL");
-  const [statusMenuOpen, setStatusMenuOpen] = useState(false);\n  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
+  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
+  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
