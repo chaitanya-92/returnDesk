@@ -4,19 +4,19 @@
 
 :root {
   color-scheme: light;
-  --background: 244 245 247;
-  --foreground: 32 39 53;
-  --card: 255 255 255;
-  --card-foreground: 32 39 53;
-  --muted: 239 241 244;
-  --muted-foreground: 104 113 128;
-  --border: 222 226 232;
-  --primary: 234 191 36;
-  --primary-foreground: 32 39 53;
-  --sidebar: 255 255 255;
-  --sidebar-foreground: 32 39 53;
-  background: #F4F5F7;
-  color: #202735;
+  --background: 250 248 242;
+  --foreground: 35 34 30;
+  --card: 255 254 251;
+  --card-foreground: 35 34 30;
+  --muted: 246 243 235;
+  --muted-foreground: 115 111 100;
+  --border: 231 226 214;
+  --primary: 242 183 25;
+  --primary-foreground: 35 34 30;
+  --sidebar: 255 254 251;
+  --sidebar-foreground: 35 34 30;
+  background: #FAF8F2;
+  color: #23221E;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,21 +24,22 @@
 }
 .dark {
   color-scheme: dark;
-  --background: 23 28 38;
-  --foreground: 243 245 248;
-  --card: 35 42 55;
-  --card-foreground: 243 245 248;
-  --muted: 43 51 66;
-  --muted-foreground: 184 192 204;
-  --border: 57 66 82;
-  --primary: 234 191 36;
-  --primary-foreground: 32 39 53;
-  --sidebar: 23 28 38;
-  --sidebar-foreground: 243 245 248;
-  background: #171C26;
-  color: #F3F5F8;
+  --background: 28 28 26;
+  --foreground: 245 242 234;
+  --card: 37 37 33;
+  --card-foreground: 245 242 234;
+  --muted: 47 46 41;
+  --muted-foreground: 184 179 165;
+  --border: 67 64 55;
+  --primary: 242 183 25;
+  --primary-foreground: 35 34 30;
+  --sidebar: 28 28 26;
+  --sidebar-foreground: 245 242 234;
+  background: #1C1C1A;
+  color: #F5F2EA;
 }
 * { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body { margin: 0; min-height: 100vh; background: rgb(var(--background)); color: rgb(var(--foreground)); }
 button, input, select, textarea { font: inherit; }
-::selection { background: #EABF24; color: #202735; }
+::selection { background: #F2B719; color: #23221E; }
