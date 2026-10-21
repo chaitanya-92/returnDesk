@@ -8,9 +8,9 @@
   --foreground: 35 34 30;
   --card: 255 255 255;
   --card-foreground: 35 34 30;
-  --muted: 255 249 220;
+  --muted: 255 255 255;
   --muted-foreground: 89 82 61;
-  --border: 242 224 151;
+  --border: 229 229 229;
   --primary: 242 183 25;
   --primary-foreground: 35 34 30;
   --sidebar: 255 255 255;
@@ -43,3 +43,15 @@ html { scroll-behavior: smooth; }
 body { margin: 0; min-height: 100vh; background: rgb(var(--background)); color: rgb(var(--foreground)); }
 button, input, select, textarea { font: inherit; }
 ::selection { background: #F2B719; color: #23221E; }
+
+/* Light mode uses a clean white canvas; yellow is reserved for actions and focus. */
+html:not(.dark) body,
+html:not(.dark) [data-sidebar="provider"] { background: #FFFFFF !important; }
+html:not(.dark) [data-sidebar="sidebar"] { background: #FFFFFF !important; }
+html:not(.dark) header.sticky { background: rgba(255,255,255,.97) !important; border-color: #EEEEEE !important; }
+html:not(.dark) [data-sidebar="menu-button"][data-active="true"] { background: #FFF0A6 !important; color: #23221E !important; }
+html:not(.dark) [data-sidebar="menu-button"]:not([data-active="true"]):hover { background: #FFF9DC !important; }
+html:not(.dark) main article,
+html:not(.dark) main section#requests { border-color: #EEEEEE !important; }
+html:not(.dark) main table thead tr { background: #FFF9DC !important; }
+html:not(.dark) main .text-\\[\\#23221E\\] { color: #23221E; }
