@@ -1,3 +1,6 @@
+import { prisma } from "@/lib/prisma";
+import { RequestStatus } from "@prisma/client";
+
 const workflow = [
   { label: "Open", count: "12", detail: "Waiting for review", tone: "bg-amber-50 text-amber-800" },
   { label: "In Review", count: "8", detail: "Being assessed", tone: "bg-sky-50 text-sky-800" },
@@ -23,7 +26,23 @@ function StatusPill({ status }: { status: string }) {
   return <span className={`inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${styles[status] ?? "bg-rose-50 text-rose-800 ring-rose-200"}`}>{status}</span>;
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  let live = { total: 0, open: 0, inReview: 0, approved: 0, completed: 0, recent: [] as Array<{ reference: string; customerName: string; itemName: string; reason: string; status: RequestStatus; createdAt: Date }> };
+  try {
+    const [total, open, inReview, approved, completed, recent] = await Promise.all([
+      prisma.returnRequest.count({ where: { archivedAt: null } }),
+      prisma.returnRequest.count({ where: { archivedAt: null, status: "OPEN" } }),
+      prisma.returnRequest.count({ where: { archivedAt: null, status: "IN_REVIEW" } }),
+      prisma.returnRequest.count({ where: { archivedAt: null, status: "APPROVED" } }),
+      prisma.returnRequest.count({ where: { archivedAt: null, status: "COMPLETED" } }),
+      prisma.returnRequest.findMany({ where: { archivedAt: null }, orderBy: { createdAt: "desc" }, take: 5, select: { reference: true, customerName: true, itemName: true, reason: true, status: true, createdAt: true } }),
+    ]);
+    live = { total, open, inReview, approved, completed, recent };
+  } catch {
+    // Keep the dashboard shell renderable until the database is configured.
+  }
+  const liveWorkflow = workflow.map((item) => ({ ...item, count: String(({ Open: live.open, "In Review": live.inReview, Approved: live.approved, Completed: live.completed } as Record<string, number>)[item.label] ?? 0) }));
+  const rows = live.recent.length ? live.recent.map((r) => ({ reference: r.reference, customer: r.customerName, item: r.itemName, reason: r.reason.replaceAll("_", " ").toLowerCase(), status: r.status === "IN_REVIEW" ? "In Review" : r.status.charAt(0) + r.status.slice(1).toLowerCase(), date: r.createdAt.toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) })) : sampleRows;
   return (
     <main className="min-h-screen bg-canvas text-ink">
       <div className="mx-auto flex min-h-screen max-w-[1600px]">
@@ -58,13 +77,13 @@ export default function HomePage() {
             </div>
 
             <div id="workflow" className="mt-8 grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
-              {workflow.map((item) => <article key={item.label} className="rounded-2xl border border-line bg-white p-5 shadow-panel"><div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-muted">{item.label}</p><span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${item.tone}`}>Requests</span></div><p className="mt-4 text-3xl font-semibold tracking-tight">{item.count}</p><p className="mt-1 text-xs text-muted">{item.detail}</p></article>)}
+              {liveWorkflow.map((item) => <article key={item.label} className="rounded-2xl border border-line bg-white p-5 shadow-panel"><div className="flex items-start justify-between gap-2"><p className="text-sm font-medium text-muted">{item.label}</p><span className={`rounded-full px-2 py-1 text-[10px] font-semibold ${item.tone}`}>Requests</span></div><p className="mt-4 text-3xl font-semibold tracking-tight">{item.count}</p><p className="mt-1 text-xs text-muted">{item.detail}</p></article>)}
             </div>
 
             <section id="requests" className="mt-8 overflow-hidden rounded-2xl border border-line bg-white shadow-panel">
               <div className="flex flex-col gap-3 border-b border-line px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><h2 className="text-base font-semibold">Recent requests</h2><p className="mt-1 text-sm text-muted">A quick look at the latest customer submissions.</p></div><div className="flex items-center gap-2"><span className="rounded-lg border border-line px-3 py-2 text-xs text-muted">All statuses ▾</span><span className="rounded-lg border border-line px-3 py-2 text-xs text-muted">Newest first</span></div></div>
-              <div className="overflow-x-auto"><table className="w-full min-w-[760px] border-collapse text-left"><thead><tr className="bg-[#fafbf9] text-[11px] uppercase tracking-wider text-muted"><th className="px-6 py-3 font-semibold">Request</th><th className="px-4 py-3 font-semibold">Customer</th><th className="px-4 py-3 font-semibold">Reason</th><th className="px-4 py-3 font-semibold">Status</th><th className="px-4 py-3 font-semibold">Created</th></tr></thead><tbody>{sampleRows.map((row) => <tr key={row.reference} className="border-t border-line transition hover:bg-[#fbfcfa]"><td className="px-6 py-4"><p className="text-sm font-semibold text-brand">{row.reference}</p><p className="mt-1 text-xs text-muted">{row.item}</p></td><td className="px-4 py-4 text-sm font-medium">{row.customer}</td><td className="px-4 py-4 text-sm text-muted">{row.reason}</td><td className="px-4 py-4"><StatusPill status={row.status}/></td><td className="px-4 py-4 text-xs text-muted">{row.date}</td></tr>)}</tbody></table></div>
-              <div className="flex items-center justify-between border-t border-line px-5 py-4 sm:px-6"><p className="text-xs text-muted">Showing 5 sample requests</p><span className="text-xs font-medium text-muted">Pagination will be connected to live data</span></div>
+              <div className="overflow-x-auto"><table className="w-full min-w-[760px] border-collapse text-left"><thead><tr className="bg-[#fafbf9] text-[11px] uppercase tracking-wider text-muted"><th className="px-6 py-3 font-semibold">Request</th><th className="px-4 py-3 font-semibold">Customer</th><th className="px-4 py-3 font-semibold">Reason</th><th className="px-4 py-3 font-semibold">Status</th><th className="px-4 py-3 font-semibold">Created</th></tr></thead><tbody>{rows.map((row) => <tr key={row.reference} className="border-t border-line transition hover:bg-[#fbfcfa]"><td className="px-6 py-4"><p className="text-sm font-semibold text-brand">{row.reference}</p><p className="mt-1 text-xs text-muted">{row.item}</p></td><td className="px-4 py-4 text-sm font-medium">{row.customer}</td><td className="px-4 py-4 text-sm text-muted">{row.reason}</td><td className="px-4 py-4"><StatusPill status={row.status}/></td><td className="px-4 py-4 text-xs text-muted">{row.date}</td></tr>)}</tbody></table></div>
+              <div className="flex items-center justify-between border-t border-line px-5 py-4 sm:px-6"><p className="text-xs text-muted">{live.total ? `Showing ${rows.length} of ${live.total} requests` : "Showing 5 sample requests"}</p><span className="text-xs font-medium text-muted">{live.total ? "Live data from PostgreSQL" : "Configure PostgreSQL to load live data"}</span></div>
             </section>
 
             <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-dashed border-[#c9d7cd] bg-[#edf4ef] p-5 sm:flex-row sm:items-center sm:justify-between sm:px-6"><div><p className="text-sm font-semibold text-brand-dark">Workflow foundation</p><p className="mt-1 text-sm leading-5 text-muted">This dashboard shell is the UI foundation. Live database-backed requests and guarded actions are the next implementation milestone.</p></div><span className="w-fit rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand ring-1 ring-inset ring-[#d5e3d9]">Implementation in progress</span></div>
