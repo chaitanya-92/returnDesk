@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ZodError } from "zod";
+import { ValidationError } from "yup";
 
 export class AppError extends Error {
   constructor(message: string, public readonly status: number, public readonly code: string) {
@@ -9,8 +9,8 @@ export class AppError extends Error {
 }
 
 export function apiError(error: unknown) {
-  if (error instanceof ZodError) {
-    return NextResponse.json({ error: "Validation failed", code: "VALIDATION_ERROR", issues: error.issues }, { status: 400 });
+  if (error instanceof ValidationError) {
+    return NextResponse.json({ error: "Validation failed", code: "VALIDATION_ERROR", issues: error.errors }, { status: 400 });
   }
   if (error instanceof AppError) {
     return NextResponse.json({ error: error.message, code: error.code }, { status: error.status });
