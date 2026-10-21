@@ -75,7 +75,7 @@ html:not(.dark) main .text-\\[rgb\\(var\\(--muted-foreground\\)\\)\\] { color: #
 html:not(.dark) [data-sidebar="provider"] { background: #F7F7F5; }
 html:not(.dark) [data-sidebar="sidebar"] { background: #F7F7F5; }
 html:not(.dark) header.sticky { background: #F7F7F5; border-bottom-color: #E8E8E3; }
-html:not(.dark) main { background: #FFFFFF; border-radius: 14px; }
+html:not(.dark) main { background: #FFFFFF; border-radius: 0; }
 html:not(.dark) main article,
 html:not(.dark) main section#requests { background: #FFFFFF; }
 html:not(.dark) [data-sidebar="footer"] > div { background: #FFFFFF; }
