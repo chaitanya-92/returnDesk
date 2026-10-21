@@ -30,7 +30,7 @@ function SidebarProvider({ children, className, ...props }: React.HTMLAttributes
     media.addEventListener("change", update);
     return () => media.removeEventListener("change", update);
   }, []);
-  return <SidebarContext.Provider value={{ openMobile, setOpenMobile, isMobile, collapsed, setCollapsed }}><div data-sidebar="provider" className={cn("flex min-h-screen w-full bg-[#F7F4EC] text-[#23221E] dark:bg-[#1C1C1A] dark:text-[#F5F2EA]", className)} {...props}>{children}</div></SidebarContext.Provider>;
+  return <SidebarContext.Provider value={{ openMobile, setOpenMobile, isMobile, collapsed, setCollapsed }}><div data-sidebar="provider" className={cn("flex min-h-screen w-full bg-white text-[#23221E] dark:bg-[#1C1C1A] dark:text-[#F5F2EA]", className)} {...props}>{children}</div></SidebarContext.Provider>;
 }
 
 function Sidebar({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) {
@@ -72,16 +72,16 @@ function SidebarMenuItem({ className, ...props }: React.LiHTMLAttributes<HTMLLIE
 }
 function SidebarMenuButton({ isActive = false, className, children, title, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { isActive?: boolean }) {
   const { setOpenMobile, collapsed } = useSidebar();
-  return <a data-sidebar="menu-button" data-active={isActive} title={collapsed ? title || (typeof children === "string" ? children : undefined) : title} onClick={() => setOpenMobile(false)} className={cn("group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2B719]", collapsed && "justify-center px-0", isActive ? "bg-[#FBEFC0] text-[#23221E] dark:bg-[#51451E] dark:text-[#FFF8E5]" : "text-[#777164] hover:bg-[#F7F4EC] hover:text-[#23221E] dark:text-[#B8B3A5] dark:hover:bg-[#2F2E29] dark:hover:text-white", className)} {...props}>{children}</a>;
+  return <a data-sidebar="menu-button" data-active={isActive} title={collapsed ? title || (typeof children === "string" ? children : undefined) : title} onClick={() => setOpenMobile(false)} className={cn("group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[13px] font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2B719]", collapsed && "justify-center px-0", isActive ? "bg-[#FBEFC0] text-[#23221E] dark:bg-[#51451E] dark:text-[#FFF8E5]" : "text-[#777164] hover:bg-[#F7F7F5] hover:text-[#23221E] dark:text-[#B8B3A5] dark:hover:bg-[#2F2E29] dark:hover:text-white", className)} {...props}>{children}</a>;
 }
 function SidebarMenuBadge({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) {
   const { collapsed } = useSidebar();
   if (collapsed) return null;
-  return <span className={cn("ml-auto rounded-md bg-[#F7F4EC] px-2 py-0.5 text-[10px] font-semibold text-[#23221E] dark:bg-[#3A3932] dark:text-[#F5F2EA]", className)} {...props} />;
+  return <span className={cn("ml-auto rounded-md bg-[#F7F7F5] px-2 py-0.5 text-[10px] font-semibold text-[#23221E] dark:bg-[#3A3932] dark:text-[#F5F2EA]", className)} {...props} />;
 }
 function SidebarTrigger({ className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const { setOpenMobile, setCollapsed, isMobile, collapsed } = useSidebar();
-  return <button type="button" aria-label={isMobile ? "Open navigation" : collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => isMobile ? setOpenMobile(true) : setCollapsed(!collapsed)} className={cn("inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[#777164] transition-colors hover:bg-[#F7F4EC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2B719] dark:text-[#B8B3A5] dark:hover:bg-[#2F2E29]", className)} {...props} />;
+  return <button type="button" aria-label={isMobile ? "Open navigation" : collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => isMobile ? setOpenMobile(true) : setCollapsed(!collapsed)} className={cn("inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-[#777164] transition-colors hover:bg-[#F7F7F5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F2B719] dark:text-[#B8B3A5] dark:hover:bg-[#2F2E29]", className)} {...props} />;
 }
 
 export { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarMenuBadge, SidebarTrigger, useSidebar };
