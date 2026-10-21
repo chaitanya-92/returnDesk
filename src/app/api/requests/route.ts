@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body: unknown = await request.json();
-    const input = requestDraftSchema.parse(body);
+    const input = await requestDraftSchema.validate(body, { abortEarly: false, stripUnknown: true });
     const created = await createRequest(input);
     return apiSuccess(created, 201);
   } catch (error) {
