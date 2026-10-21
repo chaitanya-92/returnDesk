@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, Sun, WalletCards } from "lucide-react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { toggleTheme } from "@/lib/store/theme-slice";
@@ -20,10 +21,10 @@ function Brand() {
   const { collapsed, isMobile } = useSidebar();
   const compact = collapsed && !isMobile;
   return (
-    <a href="/" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
+    <Link href="/" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
       <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#F2B719] text-[#23221E]"><Command size={21} strokeWidth={2.2} /></span>
       {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#59523D] dark:text-[#B8B3A5]">Returns workspace</span></span>}
-    </a>
+    </Link>
   );
 }
 
