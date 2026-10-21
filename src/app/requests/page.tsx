@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Formik, Form, Field, ErrorMessage, type FormikHelpers } from "formik";
+import { Formik, Form, Field, ErrorMessage, useField, type FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { CheckCircle2, X, AlertCircle } from "lucide-react";
 import { Plus, RefreshCw, Search, ArrowUpRight, Inbox } from "lucide-react";
@@ -25,6 +25,18 @@ const requestSchema = Yup.object({
 });
 const statusStyle: Record<string, string> = { OPEN: "!border-sky-300 !bg-sky-100 !text-sky-950 dark:!border-sky-800 dark:!bg-sky-950/60 dark:!text-sky-100", IN_REVIEW: "!border-amber-300 !bg-amber-100 !text-amber-950 dark:!border-amber-800 dark:!bg-amber-950/60 dark:!text-amber-100", APPROVED: "!border-violet-300 !bg-violet-100 !text-violet-950 dark:!border-violet-800 dark:!bg-violet-950/60 dark:!text-violet-100", REJECTED: "!border-rose-300 !bg-rose-100 !text-rose-950 dark:!border-rose-800 dark:!bg-rose-950/60 dark:!text-rose-100", COMPLETED: "!border-emerald-300 !bg-emerald-100 !text-emerald-950 dark:!border-emerald-800 dark:!bg-emerald-950/60 dark:!text-emerald-100" };
 const pretty = (value: string) => value.replaceAll("_", " ").toLowerCase().replace(/^\\w/, (c) => c.toUpperCase());
+
+function ReasonSelect() {
+  const [field, meta, helpers] = useField<string>("reason");
+  const [open, setOpen] = useState(false);
+  return <div className="relative">
+    <button id="reason-menu-trigger" type="button" aria-haspopup="listbox" aria-expanded={open} onClick={() => setOpen(v => !v)} className="flex w-full items-center justify-between rounded-lg border border-[#DCDCD5] bg-white px-3 py-2.5 text-left text-sm font-normal text-[#23221E] shadow-sm hover:bg-[#FFFDF5] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/40">
+      <span>{pretty(field.value)}</span><span aria-hidden="true" className="text-[#59523D]">⌄</span>
+    </button>
+    {open && <><button type="button" aria-label="Close return reason menu" tabIndex={-1} onClick={() => setOpen(false)} className="fixed inset-0 z-40 cursor-default"></button><div role="listbox" aria-label="Return reason" className="absolute left-0 top-full z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5">{reasons.map(reason => <button key={reason} type="button" role="option" aria-selected={field.value === reason} onClick={() => { void helpers.setValue(reason); void helpers.setTouched(true); setOpen(false); }} className={"flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors " + (field.value === reason ? "bg-[#FFF0A6] text-[#23221E]" : "bg-white text-[#38362F] hover:bg-[#FFF9DC] hover:text-[#23221E]")}>{pretty(reason)}{field.value === reason && <span aria-hidden="true">✓</span>}</button>)}</div></>}
+    {meta.touched && meta.error && <span className="mt-1 block text-xs font-medium text-rose-600">{meta.error}</span>}
+  </div>;
+}
 
 export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
@@ -89,9 +101,9 @@ export default function RequestsPage() {
           <label className="space-y-1.5 text-xs font-medium">Quantity *<Field name="quantity" type="number" min="1" max="1000" className={field}/><ErrorMessage name="quantity" component="span" className="block text-xs font-medium text-rose-600"/></label>
           <label className="space-y-1.5 text-xs font-medium">Customer name *<Field name="customerName" placeholder="Full name" autoComplete="name" className={field}/><ErrorMessage name="customerName" component="span" className="block text-xs font-medium text-rose-600"/></label>
           <label className="space-y-1.5 text-xs font-medium">Customer email *<Field name="customerEmail" type="email" placeholder="customer@example.com" autoComplete="email" className={field}/><ErrorMessage name="customerEmail" component="span" className="block text-xs font-medium text-rose-600"/></label>
-          <label className="space-y-1.5 text-xs font-medium">Return reason *<Field as="select" name="reason" className={field}>{reasons.map(r => <option key={r} value={r}>{pretty(r)}</option>)}</Field><ErrorMessage name="reason" component="span" className="block text-xs font-medium text-rose-600"/></label>
+          <div className="space-y-1.5 text-xs font-medium"><label htmlFor="reason-menu-trigger" className="block">Return reason *</label><ReasonSelect /></div>
           <label className="space-y-1.5 text-xs font-medium sm:col-span-2 lg:col-span-3">Description *<Field as="textarea" name="description" placeholder="Describe the issue and any relevant details…" maxLength={2000} rows={3} className={field}/><ErrorMessage name="description" component="span" className="block text-xs font-medium text-rose-600"/></label>
-          <div className="flex justify-start gap-2 sm:col-span-2 lg:col-span-3"><button type="submit" disabled={saving || isSubmitting || !isValid || !dirty} className="rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] disabled:cursor-not-allowed disabled:opacity-60">{saving || isSubmitting ? "Creating…" : "Create request"}</button><button type="button" onClick={() => setShowCreate(false)} disabled={saving} className="rounded-lg border border-[#DCDCD5] bg-white px-4 py-2.5 text-sm text-[#23221E] hover:bg-[#F7F7F5] disabled:opacity-50">Cancel</button></div>
+          <div className="flex justify-end gap-2 sm:col-span-2 lg:col-span-3"><button type="submit" disabled={saving || isSubmitting || !isValid || !dirty} className="rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] disabled:cursor-not-allowed disabled:opacity-60">{saving || isSubmitting ? "Creating…" : "Create request"}</button><button type="button" onClick={() => setShowCreate(false)} disabled={saving} className="rounded-lg border border-[#DCDCD5] bg-white px-4 py-2.5 text-sm text-[#23221E] hover:bg-[#F7F7F5] disabled:opacity-50">Cancel</button></div>
         </Form>}
       </Formik>
     </section></div>}
