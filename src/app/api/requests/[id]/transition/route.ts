@@ -8,7 +8,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 export async function POST(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const input = transitionSchema.parse(await request.json());
+    const input = await transitionSchema.validate(await request.json(), { abortEarly: false, stripUnknown: true });
     return apiSuccess(await transitionRequest(id, input));
   } catch (error) {
     return apiError(error);
