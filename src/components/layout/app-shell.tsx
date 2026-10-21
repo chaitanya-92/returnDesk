@@ -64,15 +64,16 @@ function WorkspaceNavbar() {
       
       <div className="sm:hidden"><Brand /></div>
     </div>
-    <div className="flex items-center gap-2 justify-self-center sm:gap-3">
+    <div className="flex justify-self-center">
       <div className="relative hidden w-56 md:block lg:w-64"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#59523D] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#F2E097] bg-white pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
-      <div className="flex items-center gap-2 justify-self-end"><Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
+    </div>
+    <div className="flex items-center justify-self-end gap-2 sm:gap-3">
+      <Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
       <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /></Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild><Button variant="ghost" className="h-auto gap-2 rounded-lg p-1.5"><Avatar><AvatarFallback>OP</AvatarFallback></Avatar><span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Operations</span><span className="block text-[10px] text-[#59523D] dark:text-[#B8B3A5]">Administrator</span></span><ChevronDown size={14} className="hidden sm:block" /></Button></DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52"><DropdownMenuLabel>Operations account</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem><Bell size={15} /> Notification preferences</DropdownMenuItem></DropdownMenuContent>
-      </DropdownMenu></div>
-    </div>
+      </DropdownMenu>
   </header>;
 }
 
