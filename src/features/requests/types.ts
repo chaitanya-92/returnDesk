@@ -5,7 +5,7 @@ export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export type ResolutionType = (typeof RESOLUTION_TYPES)[number];
 
 export type RequestResolution = {
-  resolution: ResolutionType;
+  resolution: ResolutionType | undefined;
   refundAmount: number | null;
 };
 
