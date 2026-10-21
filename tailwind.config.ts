@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import forms from "@tailwindcss/forms";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
@@ -14,7 +15,7 @@ const config: Config = {
       boxShadow: { panel: "0 8px 30px rgba(20, 45, 32, 0.06)" },
     },
   },
-  plugins: [require("@tailwindcss/forms")],
+  plugins: [forms],
 };
 
 export default config;
