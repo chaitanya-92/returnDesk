@@ -1,4 +1,5 @@
 import { Prisma, RequestEventType, RequestStatus } from "@prisma/client";
+import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/prisma";
 import { AppError } from "@/lib/http";
 import { ACTIVE_STATUSES, ALLOWED_TRANSITIONS, type RequestDetailsUpdate, type RequestDraft, type RequestResolution } from "./types";
@@ -8,7 +9,7 @@ const liveFilter = { archivedAt: null } as const;
 
 function nextReference() {
   const day = new Date().toISOString().slice(0, 10).replaceAll("-", "");
-  const suffix = Math.random().toString(36).slice(2, 7).toUpperCase();
+  const suffix = randomUUID().replaceAll("-", "").slice(0, 8).toUpperCase();
   return `RT-${day}-${suffix}`;
 }
 
@@ -77,9 +78,9 @@ export async function updateRequestDetails(id: string, input: RequestDetailsUpda
   }
 
   return prisma.$transaction(async (tx) => {
-    const updated = await tx.returnRequest.update({ where: { id }, data: input, include: { notes: true, events: true } });
+    await tx.returnRequest.update({ where: { id }, data: input });
     await tx.requestEvent.create({ data: { requestId: id, type: RequestEventType.DETAILS_UPDATED, message: "Request details updated." } });
-    return updated;
+    return tx.returnRequest.findUniqueOrThrow({ where: { id }, include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } } });
   });
 }
 
@@ -88,7 +89,7 @@ export async function transitionRequest(id: string, input: RequestTransitionInpu
     const existing = await tx.returnRequest.findFirst({ where: { id, ...liveFilter } });
     if (!existing) throw new AppError("Return request not found.", 404, "REQUEST_NOT_FOUND");
 
-    if (!ALLOWED_TRANSITIONS[existing.status as keyof typeof ALLOWED_TRANSITIONS].includes(input.status)) {
+    if (!(ALLOWED_TRANSITIONS[existing.status as keyof typeof ALLOWED_TRANSITIONS] as RequestStatus[]).includes(input.status as RequestStatus)) {
       throw new AppError(`Transition from ${existing.status.replaceAll("_", " ")} to ${input.status.replaceAll("_", " ")} is not allowed.`, 409, "INVALID_STATUS_TRANSITION");
     }
 
@@ -102,7 +103,7 @@ export async function transitionRequest(id: string, input: RequestTransitionInpu
       updateData.resolution = resolutionInput.resolution;
       updateData.refundAmount = resolutionInput.refundAmount == null ? null : new Prisma.Decimal(resolutionInput.refundAmount);
     }
-    const updated = await tx.returnRequest.update({ where: { id }, data: updateData, include: { notes: true, events: true } });
+    await tx.returnRequest.update({ where: { id }, data: updateData });
     await tx.requestEvent.create({
       data: { requestId: id, type: RequestEventType.STATUS_CHANGED, fromStatus: existing.status, toStatus: input.status, message: `Status changed from ${existing.status} to ${input.status}.` },
     });
@@ -111,7 +112,7 @@ export async function transitionRequest(id: string, input: RequestTransitionInpu
       await tx.requestNote.create({ data: { requestId: id, body: input.note.trim(), author: "Operations team" } });
       await tx.requestEvent.create({ data: { requestId: id, type: RequestEventType.NOTE_ADDED, message: "A note was added during status change." } });
     }
-    return updated;
+    return tx.returnRequest.findUniqueOrThrow({ where: { id }, include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } });
   });
 }
 

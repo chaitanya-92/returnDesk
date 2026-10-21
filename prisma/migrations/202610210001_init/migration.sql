@@ -64,3 +64,6 @@ ALTER TABLE "RequestNote" ADD CONSTRAINT "RequestNote_requestId_fkey"
 FOREIGN KEY ("requestId") REFERENCES "ReturnRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "RequestEvent" ADD CONSTRAINT "RequestEvent_requestId_fkey"
 FOREIGN KEY ("requestId") REFERENCES "ReturnRequest"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+ALTER TABLE "ReturnRequest" ADD CONSTRAINT "ReturnRequest_approved_requires_resolution"
+CHECK ("status" <> 'APPROVED' OR "resolution" IS NOT NULL);

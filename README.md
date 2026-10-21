@@ -13,7 +13,7 @@ A returns and replacements management system built for the Frido full-stack asse
 
 - Next.js App Router, React, TypeScript, Tailwind CSS
 - PostgreSQL and Prisma ORM
-- Zod for request validation
+- Yup for request validation
 - Vitest for focused unit/integration tests
 
 ## Business rules
@@ -34,8 +34,8 @@ Requirements: Node.js 20.9 or newer and a PostgreSQL database.
 npm install
 cp .env.example .env
 # Set DATABASE_URL in .env
-npx prisma migrate dev
-npx prisma db seed
+npx prisma migrate deploy
+npm run db:seed
 npm run dev
 ```
 
@@ -54,4 +54,4 @@ Run these checks locally before treating the repository as ready for submission.
 
 ## Assessment status
 
-The repository is being implemented in milestones. Each milestone should be reviewed and run locally before proceeding. Do not treat a GitHub file write as proof that the app compiles or tests pass.
+Backend milestone: the API routes, Yup validation, lifecycle service, PostgreSQL schema/migration, seed script, health check, and focused validation tests are in place. The repository has not been run in a local Node.js environment from this session; run the quality checks above and fix any reported issues before submission.
