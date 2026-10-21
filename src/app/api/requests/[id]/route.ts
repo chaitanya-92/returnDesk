@@ -17,7 +17,7 @@ export async function GET(_request: NextRequest, context: RouteContext) {
 export async function PATCH(request: NextRequest, context: RouteContext) {
   try {
     const { id } = await context.params;
-    const input = requestDetailsUpdateSchema.parse(await request.json());
+    const input = await requestDetailsUpdateSchema.validate(await request.json(), { abortEarly: false, stripUnknown: true });
     return apiSuccess(await updateRequestDetails(id, input));
   } catch (error) {
     return apiError(error);
