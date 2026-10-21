@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, ShieldCheck, Sun } from "lucide-react";
+import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, Sun } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { toggleTheme } from "@/lib/store/theme-slice";
@@ -13,7 +13,6 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel
 const navigation = [
   { label: "Overview", href: "/", icon: LayoutDashboard },
   { label: "Return requests", href: "/requests", icon: PackageCheck },
-  { label: "Workflow", href: "/workflow", icon: ShieldCheck },
 ];
 
 function Brand() {
