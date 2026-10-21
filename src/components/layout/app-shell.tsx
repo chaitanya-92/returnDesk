@@ -11,7 +11,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel
 
 const navigation = [
   { label: "Overview", href: "#overview", icon: LayoutDashboard },
-  { label: "Return requests", href: "#requests", icon: PackageCheck, count: "30+" },
+  { label: "Return requests", href: "#requests", icon: PackageCheck },
   { label: "Workflow", href: "#workflow", icon: ShieldCheck },
 ];
 
@@ -19,8 +19,8 @@ function Brand() {
   const { collapsed, isMobile } = useSidebar();
   const compact = collapsed && !isMobile;
   return <a href="#overview" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
-    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#EABF24] text-[#202735]"><Command size={21} strokeWidth={2.4} /></span>
-    {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#687180] dark:text-[#B8C0CC]">Returns workspace</span></span>}
+    <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#F2B719] text-[#23221E]"><Command size={21} strokeWidth={2.2} /></span>
+    {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#777164] dark:text-[#B8B3A5]">Returns workspace</span></span>}
   </a>;
 }
 
@@ -33,12 +33,11 @@ function WorkspaceSidebar() {
       <SidebarGroup>
         <SidebarGroupLabel>Workspace</SidebarGroupLabel>
         <SidebarMenu>
-          {navigation.map(({ label, href, icon: Icon, count }, index) => (
+          {navigation.map(({ label, href, icon: Icon }, index) => (
             <SidebarMenuItem key={label}>
               <SidebarMenuButton href={href} isActive={index === 0} title={label}>
                 <Icon size={18} strokeWidth={1.8} />
                 {!compact && <span className="flex-1">{label}</span>}
-                {count && !compact && <SidebarMenuBadge>{count}</SidebarMenuBadge>}
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
@@ -46,9 +45,9 @@ function WorkspaceSidebar() {
       </SidebarGroup>
     </SidebarContent>
     {!compact && <SidebarFooter>
-      <div className="rounded-2xl bg-[#F4F5F7] p-4 dark:bg-[#232A37]">
-        <div className="flex items-center gap-2 text-xs font-semibold"><span className="size-2 rounded-full bg-[#EABF24]" /> System status</div>
-        <p className="mt-2 text-xs leading-5 text-[#687180] dark:text-[#B8C0CC]">Review requests and keep every resolution on track.</p>
+      <div className="rounded-xl border border-[#E7E2D6] bg-[#F7F4EC] p-4 dark:border-[#434037] dark:bg-[#2F2E29]">
+        <div className="flex items-center gap-2 text-xs font-semibold"><span className="size-2 rounded-full bg-[#F2B719]" /> Operations workspace</div>
+        <p className="mt-2 text-xs leading-5 text-[#777164] dark:text-[#B8B3A5]">Review requests and keep resolutions moving.</p>
       </div>
     </SidebarFooter>}
   </Sidebar>;
@@ -58,19 +57,19 @@ function WorkspaceNavbar() {
   const dispatch = useAppDispatch();
   const dark = useAppSelector((state) => state.theme.mode === "dark");
   const { collapsed, isMobile, setCollapsed } = useSidebar();
-  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between bg-white px-4 text-[#202735] dark:bg-[#171C26] dark:text-[#F3F5F8] sm:px-6 lg:px-8">
+  return <header className="sticky top-0 z-30 flex h-[76px] items-center justify-between border-b border-[#E7E2D6]/70 bg-[#FFFEFB]/95 px-4 text-[#23221E] backdrop-blur-md dark:border-[#434037]/70 dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
     <div className="flex min-w-0 items-center gap-3">
       {!isMobile && <Button variant="ghost" size="icon" aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"} onClick={() => setCollapsed(!collapsed)}><PanelLeft size={18} /></Button>}
       {isMobile && <SidebarTrigger><Menu size={18} /></SidebarTrigger>}
-      <div className="hidden items-center gap-2 text-xs text-[#687180] dark:text-[#B8C0CC] sm:flex"><span>Workspace</span><span>/</span><span className="font-semibold text-[#202735] dark:text-[#F3F5F8]">Overview</span></div>
+      <div className="hidden items-center gap-2 text-xs text-[#777164] dark:text-[#B8B3A5] sm:flex"><span>Workspace</span><span className="text-[#C5BFAF]">/</span><span className="font-semibold text-[#23221E] dark:text-[#F5F2EA]">Overview</span></div>
       <div className="sm:hidden"><Brand /></div>
     </div>
     <div className="flex items-center gap-2 sm:gap-3">
-      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#687180]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#DEE2E8] bg-[#F4F5F7] pl-9 pr-3 text-xs shadow-none dark:border-[#394252] dark:bg-[#232A37]" /></div>
+      <div className="relative hidden w-56 md:block"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#777164] dark:text-[#B8B3A5]" /><Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#E7E2D6] bg-[#F7F4EC] pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" /></div>
       <Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
-      <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /><span className="absolute right-2 top-2 size-1.5 rounded-full bg-[#EABF24]" /></Button>
+      <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /></Button>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-auto gap-2 rounded-xl p-1.5"><Avatar><AvatarFallback>OP</AvatarFallback></Avatar><span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Operations</span><span className="block text-[10px] text-[#687180] dark:text-[#B8C0CC]">Administrator</span></span><ChevronDown size={14} className="hidden sm:block" /></Button></DropdownMenuTrigger>
+        <DropdownMenuTrigger asChild><Button variant="ghost" className="h-auto gap-2 rounded-lg p-1.5"><Avatar><AvatarFallback>OP</AvatarFallback></Avatar><span className="hidden text-left sm:block"><span className="block text-xs font-semibold">Operations</span><span className="block text-[10px] text-[#777164] dark:text-[#B8B3A5]">Administrator</span></span><ChevronDown size={14} className="hidden sm:block" /></Button></DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-52"><DropdownMenuLabel>Operations account</DropdownMenuLabel><DropdownMenuSeparator /><DropdownMenuItem><Bell size={15} /> Notification preferences</DropdownMenuItem></DropdownMenuContent>
       </DropdownMenu>
     </div>
