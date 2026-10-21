@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { Plus, RefreshCw, Search, ArrowUpRight, Inbox } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -38,7 +38,7 @@ export default function RequestsPage() {
   async function createRequest(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setSaving(true); setError(""); setNotice("");
     const form = new FormData(event.currentTarget);
-    const body = Object.fromEntries(form.entries());
+    const body: Record<string, FormDataEntryValue | number> = Object.fromEntries(form.entries());
     body.quantity = Number(body.quantity);
     try {
       const response = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
