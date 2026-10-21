@@ -14,6 +14,10 @@ function nextReference() {
 }
 
 function validateResolution(input: RequestResolution) {
+  if (!input.resolution) {
+    throw new AppError("A resolution is required for approval.", 400, "RESOLUTION_REQUIRED");
+  }
+
   if (input.resolution === "REFUND") {
     if (input.refundAmount == null || !Number.isFinite(input.refundAmount) || input.refundAmount <= 0) {
       throw new AppError("A refund requires a positive refund amount.", 400, "REFUND_AMOUNT_REQUIRED");
