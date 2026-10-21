@@ -8,6 +8,7 @@ import { AppShell } from "@/components/layout/app-shell";
 type RequestRow = { id: string; reference: string; orderNumber: string; itemName: string; customerName: string; customerEmail: string; reason: string; status: string; createdAt: string; quantity?: number };
 const statuses = ["ALL", "OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
 const reasons = ["DAMAGED", "WRONG_ITEM", "WRONG_SIZE", "NOT_AS_DESCRIBED", "CHANGED_MIND", "MISSING_PARTS", "OTHER"];
+const statusStyle: Record<string, string> = { OPEN: "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-200", IN_REVIEW: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-200", APPROVED: "border-violet-200 bg-violet-50 text-violet-800 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-200", REJECTED: "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-200", COMPLETED: "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-200" };
 const pretty = (value: string) => value.replaceAll("_", " ").toLowerCase().replace(/^\\w/, (c) => c.toUpperCase());
 
 export default function RequestsPage() {
