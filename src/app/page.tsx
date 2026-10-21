@@ -36,7 +36,7 @@ export default function HomePage() {
       .then((payload) => {
         if (!active) return;
         const requests = Array.isArray(payload) ? payload : payload.data ?? payload.requests ?? [];
-        const rows: RequestRow[] = requests.map((request: Record<string, unknown>) => ({
+        const allRows: RequestRow[] = requests.map((request: Record<string, unknown>) => ({
           reference: String(request.reference ?? request.id ?? "—"),
           customer: String(request.customerName ?? request.customer ?? "Unknown customer"),
           item: String(request.itemName ?? request.item ?? "—"),
@@ -44,14 +44,14 @@ export default function HomePage() {
           status: String(request.status ?? "OPEN") as RequestStatus,
           date: request.createdAt ? new Date(String(request.createdAt)).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—",
         }));
-        const counts = { total: rows.length, open: 0, inReview: 0, approved: 0, completed: 0 };
-        rows.forEach((row) => {
+        const counts = { total: allRows.length, open: 0, inReview: 0, approved: 0, completed: 0 };
+        allRows.forEach((row) => {
           if (row.status === "OPEN") counts.open++;
           if (row.status === "IN_REVIEW") counts.inReview++;
           if (row.status === "APPROVED") counts.approved++;
           if (row.status === "COMPLETED") counts.completed++;
         });
-        setData({ ...counts, recent: rows });
+        setData({ ...counts, recent: allRows.slice(0, 5) });
       })
       .catch(() => { if (active) setLoadError(true); });
     return () => { active = false; };
