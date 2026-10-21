@@ -67,3 +67,8 @@ html:not(.dark) main select,
 html:not(.dark) main textarea { background-color: #FFFFFF; color: #23221E; border-color: #DCDCD5; }
 html:not(.dark) main table thead tr { background: #FFF9DC; color: #5B4A10; }
 html:not(.dark) main a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+/* Keep native form controls and their option menus readable in light mode, even when the OS is dark. */
+html:not(.dark) select,
+html:not(.dark) select option { color-scheme: light; background-color: #FFFFFF; color: #23221E; }
+html:not(.dark) select option:checked { background-color: #FFF0A6; color: #23221E; }
