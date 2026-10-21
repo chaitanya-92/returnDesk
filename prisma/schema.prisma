@@ -41,7 +41,7 @@ model ReturnRequest {
   customerEmail    String
   reason           String
   description      String
-  status           RequestStatus  @default(OPEN)
+  status           RequestStatus   @default(OPEN)
   resolution       ResolutionType?
   refundAmount     Decimal?        @db.Decimal(10, 2)
   archivedAt       DateTime?
