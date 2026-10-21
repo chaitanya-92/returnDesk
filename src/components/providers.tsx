@@ -25,11 +25,11 @@ function ThemeBridge({ children }: { children: React.ReactNode }) {
   }, [dispatch]);
 
   useEffect(() => {
+    if (!hydrated) return;
     const root = document.documentElement;
     root.classList.toggle("dark", mode === "dark");
     root.dataset.theme = mode;
     root.style.colorScheme = mode;
-    if (!hydrated) return;
     try {
       window.localStorage.setItem("returndesk-theme", mode);
     } catch {
