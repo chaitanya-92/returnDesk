@@ -7,7 +7,6 @@ import { RequestCreateForm } from "@/features/requests/components/request-create
 import { EMPTY_REQUEST_DRAFT } from "@/features/requests/request-form-data";
 
 type RequestPageHeaderProps = {
-  loading: boolean;
   error: string;
   toast: { type: "success" | "error"; message: string } | null;
   setToast: (value: { type: "success" | "error"; message: string } | null) => void;
@@ -20,7 +19,6 @@ type RequestPageHeaderProps = {
 };
 
 export function RequestPageHeader({
-  loading,
   error,
   toast,
   setToast,
