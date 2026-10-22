@@ -21,7 +21,6 @@ export function RefundConfirmationDialog({
 
   const formatCurrency = formatCurrencyINR;
   const confirmRefund = refund;
-  const processed = onConfirm;
   return (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
