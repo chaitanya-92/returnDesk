@@ -177,9 +177,9 @@ export async function updateRequestDetails(
   });
   if (!existing)
     throw new AppError("Return request not found.", 404, "REQUEST_NOT_FOUND");
-  if (["APPROVED", "REJECTED", "COMPLETED"].includes(existing.status)) {
+  if (["APPROVED", "PROCESSING", "REJECTED", "COMPLETED"].includes(existing.status)) {
     throw new AppError(
-      "Request details cannot be edited after approval, rejection, or completion.",
+      "Request details cannot be edited after approval, during fulfilment, after rejection, or after completion.",
       409,
       "REQUEST_DETAILS_LOCKED",
     );
