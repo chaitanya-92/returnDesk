@@ -35,6 +35,8 @@ export default function RequestDetailsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("Returning to requests…");
   const [note, setNote] = useState("");
   const [toast, setToast] = useState("");
   const [resolution, setResolution] = useState<"REFUND" | "REPLACEMENT" | "STORE_CREDIT">("REFUND");
@@ -66,6 +68,13 @@ export default function RequestDetailsPage() {
   useEffect(() => {
     void load();
   }, [load]);
+  async function returnToRequestsAfterToast(message: string) {
+    setRedirectMessage(message);
+    setRedirecting(true);
+    await new Promise((resolve) => window.setTimeout(resolve, 1600));
+    router.push(returnToRequests());
+  }
+
   async function transition(
     status: "IN_REVIEW" | "APPROVED" | "PROCESSING" | "REJECTED" | "COMPLETED",
   ) {
@@ -94,8 +103,8 @@ export default function RequestDetailsPage() {
       }
 
       if (status === "APPROVED") {
-        showToast("Request approved", "success", "Start fulfilment when ready.");
-        await load();
+        showToast("Request approved", "success", "Opening the requests table…");
+        await returnToRequestsAfterToast("Approved successfully. Returning to requests…");
         return;
       }
 
@@ -106,8 +115,8 @@ export default function RequestDetailsPage() {
       }
 
       if (status === "REJECTED") {
-        showToast("Request rejected", "error", "The request was returned to the Return Requests table.");
-        router.push(returnToRequests());
+        showToast("Request rejected", "success", "Returning to the requests table…");
+        await returnToRequestsAfterToast("Request rejected. Returning to requests…");
         return;
       }
 
@@ -164,6 +173,12 @@ export default function RequestDetailsPage() {
     return (
       <AppShell>
         <div className="relative min-w-0 space-y-5 pb-8">
+          {redirecting && <div role="status" aria-live="polite" className="fixed inset-0 z-[120] flex items-center justify-center bg-black/25 p-4 backdrop-blur-[2px]">
+            <div className="flex w-full max-w-sm items-center gap-4 rounded-2xl border border-[rgb(var(--border))] bg-white p-5 shadow-xl dark:bg-[rgb(var(--card))]">
+              <span className="h-9 w-9 shrink-0 animate-spin rounded-full border-4 border-[#F2B719]/25 border-t-[#B8872C]" />
+              <div><p className="font-semibold text-[rgb(var(--foreground))]">{redirectMessage}</p><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Please wait while we return you to the correct table view.</p></div>
+            </div>
+          </div>}
           <button onClick={() => router.push(returnToRequests())} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
           <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
