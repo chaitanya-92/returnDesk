@@ -1,7 +1,7 @@
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 export type RefundStatus = "ALL" | "APPROVED" | "COMPLETED";
-export type RefundSortField = "customerName" | "refundAmount" | "updatedAt";
+export type RefundSortField = "customerName" | "refundAmount" | "updatedAt" | "createdAt" | "reference";
 export type SortOrder = "asc" | "desc";
 
 export type RefundRequest = Pick<
@@ -16,6 +16,7 @@ export type RefundRequest = Pick<
   | "resolution"
   | "refundAmount"
   | "updatedAt"
+  | "createdAt"
 >;
 
 export type RefundSummary = {
@@ -48,6 +49,10 @@ function compareRefunds(
       return Number(left.refundAmount ?? 0) - Number(right.refundAmount ?? 0);
     case "updatedAt":
       return new Date(left.updatedAt).getTime() - new Date(right.updatedAt).getTime();
+    case "createdAt":
+      return new Date(left.createdAt).getTime() - new Date(right.createdAt).getTime();
+    case "reference":
+      return left.reference.localeCompare(right.reference, undefined, { sensitivity: "base" });
   }
 }
 
