@@ -349,5 +349,6 @@ export function RequestTableSection({
               </DataTableBody>
             </DataTable>
           </DataTableContainer>
+        </section>
   );
 }
