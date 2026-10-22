@@ -9,7 +9,23 @@ import {
   useField,
   type FormikHelpers,
 } from "formik";
-import {\n  AlertCircle,\n  ArrowDown,\n  ArrowUp,\n  ArrowUpDown,\n  ArrowUpRight,\n  CheckCircle2,\n  Eye,\n  Filter,\n  Inbox,\n  MoreHorizontal,\n  Plus,\n  RefreshCw,\n  Search,\n  WalletCards,\n  X,\n} from "lucide-react";
+import {
+  AlertCircle,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ArrowUpRight,
+  CheckCircle2,
+  Eye,
+  Filter,
+  Inbox,
+  MoreHorizontal,
+  Plus,
+  RefreshCw,
+  Search,
+  WalletCards,
+  X,
+} from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
 import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
@@ -27,7 +43,10 @@ type RequestRow = Pick<
   "customerEmail" | "reason" | "status" | "createdAt" | "quantity"
 >;
 const statuses: RequestStatusFilter[] = ["ALL", ...REQUEST_STATUSES];
-const reasons = REQUEST_REASONS.map((reason) => ({\n  value: reason,\n  label: formatRequestStatus(reason),\n}));
+const reasons = REQUEST_REASONS.map((reason) => ({
+  value: reason,
+  label: formatRequestStatus(reason),
+}));
 
 const initialDraft: RequestDraft = {
   orderNumber: "",
@@ -76,7 +95,7 @@ function ReasonSelect() {
           >
             {reasons.map(({ value, label }) => (
               <button
-                key={reason}
+                key={value}
                 type="button"
                 role="option"
                 aria-selected={field.value === value}
