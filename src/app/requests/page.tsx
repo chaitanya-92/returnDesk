@@ -176,13 +176,7 @@ export default function RequestsPage() {
           query={query}
           status={status}
           actionMenuId={actionMenuId}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
-          setSortBy={setSortBy}
-          setSortOrder={setSortOrder}
           setStatusMenuOpen={setStatusMenuOpen}
-          setStatus={setStatus}
-          setPage={setPage}
           setActionMenuId={setActionMenuId}
         />
         <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
