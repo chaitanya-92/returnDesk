@@ -131,7 +131,7 @@ export async function createRequest(input: RequestDraft) {
         orderNumber: input.orderNumber,
         orderItemId: input.orderItemId,
         archivedAt: null,
-        status: { in: ACTIVE_STATUSES },
+        status: { in: [...ACTIVE_STATUSES] },
       },
       select: { id: true },
     });
