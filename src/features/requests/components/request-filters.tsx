@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Search, SlidersHorizontal, ChevronDown, X, ArrowDownWideNarrow } from "lucide-react";
 import { REQUEST_REASON_OPTIONS, REQUEST_STATUS_FILTER_OPTIONS } from "@/features/requests/request-form-data";
 import type { RequestStatusFilter } from "@/features/requests/types";
@@ -18,13 +18,32 @@ type Props = {
 export function RequestFilters(props: Props) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
+  const dropdownsRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!filterOpen && !sortOpen) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.target instanceof Node && !dropdownsRef.current?.contains(event.target)) {
+        setFilterOpen(false);
+        setSortOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") { setFilterOpen(false); setSortOpen(false); }
+    };
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [filterOpen, sortOpen]);
   const field = "min-h-10 rounded-lg border border-[rgb(var(--border))] bg-white px-3 py-2 text-sm text-[#23221E] outline-none focus:border-[#D7A400] focus:ring-2 focus:ring-[#F2B719]/20";
   const activeCount = props.statuses.length + props.reasons.length + Number(Boolean(props.createdDate));
   const clear = () => { props.onQueryChange(""); props.onStatusesChange([]); props.onReasonsChange([]); props.onCreatedDateChange(""); };
   const toggle = <T extends string>(values: T[], value: T, change: (next: T[]) => void) =>
     change(values.includes(value) ? values.filter((item) => item !== value) : [...values, value]);
   return <div className="rounded-xl border border-[rgb(var(--border))] bg-white p-3">
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+    <div ref={dropdownsRef} className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative min-w-0 flex-1">
         <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
         <input value={props.query} onChange={(e) => props.onQueryChange(e.target.value)} placeholder="Search reference, customer, order, item…" aria-label="Search requests" className={field + " w-full pl-9"}/>
