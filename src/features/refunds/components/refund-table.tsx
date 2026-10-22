@@ -6,7 +6,7 @@ import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableH
 import { Pagination } from "@/components/requests/pagination";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { formatCurrencyINR, formatDate } from "@/features/requests/presentation";
-import type { RefundRequest, RefundSortField, RefundStatus, SortOrder } from "@/features/refunds/refund-utils";
+import type { RefundRequest, RefundSortField, RefundStatus } from "@/features/refunds/refund-utils";
 
 type RefundTableProps = {
   shown: RefundRequest[];
@@ -17,8 +17,6 @@ type RefundTableProps = {
   setStatusFilter: (status: RefundStatus) => void;
   filterMenuOpen: boolean;
   setFilterMenuOpen: (open: boolean | ((current: boolean) => boolean)) => void;
-  sortBy: RefundSortField;
-  sortOrder: SortOrder;
   handleSort: (field: RefundSortField) => void;
   sortIndicator: (field: RefundSortField) => React.ReactNode;
   actionMenuId: string | null;
@@ -35,7 +33,7 @@ const formatCurrency = formatCurrencyINR;
 
 export function RefundTable({
   shown, filtered, loading, query, statusFilter, setStatusFilter,
-  filterMenuOpen, setFilterMenuOpen, sortBy, sortOrder, handleSort,
+  filterMenuOpen, setFilterMenuOpen, handleSort,
   sortIndicator, actionMenuId, setActionMenuId, busyId, setConfirmRefund,
   page, pageCount, onPageChange,
 }: RefundTableProps) {
