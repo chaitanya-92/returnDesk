@@ -72,13 +72,11 @@ export default function RequestDetailsPage() {
   useEffect(() => {
     if (!item || item.status !== "OPEN" || autoReviewAttempted.current === id) return;
     autoReviewAttempted.current = id;
-    let cancelled = false;
     async function startReviewOnOpen() {
       setBusy(true);
       setError("");
       try {
         await requestsApi.transition(id, { status: "IN_REVIEW" });
-        if (cancelled) return;
         showToast("Request moved to In Review", "success");
         await load();
       } catch (cause) {
@@ -87,11 +85,10 @@ export default function RequestDetailsPage() {
         setError(message);
         showToast(message, "error");
       } finally {
-        if (!cancelled) setBusy(false);
+        setBusy(false);
       }
     }
     void startReviewOnOpen();
-    return () => { cancelled = true; };
   }, [item, id, load]);
 
   async function returnToRequestsAfterToast(message: string) {
