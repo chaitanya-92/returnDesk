@@ -1,13 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  Formik,
-  Form,
-  Field,
-  ErrorMessage,
-  type FormikHelpers,
-} from "formik";
+import type { FormikHelpers } from "formik";
 import {
   AlertCircle,
   ArrowDown,
@@ -36,13 +30,12 @@ import {
   DataTableHeader,
   DataTableRow,
 } from "@/components/ui/data-table";
-import { requestDraftSchema } from "@/features/requests/schemas";
 import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
-import { ReasonSelect } from "@/features/requests/components/reason-select";
+import { RequestCreateForm } from "@/features/requests/components/request-create-form";
 import type { RequestDraft } from "@/features/requests/types";
 import {
   EMPTY_REQUEST_DRAFT as initialDraft,
@@ -284,160 +277,13 @@ export default function RequestsPage() {
                   <X size={18} />
                 </button>
               </div>
-              <Formik<RequestDraft>
+              <RequestCreateForm
                 initialValues={initialDraft}
-                validationSchema={requestDraftSchema}
+                fieldClassName={field}
+                saving={saving}
+                onCancel={() => setShowCreate(false)}
                 onSubmit={createRequest}
-              >
-                {({ isSubmitting, isValid, dirty }) => (
-                  <Form
-                    className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3"
-                    noValidate
-                  >
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Order number *
-                      <Field
-                        name="orderNumber"
-                        placeholder="e.g. ORD-52001"
-                        autoComplete="off"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="orderNumber"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Order item ID *
-                      <Field
-                        name="orderItemId"
-                        placeholder="e.g. ORD-52001-01"
-                        autoComplete="off"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="orderItemId"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Item name *
-                      <Field
-                        name="itemName"
-                        placeholder="e.g. Everyday Bottle 750 ml"
-                        autoComplete="off"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="itemName"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Item SKU *
-                      <Field
-                        name="itemSku"
-                        placeholder="e.g. BOT-750-BLK"
-                        autoComplete="off"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="itemSku"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Quantity *
-                      <Field
-                        name="quantity"
-                        type="number"
-                        min="1"
-                        max="1000"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="quantity"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Customer name *
-                      <Field
-                        name="customerName"
-                        placeholder="Full name"
-                        autoComplete="name"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="customerName"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <label className="space-y-1.5 text-xs font-medium">
-                      Customer email *
-                      <Field
-                        name="customerEmail"
-                        type="email"
-                        placeholder="customer@example.com"
-                        autoComplete="email"
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="customerEmail"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <div className="space-y-1.5 text-xs font-medium">
-                      <label htmlFor="reason-menu-trigger" className="block">
-                        Return reason *
-                      </label>
-                      <ReasonSelect />
-                    </div>
-                    <label className="space-y-1.5 text-xs font-medium sm:col-span-2 lg:col-span-3">
-                      Description *
-                      <Field
-                        as="textarea"
-                        name="description"
-                        placeholder="Describe the issue and any relevant details…"
-                        maxLength={2000}
-                        rows={3}
-                        className={field}
-                      />
-                      <ErrorMessage
-                        name="description"
-                        component="span"
-                        className="block text-xs font-medium text-rose-600"
-                      />
-                    </label>
-                    <div className="flex justify-end gap-2 sm:col-span-2 lg:col-span-3">
-                      <button
-                        type="submit"
-                        disabled={saving || isSubmitting || !isValid || !dirty}
-                        className="rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {saving || isSubmitting
-                          ? "Creating…"
-                          : "Create request"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setShowCreate(false)}
-                        disabled={saving}
-                        className="rounded-lg border border-[#DCDCD5] bg-white px-4 py-2.5 text-sm text-[#23221E] hover:bg-[#F7F7F5] disabled:opacity-50"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
+              />
             </section>
           </div>
         )}
