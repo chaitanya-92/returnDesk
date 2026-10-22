@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, type RefundRequest } from "./refund-utils";
-const refund = (overrides: Partial<RefundRequest> = {}): RefundRequest => ({ id:"1", reference:"RT-20261022-ABC12345", orderNumber:"ORD-1", itemName:"Bottle", customerName:"Avery", customerEmail:"avery@example.com", status:"APPROVED", resolution:"REFUND", refundAmount:125, updatedAt:"2026-10-22T10:00:00.000Z", ...overrides });
+const refund = (overrides: Partial<RefundRequest> = {}): RefundRequest => ({ id:"1", reference:"RT-20261022-ABC12345", orderNumber:"ORD-1", itemName:"Bottle", orderItemId:"ITEM-1", itemSku:"BOT-1", quantity:1, reason:"DAMAGED", description:"Bottle damaged", customerName:"Avery", customerEmail:"avery@example.com", createdAt:"2026-10-21T10:00:00.000Z", status:"APPROVED", resolution:"REFUND", refundAmount:125, updatedAt:"2026-10-22T10:00:00.000Z", ...overrides });
 describe("refund utilities", () => {
  it("selects refund resolutions that are approved or completed", () => expect(selectRefundRequests([refund(),refund({id:"2",status:"COMPLETED"}),refund({id:"3",resolution:"REPLACEMENT"}),refund({id:"4",status:"REJECTED"})]).map(x=>x.id)).toEqual(["1","2"]));
  it("filters without mutating the source list", () => { const input=[refund(),refund({id:"2",status:"COMPLETED"})]; expect(filterAndSortRefunds(input,"COMPLETED","updatedAt","desc").map(x=>x.id)).toEqual(["2"]); expect(input).toHaveLength(2); });
