@@ -101,7 +101,7 @@ export default function RefundsPage() {
     }
   };
 
-  const filtered = useMemo(() => filterAndSortRefunds(rows, statusFilter, sortBy, sortOrder), [rows, statusFilter, sortBy, sortOrder]);
+  const filtered = useMemo(() => filterAndSortRefunds(rows, statusFilter, sortBy, sortOrder).filter((refund) => { const amount = Number(refund.refundAmount ?? 0); const date = new Date(refund.updatedAt).getTime(); return (!financialStatuses.length || financialStatuses.includes(refund.status as OperationsStatus)) && (!fromDate || date >= new Date(fromDate + "T00:00:00").getTime()) && (!toDate || date <= new Date(toDate + "T23:59:59").getTime()) && (!amountMin || amount >= Number(amountMin)) && (!amountMax || amount <= Number(amountMax)); }), [rows, statusFilter, sortBy, sortOrder, financialStatuses, fromDate, toDate, amountMin, amountMax]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
