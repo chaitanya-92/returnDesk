@@ -36,15 +36,7 @@ export function RequestTableSection({
   error,
   query,
   status,
-  statusMenuOpen,
   actionMenuId,
-  sortBy,
-  sortOrder,
-  setSortBy,
-  setSortOrder,
-  setStatusMenuOpen,
-  setStatus,
-  setPage,
   setActionMenuId,
 }: RequestTableSectionProps) {
   return (
