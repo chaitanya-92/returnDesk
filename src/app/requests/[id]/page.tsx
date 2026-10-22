@@ -98,7 +98,7 @@ export default function RequestDetailsPage() {
   }
 
   async function transition(
-    status: "IN_REVIEW" | "APPROVED" | "PROCESSING" | "REJECTED" | "COMPLETED",
+    status: "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED",
   ) {
     setBusy(true);
     setError("");
@@ -129,11 +129,6 @@ export default function RequestDetailsPage() {
         return;
       }
 
-      if (status === "PROCESSING") {
-        showToast("Fulfilment started", "success", "Complete the resolution after it succeeds.");
-        await load();
-        return;
-      }
 
       if (status === "REJECTED") {
         showToast("Request rejected", "success", "Returning to the requests table…");
