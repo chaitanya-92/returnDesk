@@ -137,6 +137,7 @@ export default function RefundsPage() {
             setPage(1);
           }}
         />
+        <div className="flex justify-end"><OperationsTableControls statuses={financialStatuses} onStatusesChange={(value) => { setFinancialStatuses(value); setStatusFilter(value.length === 1 ? value[0] : "ALL"); setPage(1); }} fromDate={fromDate} onFromDateChange={(value) => { setFromDate(value); setPage(1); }} toDate={toDate} onToDateChange={(value) => { setToDate(value); setPage(1); }} amountMin={amountMin} onAmountMinChange={(value) => { setAmountMin(value); setPage(1); }} amountMax={amountMax} onAmountMaxChange={(value) => { setAmountMax(value); setPage(1); }} sortBy={financialSort} onSortByChange={(value) => { setFinancialSort(value); setPage(1); }} sortOrder={financialSortOrder} onSortOrderChange={(value) => { setFinancialSortOrder(value); setPage(1); }} /></div>
         <RefundTable
           shown={shown}
           filtered={filtered}
