@@ -96,7 +96,7 @@ export async function listRequests(filters?: RequestListFilters) {
       : {}),
     ...(searchVariants.length
       ? {
-          OR: searchVariants.flatMap((term) => searchableFields(term)),
+          AND: search.split(" ").filter(Boolean).map((term) => ({
         }
       : {}),
   };
