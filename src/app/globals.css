@@ -15,8 +15,8 @@
   --primary-foreground: 35 34 30;
   --sidebar: 247 247 245;
   --sidebar-foreground: 35 34 30;
-  background: #FFFFFF;
-  color: #23221E;
+  background: #ffffff;
+  color: #23221e;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -35,60 +35,213 @@
   --primary-foreground: 35 34 30;
   --sidebar: 28 28 26;
   --sidebar-foreground: 245 242 234;
-  background: #1C1C1A;
-  color: #F5F2EA;
+  background: #1c1c1a;
+  color: #f5f2ea;
 }
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body { margin: 0; min-height: 100vh; background: rgb(var(--background)); color: rgb(var(--foreground)); }
-button, input, select, textarea { font: inherit; }
-::selection { background: #F2B719; color: #23221E; }
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+::selection {
+  background: #f2b719;
+  color: #23221e;
+}
 
 /* Light mode: warm neutral shell, crisp white work surfaces, high-contrast text. */
-html:not(.dark) body { background: #F7F7F5; color: #23221E; }
+html:not(.dark) body {
+  background: #f7f7f5;
+  color: #23221e;
+}
 html:not(.dark) [data-sidebar="provider"],
-html:not(.dark) [data-sidebar="sidebar"] { background: #F7F7F5; color: #23221E; }
-html:not(.dark) header.sticky { background: rgba(247,247,245,.97); color: #23221E; border-bottom: 1px solid #E8E8E3; }
+html:not(.dark) [data-sidebar="sidebar"] {
+  background: #f7f7f5;
+  color: #23221e;
+}
+html:not(.dark) header.sticky {
+  background: rgba(247, 247, 245, 0.97);
+  color: #23221e;
+  border-bottom: 1px solid #e8e8e3;
+}
 html:not(.dark) header.sticky button,
 html:not(.dark) header.sticky a,
-html:not(.dark) header.sticky svg { color: #38362F; }
-html:not(.dark) header.sticky input { background: #FFFFFF; color: #23221E; border-color: #E6E6E0; }
-html:not(.dark) [data-sidebar="menu-button"] { color: #595959; }
-html:not(.dark) [data-sidebar="menu-button"][data-active="true"] { background: #FFF0A6; color: #23221E; }
-html:not(.dark) [data-sidebar="menu-button"]:not([data-active="true"]):hover { background: #FFF9DC; color: #23221E; }
-html:not(.dark) [data-sidebar="group-label"] { color: #777777; }
-html:not(.dark) [data-sidebar="footer"] > div { background: #FFFFFF; border-color: #E8E8E3; color: #23221E; }
-html:not(.dark) [data-sidebar="footer"] p { color: #666666; }
-html:not(.dark) main { background: #FFFFFF; color: #23221E; }
+html:not(.dark) header.sticky svg {
+  color: #38362f;
+}
+html:not(.dark) header.sticky input {
+  background: #ffffff;
+  color: #23221e;
+  border-color: #e6e6e0;
+}
+html:not(.dark) [data-sidebar="menu-button"] {
+  color: #595959;
+}
+html:not(.dark) [data-sidebar="menu-button"][data-active="true"] {
+  background: #fff0a6;
+  color: #23221e;
+}
+html:not(.dark) [data-sidebar="menu-button"]:not([data-active="true"]):hover {
+  background: #fff9dc;
+  color: #23221e;
+}
+html:not(.dark) [data-sidebar="group-label"] {
+  color: #777777;
+}
+html:not(.dark) [data-sidebar="footer"] > div {
+  background: #ffffff;
+  border-color: #e8e8e3;
+  color: #23221e;
+}
+html:not(.dark) [data-sidebar="footer"] p {
+  color: #666666;
+}
+html:not(.dark) main {
+  background: #ffffff;
+  color: #23221e;
+}
 html:not(.dark) main article,
-html:not(.dark) main section { border-color: #E8E8E3; }
+html:not(.dark) main section {
+  border-color: #e8e8e3;
+}
 html:not(.dark) main input,
 html:not(.dark) main select,
-html:not(.dark) main textarea { background-color: #FFFFFF; color: #23221E; border-color: #DCDCD5; }
-html:not(.dark) main table thead tr { background: #FFF9DC; color: #5B4A10; }
-html:not(.dark) main a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
+html:not(.dark) main textarea {
+  background-color: #ffffff;
+  color: #23221e;
+  border-color: #dcdcd5;
+}
+html:not(.dark) main table thead tr {
+  background: #fff9dc;
+  color: #5b4a10;
+}
+html:not(.dark) main a {
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
 
 /* Keep native form controls and their option menus readable in light mode, even when the OS is dark. */
 html:not(.dark) select,
-html:not(.dark) select option { color-scheme: light; background-color: #FFFFFF; color: #23221E; }
-html:not(.dark) select option:checked { background-color: #FFF0A6; color: #23221E; }
+html:not(.dark) select option {
+  color-scheme: light;
+  background-color: #ffffff;
+  color: #23221e;
+}
+html:not(.dark) select option:checked {
+  background-color: #fff0a6;
+  color: #23221e;
+}
 
 /* Keep table hover/focus readable in both themes; avoid dark text on dark hover rows. */
-html:not(.dark) main table tbody tr:hover { background-color: #FFFCF0 !important; color: #23221E !important; }
-html.dark main table tbody tr:hover { background-color: #302F2A !important; color: #F5F2EA !important; }
+html:not(.dark) main table tbody tr:hover {
+  background-color: #fffcf0 !important;
+  color: #23221e !important;
+}
+html.dark main table tbody tr:hover {
+  background-color: #302f2a !important;
+  color: #f5f2ea !important;
+}
 html.dark main table tbody tr:hover td,
 html.dark main table tbody tr:hover td p,
-html.dark main table tbody tr:hover td a { color: #F5F2EA; }
+html.dark main table tbody tr:hover td a {
+  color: #f5f2ea;
+}
 html:not(.dark) main table tbody tr,
-html:not(.dark) main table tbody tr td { color: #23221E; }
-html:not(.dark) main table tbody tr:hover td a { color: #7A5B00; }
+html:not(.dark) main table tbody tr td {
+  color: #23221e;
+}
+html:not(.dark) main table tbody tr:hover td a {
+  color: #7a5b00;
+}
 html:not(.dark) main input::placeholder,
-html:not(.dark) main textarea::placeholder { color: #77736A; opacity: 1; }
+html:not(.dark) main textarea::placeholder {
+  color: #77736a;
+  opacity: 1;
+}
 html.dark main input::placeholder,
-html.dark main textarea::placeholder { color: #B8B3A5; opacity: 1; }
+html.dark main textarea::placeholder {
+  color: #b8b3a5;
+  opacity: 1;
+}
 
-html:not(.dark) .status-badge-open{background:#E0F2FE!important;color:#0C4A6E!important;border-color:#7DD3FC!important}
-html:not(.dark) .status-badge-review{background:#FEF3C7!important;color:#78350F!important;border-color:#FCD34D!important}
-html:not(.dark) .status-badge-approved{background:#EDE9FE!important;color:#4C1D95!important;border-color:#C4B5FD!important}
-html:not(.dark) .status-badge-rejected{background:#FFE4E6!important;color:#881337!important;border-color:#FDA4AF!important}
-html:not(.dark) .status-badge-completed{background:#D1FAE5!important;color:#064E3B!important;border-color:#6EE7B7!important}
+html:not(.dark) .status-badge-open {
+  background: #e0f2fe !important;
+  color: #0c4a6e !important;
+  border-color: #7dd3fc !important;
+}
+html:not(.dark) .status-badge-review {
+  background: #fef3c7 !important;
+  color: #78350f !important;
+  border-color: #fcd34d !important;
+}
+html:not(.dark) .status-badge-approved {
+  background: #ede9fe !important;
+  color: #4c1d95 !important;
+  border-color: #c4b5fd !important;
+}
+html:not(.dark) .status-badge-rejected {
+  background: #ffe4e6 !important;
+  color: #881337 !important;
+  border-color: #fda4af !important;
+}
+html:not(.dark) .status-badge-completed {
+  background: #d1fae5 !important;
+  color: #064e3b !important;
+  border-color: #6ee7b7 !important;
+}
+
+/* Consistent, low-contrast scrollbars for independently scrollable work areas. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c9c4b7 transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background: #c9c4b7;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #a8a18f;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+html.dark * {
+  scrollbar-color: #5c584e transparent;
+}
+html.dark *::-webkit-scrollbar-thumb {
+  background: #5c584e;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Dashboard-specific status colors stay readable regardless of app theme state. */
+html:not(.dark) .dashboard-status-review {
+  background: #fff4cc !important;
+  color: #805600 !important;
+  border-color: #e8c96a !important;
+}
+html.dark .dashboard-status-review {
+  background: #3a301a !important;
+  color: #f4d76b !important;
+  border-color: #8a6b25 !important;
+}

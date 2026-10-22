@@ -1,11 +1,160 @@
 "use client";
-import {useCallback,useEffect,useState} from "react";import {AppShell} from "@/components/layout/app-shell";import {RefreshCw,Search,WalletCards,CheckCircle2,MoreHorizontal,Eye,ArrowUpRight} from "lucide-react";
-type R={id:string;reference:string;orderNumber:string;itemName:string;customerName:string;customerEmail:string;status:string;resolution:string|null;refundAmount:string|number|null;updatedAt:string};
-const badge:Record<string,string>={APPROVED:"status-badge-review border-amber-300 bg-amber-100 text-amber-950",COMPLETED:"status-badge-completed border-emerald-300 bg-emerald-100 text-emerald-950"};
-export default function RefundsPage(){const[rows,S]=useState<R[]>([]),[q,Q]=useState(""),[loading,L]=useState(true),[error,E]=useState(""),[toast,T]=useState(""),[busy,B]=useState(""),[page,P]=useState(1);const size=10;const [actionMenuId,AM]=useState<string|null>(null);
-const load=useCallback(async()=>{L(true);E("");try{const r=await fetch("/api/requests?"+new URLSearchParams({q}),{cache:"no-store"}),p=await r.json();if(!r.ok)throw Error(p.error??"Could not load refunds");S((p.data??[]).filter((x:R)=>x.resolution==="REFUND"&&["APPROVED","COMPLETED"].includes(x.status)))}catch(e){E(e instanceof Error?e.message:"Could not load refunds")}finally{L(false)}},[q]);useEffect(()=>{void load()},[load]);useEffect(()=>P(1),[q]);
-async function processed(x:R){B(x.id);E("");T("");try{const r=await fetch("/api/requests/"+x.id+"/transition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:"COMPLETED",note:"Refund marked as processed by operations."})}),p=await r.json();if(!r.ok)throw Error(p.error??"Could not update refund");T("Refund "+x.reference+" marked processed.");await load()}catch(e){E(e instanceof Error?e.message:"Could not update refund")}finally{B("")}}
-const count=Math.max(1,Math.ceil(rows.length/size)),shown=rows.slice((page-1)*size,page*size);return <AppShell><div aria-busy={loading} className="space-y-6"><header className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgb(var(--border))] pb-5"><div><h1 className="text-3xl font-semibold">Refund requests</h1><p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">Track refunds approved by operations and record processing completion.</p></div><button onClick={()=>void load()} className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-sm"><RefreshCw size={15}/>Refresh</button></header>
-{error&&<div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}{toast&&<div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"><CheckCircle2 className="mr-2 inline" size={16}/>{toast}</div>}
-<div className="grid gap-3 sm:grid-cols-3">{[{label:"Awaiting processing",value:rows.filter(x=>x.status==="APPROVED").length},{label:"Processed",value:rows.filter(x=>x.status==="COMPLETED").length},{label:"Total refund value",value:rows.reduce((n,x)=>n+Number(x.refundAmount||0),0).toLocaleString("en-IN",{style:"currency",currency:"INR"})}].map(x=><div key={x.label} className="rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><p className="text-sm text-[rgb(var(--muted-foreground))]">{x.label}</p><p className="mt-2 text-3xl font-semibold">{x.value}</p></div>)}</div>
-<section className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><div className="border-b border-[rgb(var(--border))] p-4 relative"><Search size={15} className="absolute left-7 top-7 text-[#77736A]"/><input value={q} onChange={e=>Q(e.target.value)} placeholder="Search refund reference, customer, or order…" className="w-full rounded-lg border border-[rgb(var(--border))] bg-white py-2.5 pl-9 pr-3 text-sm text-[#23221E] placeholder:text-[#77736A] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"/></div><div className="overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]"><tr>{["Refund / order","Customer","Amount","Status","Updated","Action"].map(t=><th key={t} className="px-4 py-3">{t}</th>)}</tr></thead><tbody className="divide-y divide-[rgb(var(--border))]">{shown.map(x=><tr key={x.id} className="bg-white hover:bg-[#FFFCF0] dark:bg-[rgb(var(--card))] dark:hover:bg-[#302F2A]"><td className="px-4 py-4"><b>{x.reference}</b><p className="mt-1 text-xs text-[#6B685F] dark:text-[rgb(var(--muted-foreground))]">{x.orderNumber} · {x.itemName}</p></td><td className="px-4 py-4">{x.customerName}<p className="text-xs text-[#6B685F]">{x.customerEmail}</p></td><td className="px-4 py-4 font-semibold">{x.refundAmount==null?"—":Number(x.refundAmount).toLocaleString("en-IN",{style:"currency",currency:"INR"})}</td><td className="px-4 py-4"><span className={"rounded-md border px-2 py-1 text-xs font-medium "+(badge[x.status]??"border-slate-300 bg-slate-100 text-slate-900")}>{x.status==="APPROVED"?"Awaiting processing":"Processed"}</span></td><td className="px-4 py-4 text-xs">{new Date(x.updatedAt).toLocaleDateString("en-IN")}</td><td className="px-4 py-4"><div className="relative flex justify-end"><button type="button" aria-label={"Actions for "+x.reference} aria-haspopup="menu" aria-expanded={actionMenuId===x.id} onClick={()=>AM(current=>current===x.id?null:x.id)} className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E1DFD6] bg-white text-[#4B493F] shadow-sm hover:bg-[#FFF9DC] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><MoreHorizontal size={18}/></button>{actionMenuId===x.id&&<><button type="button" aria-label="Close actions menu" tabIndex={-1} onClick={()=>AM(null)} className="fixed inset-0 z-40 cursor-default"></button><div role="menu" aria-label={"Actions for "+x.reference} className="absolute right-0 top-full z-50 mt-1 w-52 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><a role="menuitem" href={"/requests/"+x.id} onClick={()=>AM(null)} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"><Eye size={15}/> View details <ArrowUpRight size={13} className="ml-auto"/></a>{x.status==="APPROVED"&&<button role="menuitem" type="button" disabled={busy===x.id} onClick={()=>{AM(null);void processed(x)}} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-[#FFF9DC] disabled:opacity-50 dark:hover:bg-[rgb(var(--muted))]"><CheckCircle2 size={15}/>{busy===x.id?"Updating…":"Mark processed"}</button>}</div></>}</div></td></tr>)}{!loading&&shown.length===0&&<tr><td colSpan={6} className="px-4 py-12 text-center"><WalletCards className="mx-auto mb-2"/><p>No refund requests found</p><p className="mt-1 text-xs">Refunds appear after a request is approved with the Refund resolution.</p></td></tr>}{loading&&Array.from({length:5},(_,i)=><tr key={"refund-skeleton-"+i} aria-hidden="true">{Array.from({length:6},(_,j)=><td key={j} className="px-4 py-5"><div className={"h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] "+(j===0?"w-28":j===1?"w-32":j===2?"w-20":j===3?"w-24":j===4?"w-20":"w-8")}/>{j<2&&<div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>}</td>)}</tr>)}</tbody></table></div><div className="flex items-center justify-between border-t border-[rgb(var(--border))] px-4 py-3 text-xs"><span>Showing {rows.length?(page-1)*size+1:0}–{Math.min(page*size,rows.length)} of {rows.length}</span><div className="flex items-center gap-2"><button disabled={page<=1} onClick={()=>P(p=>p-1)} className="rounded border px-3 py-2 disabled:opacity-40">Previous</button><span>Page {page} of {count}</span><button disabled={page>=count} onClick={()=>P(p=>p+1)} className="rounded border px-3 py-2 disabled:opacity-40">Next</button></div></div></section></div></AppShell>}
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useRefundTableState } from "@/features/refunds/hooks/use-refund-table-state";
+import { AppShell } from "@/components/layout/app-shell";
+import { showToast } from "@/components/ui/toaster";
+import { requestsApi } from "@/features/requests/api/requests-api";
+import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
+import type { RequestRecord } from "@/features/requests/api/requests-api";
+import {
+  filterAndSortRefunds,
+  selectRefundRequests,
+  summarizeRefunds,
+  type RefundRequest,
+} from "@/features/refunds/refund-utils";
+import { RefundTable } from "@/features/refunds/components/refund-table";
+import { RefundPageToolbar } from "@/features/refunds/components/refund-page-toolbar";
+import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
+
+const PAGE_SIZE = 10;
+
+export default function RefundsPage() {
+  const [rows, setRows] = useState<RefundRequest[]>([]);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 300);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [toast, setToast] = useState("");
+  const [busyId, setBusyId] = useState("");
+  const {
+    page, setPage, statusFilter, setStatusFilter,
+    actionMenuId, setActionMenuId, confirmRefund, setConfirmRefund,
+    filterMenuOpen, setFilterMenuOpen, sortBy, sortOrder, handleSort, sortIndicator,
+  } = useRefundTableState();
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const params = new URLSearchParams({
+        q: debouncedQuery,
+        page: "1",
+        pageSize: "100",
+      });
+
+      const payload = await requestsApi.list(params);
+
+      const items: RequestRecord[] = payload.data.items ?? [];
+
+      setRows(
+        selectRefundRequests(items),
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load refunds");
+    } finally {
+      setLoading(false);
+    }
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, statusFilter, setPage]);
+
+  const processed = async (refund: RefundRequest) => {
+    setBusyId(refund.id);
+    setError("");
+    setToast("");
+
+    try {
+      await requestsApi.transition(refund.id, {
+        status: "COMPLETED",
+        note: "Refund marked as processed by operations.",
+      });
+
+      setToast(`Refund ${refund.reference} marked processed.`);
+
+      showToast("Refund marked processed", "success", refund.reference);
+
+      await load();
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Could not update refund";
+
+      setError(message);
+      showToast(message, "error");
+    } finally {
+      setBusyId("");
+    }
+  };
+
+  const filtered = useMemo(() => filterAndSortRefunds(rows, statusFilter, sortBy, sortOrder), [rows, statusFilter, sortBy, sortOrder]);
+
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+
+  const currentPage = Math.min(page, pageCount);
+
+  const shown = useMemo(
+    () => loading ? [] : filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE),
+    [filtered, currentPage, loading],
+  );
+
+  const { awaitingCount, processedCount, totalRefundValue } = useMemo(() => summarizeRefunds(rows), [rows]);
+
+
+
+  return (
+    <AppShell>
+      <div aria-busy={loading} className="space-y-6">
+        <RefundPageToolbar
+          loading={loading}
+          error={error}
+          toast={toast}
+          onRefresh={() => void load()}
+          awaitingCount={awaitingCount}
+          processedCount={processedCount}
+          totalRefundValue={totalRefundValue}
+          onSelectStatus={(status) => {
+            setStatusFilter(status);
+            setPage(1);
+          }}
+          query={query}
+          onQueryChange={(value) => {
+            setQuery(value);
+            setPage(1);
+          }}
+        />
+        <RefundTable
+          shown={shown}
+          filtered={filtered}
+          loading={loading}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+          filterMenuOpen={filterMenuOpen}
+          setFilterMenuOpen={setFilterMenuOpen}
+          handleSort={handleSort}
+          sortIndicator={sortIndicator}
+          actionMenuId={actionMenuId}
+          setActionMenuId={setActionMenuId}
+          busyId={busyId}
+          setConfirmRefund={setConfirmRefund}
+          page={currentPage}
+          pageCount={pageCount}
+          onPageChange={setPage}
+        />
+      </div>
+
+      <RefundConfirmationDialog
+        refund={confirmRefund}
+        busyId={busyId}
+        onClose={() => setConfirmRefund(null)}
+        onConfirm={processed}
+      />
+    </AppShell>
+  );
+}
