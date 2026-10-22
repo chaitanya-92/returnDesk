@@ -79,3 +79,12 @@ export function summarizeRefunds(refunds: RefundRequest[]): RefundSummary {
     { awaitingCount: 0, processedCount: 0, totalRefundValue: 0 },
   );
 }
+
+export const REFUND_STATUS_FILTERS: ReadonlyArray<{
+  value: RefundStatus;
+  label: string;
+}> = [
+  { value: "ALL", label: "All refunds" },
+  { value: "APPROVED", label: "Awaiting" },
+  { value: "COMPLETED", label: "Processed" },
+];
