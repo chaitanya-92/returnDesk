@@ -22,6 +22,7 @@ export const REQUEST_REASONS = [
 ] as const;
 
 export type RequestReason = (typeof REQUEST_REASONS)[number];
+export type RequestStatusFilter = "ALL" | RequestStatus;
 
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export type ResolutionType = (typeof RESOLUTION_TYPES)[number];
