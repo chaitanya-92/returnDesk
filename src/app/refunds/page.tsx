@@ -20,7 +20,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
 import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
-import { formatCurrencyINR, formatDate, formatRequestStatus } from "@/features/requests/presentation";
+import { formatCurrencyINR, formatDate } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
@@ -189,7 +189,7 @@ export default function RefundsPage() {
     setSortOrder(field === "updatedAt" ? "desc" : "asc");
   };
 
-  const sortIndicator = (field: SortField) => {
+  const sortIndicator = (field: RefundSortField) => {
     if (sortBy !== field) {
       return <span>↕</span>;
     }
