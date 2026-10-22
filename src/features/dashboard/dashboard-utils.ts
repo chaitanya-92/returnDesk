@@ -45,9 +45,14 @@ export function formatDurationHours(hours: number | null): string {
 export function getMaximumReasonCount(
   reasons: ReadonlyArray<{ count: number }>,
 ): number {
-  return Math.max(1, ...reasons.map(({ count }) => count));
+  return reasons.reduce(
+    (maximum, { count }) => Math.max(maximum, count),
+    1,
+  );
 }
 
 export function getReasonBarWidth(count: number, maximum: number): string {
-  return `${Math.min(100, Math.max(0, (count / Math.max(1, maximum)) * 100))}%`;
+  const safeMaximum = Math.max(1, maximum);
+  const percentage = (count / safeMaximum) * 100;
+  return `${Math.min(100, Math.max(0, percentage))}%`;
 }
