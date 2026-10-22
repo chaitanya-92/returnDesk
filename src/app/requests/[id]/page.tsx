@@ -68,7 +68,7 @@ export default function RequestDetailsPage() {
     void load();
   }, [load]);
   async function transition(
-    status: "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED",
+    status: "IN_REVIEW" | "APPROVED" | "PROCESSING" | "REJECTED" | "COMPLETED",
   ) {
     setBusy(true);
     setError("");
@@ -95,8 +95,14 @@ export default function RequestDetailsPage() {
       }
 
       if (status === "APPROVED") {
-        showToast("Request approved", "success", "The request is ready for fulfilment.");
-        router.push(returnToRequests);
+        showToast("Request approved", "success", "Start fulfilment when ready.");
+        await load();
+        return;
+      }
+
+      if (status === "PROCESSING") {
+        showToast("Fulfilment started", "success", "Complete the resolution after it succeeds.");
+        await load();
         return;
       }
 
