@@ -3,15 +3,13 @@
 import { useState } from "react";
 import type { RefundRequest, RefundSortField, RefundStatus, SortOrder } from "@/features/refunds/refund-utils";
 
-const PAGE_SIZE = 10;
-
 function getInitialStatusFilter(): RefundStatus {
   if (typeof window === "undefined") return "ALL";
   const status = new URLSearchParams(window.location.search).get("status");
   return status === "APPROVED" || status === "COMPLETED" ? status : "ALL";
 }
 
-export function useRefundTableState(filteredCount: number) {
+export function useRefundTableState() {
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<RefundStatus>(getInitialStatusFilter);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
@@ -20,8 +18,6 @@ export function useRefundTableState(filteredCount: number) {
   const [sortBy, setSortBy] = useState<RefundSortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
-  const pageCount = Math.max(1, Math.ceil(filteredCount / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
 
   const handleSort = (field: RefundSortField) => {
     if (sortBy === field) {
@@ -38,7 +34,7 @@ export function useRefundTableState(filteredCount: number) {
   };
 
   return {
-    page, setPage, pageCount, currentPage,
+    page, setPage,
     statusFilter, setStatusFilter,
     actionMenuId, setActionMenuId,
     confirmRefund, setConfirmRefund,
