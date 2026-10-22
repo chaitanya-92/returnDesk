@@ -53,7 +53,7 @@ export type RequestDraft = {
   quantity: number;
   customerName: string;
   customerEmail: string;
-  reason: string;
+  reason: RequestReason;
   description: string;
 };
 
