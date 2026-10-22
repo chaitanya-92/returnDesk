@@ -10,6 +10,7 @@ export const REFUND_SUMMARY_CARDS = [
     tone: "border border-amber-200 bg-amber-100 text-amber-950",
     href: "/refunds?status=APPROVED#refund-table",
     status: "APPROVED",
+    format: undefined,
   },
   {
     id: "processed",
@@ -19,6 +20,7 @@ export const REFUND_SUMMARY_CARDS = [
     tone: "border border-emerald-200 bg-emerald-100 text-emerald-950",
     href: "/refunds?status=COMPLETED#refund-table",
     status: "COMPLETED",
+    format: undefined,
   },
   {
     id: "total-value",
