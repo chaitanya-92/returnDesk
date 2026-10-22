@@ -108,11 +108,7 @@ export default function RequestsPage() {
     try {
       const payload = await requestsApi.create(values);
       setShowCreate(false);
-      setToast({
-        type: "success",
-        message: "Return request created successfully.",
-      });
-      showToast(
+showToast(
         "Return request created",
         "success",
         payload.data?.reference
@@ -126,8 +122,7 @@ export default function RequestsPage() {
       const message =
         e instanceof Error ? e.message : "Could not create request.";
       setError(message);
-      setToast({ type: "error", message });
-      showToast("Could not create request", "error", message);
+showToast("Could not create request", "error", message);
     } finally {
       setSaving(false);
       helpers.setSubmitting(false);
