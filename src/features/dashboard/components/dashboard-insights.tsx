@@ -2,10 +2,8 @@
 
 import { useMemo } from "react";
 import {
-  ArrowUpRight,
   CheckCircle2,
   Inbox,
-  ShieldAlert,
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
