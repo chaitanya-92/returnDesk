@@ -141,8 +141,8 @@ export default function RequestDetailsPage() {
       })),
     ].slice().sort((left, right) => new Date(left.date).getTime() - new Date(right.date).getTime());
     return (
-    return <AppShell>
-      <div className="relative min-h-[65vh] space-y-6">
+      <AppShell>
+        <div className="relative min-h-[65vh] space-y-6">
           <button onClick={() => router.push("/requests")} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
           <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
