@@ -75,6 +75,7 @@ const count=Math.max(1,Math.ceil(filtered.length/size)),shown=filtered.slice((pa
 <Filter size={14}/>
 </button>{filterMenuOpen&&<div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border bg-white p-1.5 text-[#23221E] shadow-xl">{[{value:"ALL",label:"All refunds"},{value:"APPROVED",label:"Awaiting"},{value:"COMPLETED",label:"Processed"}].map(t=>
 <button key={t.value} type="button" onClick={()=>{SF(t.value as typeof statusFilter);FMO(false);P(1)}} className={"block w-full rounded px-3 py-2 text-left text-xs "+(statusFilter===t.value?"bg-[#FFF0A6]":"hover:bg-[#FFF9DC]")}>{t.label}</button>)}</div>}</div>
+</div>
 </th>
 <th className="px-3 py-2.5 align-middle">
 <button type="button" onClick={()=>{SB("updatedAt");SO(v=>sortBy==="updatedAt"?(v==="asc"?"desc":"asc"):"desc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Updated {sortBy==="updatedAt"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button>
