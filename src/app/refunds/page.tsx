@@ -16,12 +16,20 @@ import {
 import { RefundTable } from "@/features/refunds/components/refund-table";
 import { RefundPageToolbar } from "@/features/refunds/components/refund-page-toolbar";
 import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
+import { OperationsTableControls, type OperationsSort, type OperationsStatus } from "@/features/shared/components/operations-table-controls";
 
 const PAGE_SIZE = 10;
 
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
   const [query, setQuery] = useState("");
+  const [financialStatuses, setFinancialStatuses] = useState<OperationsStatus[]>([]);
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
+  const [amountMin, setAmountMin] = useState("");
+  const [amountMax, setAmountMax] = useState("");
+  const [financialSort, setFinancialSort] = useState<OperationsSort>("updatedAt");
+  const [financialSortOrder, setFinancialSortOrder] = useState<"asc" | "desc">("desc");
   const debouncedQuery = useDebouncedValue(query, 300);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
