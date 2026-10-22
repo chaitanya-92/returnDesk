@@ -51,3 +51,17 @@ export function formatDurationHours(hours: number | null | undefined): string {
   const days = hours / 24;
   return `${days.toFixed(days >= 10 ? 0 : 1)}d`;
 }
+
+export function formatInteger(value: number): string {
+  return Math.round(value).toLocaleString("en-IN");
+}
+
+export function formatCurrencyINR(value: number | string | null | undefined): string {
+  if (value == null || value === "" || !Number.isFinite(Number(value))) return "—";
+
+  return Number(value).toLocaleString("en-IN", {
+    style: "currency",
+    currency: "INR",
+    maximumFractionDigits: 2,
+  });
+}
