@@ -42,7 +42,6 @@ function ReasonSelect() {
 export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [status, setStatus] = useState(() => { if (typeof window === "undefined") return "ALL"; const initial = new URLSearchParams(window.location.search).get("status"); return ["OPEN","IN_REVIEW","APPROVED","REJECTED","COMPLETED"].includes(initial ?? "") ? initial! : "ALL"; });
-  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
