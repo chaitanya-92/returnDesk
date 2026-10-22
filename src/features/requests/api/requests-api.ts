@@ -1,5 +1,5 @@
 import { apiRequest } from "@/lib/client-api";
-import type { RequestStatus, ResolutionType } from "../types";
+import type { RequestDraft, RequestStatus, ResolutionType, RequestReason } from "../types";
 
 export type RequestNote = {
   id: string;
@@ -24,7 +24,7 @@ export type RequestRecord = {
   quantity: number;
   customerName: string;
   customerEmail: string;
-  reason: string;
+  reason: RequestReason;
   description: string;
   status: RequestStatus;
   resolution: ResolutionType | null;
@@ -66,11 +66,11 @@ export const requestsApi = {
     });
   },
 
-  create(input: Record<string, unknown>) {
+  create(input: RequestDraft) {
     return apiRequest<RequestRecord>("/api/requests", json("POST", input));
   },
 
-  update(id: string, input: Record<string, unknown>) {
+  update(id: string, input: Partial<RequestDraft>) {
     return apiRequest<RequestRecord>(
       `/api/requests/${encodeURIComponent(id)}`,
       { ...json("PATCH", input) },
