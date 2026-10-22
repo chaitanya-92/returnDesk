@@ -54,7 +54,6 @@ function getInitialStatusFilter(): RefundStatus {
 
 const formatCurrency = formatCurrencyINR;
 
-
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
   const [query, setQuery] = useState("");
