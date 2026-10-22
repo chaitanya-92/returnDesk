@@ -34,7 +34,7 @@ export function DataTableHeader({
   children,
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={className} {...props}>{children}</thead>;
+  return <thead className={`border-b border-[rgb(var(--border))] ${className}`.trim()} {...props}>{children}</thead>;
 }
 
 export function DataTableBody({
@@ -54,7 +54,7 @@ export function DataTableRow({
   children,
   ...props
 }: HTMLAttributes<HTMLTableRowElement>) {
-  return <tr className={className} {...props}>{children}</tr>;
+  return <tr className={`align-middle ${className}`.trim()} {...props}>{children}</tr>;
 }
 
 export function DataTableHead({
@@ -62,7 +62,7 @@ export function DataTableHead({
   children,
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement>) {
-  return <th className={`px-3 py-2.5 ${className}`.trim()} {...props}>{children}</th>;
+  return <th className={`whitespace-nowrap px-4 py-3 text-left align-middle text-[11px] font-semibold uppercase tracking-[0.08em] ${className}`.trim()} {...props}>{children}</th>;
 }
 
 export function DataTableCell({
@@ -70,5 +70,5 @@ export function DataTableCell({
   children,
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement>) {
-  return <td className={`px-4 py-4 ${className}`.trim()} {...props}>{children}</td>;
+  return <td className={`px-4 py-4 align-middle ${className}`.trim()} {...props}>{children}</td>;
 }
