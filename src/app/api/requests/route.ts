@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
     const rawDate = params.get("date");
-    if (rawDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(rawDate)) throw new AppError("Date must use YYYY-MM-DD format.", 400, "INVALID_DATE_FILTER");
+    if (rawDate && !/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) throw new AppError("Date must use YYYY-MM-DD format.", 400, "INVALID_DATE_FILTER");
     const date = rawDate ? new Date(`${rawDate}T00:00:00.000Z`) : undefined;
     if (date && Number.isNaN(date.getTime())) throw new AppError("Invalid date filter.", 400, "INVALID_DATE_FILTER");
     const page = Number(params.get("page") ?? "1");
