@@ -1,10 +1,6 @@
 "use client";
 
 import {
-  ArrowDown,
-  ArrowUp,
-  ArrowUpDown,
-  Filter,
   ArrowUpRight,
   Eye,
   Inbox,
@@ -13,7 +9,6 @@ import {
 } from "lucide-react";
 import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/requests/status-badge";
-import { REQUEST_STATUS_FILTER_OPTIONS } from "@/features/requests/request-form-data";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 import type { RequestStatusFilter } from "@/features/requests/types";
@@ -30,20 +25,13 @@ type RequestTableSectionProps = {
   error: string;
   query: string;
   status: string;
-  statusMenuOpen: boolean;
   actionMenuId: string | null;
-  sortBy: "createdAt" | "customerName" | "status" | "reason" | "reference";
-  sortOrder: "asc" | "desc";
-  setSortBy: (value: RequestTableSectionProps["sortBy"]) => void;
-  setSortOrder: (value: "asc" | "desc" | ((current: "asc" | "desc") => "asc" | "desc")) => void;
-  setStatusMenuOpen: (value: boolean | ((current: boolean) => boolean)) => void;
   setStatus: (value: RequestStatusFilter) => void;
   setPage: (value: number) => void;
   setActionMenuId: (value: string | null | ((current: string | null) => string | null)) => void;
 };
 
 const pretty = formatRequestStatus;
-const statuses = REQUEST_STATUS_FILTER_OPTIONS;
 
 export function RequestTableSection({
   visibleRows,
@@ -67,145 +55,7 @@ export function RequestTableSection({
           <DataTableContainer>
             <DataTable className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]">
               <DataTableHeader className="bg-[#FFF7D6] text-[10px] uppercase tracking-[0.09em] text-[#4C3B08] dark:bg-[#342C19] dark:text-[#F4D76B]">
-                <DataTableRow>
-                  <DataTableHead className="px-3 py-2.5">
-                    <span className="mb-1 block">Request</span>
-                  </DataTableHead>
-                  <DataTableHead className="px-3 py-2.5">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSortBy("customerName");
-                        setSortOrder((v) =>
-                          sortBy === "customerName"
-                            ? v === "asc"
-                              ? "desc"
-                              : "asc"
-                            : "asc",
-                        );
-                      }}
-                      className="inline-flex items-center gap-2"
-                    >
-                      Customer{" "}
-                      <span>
-                        {sortBy === "customerName" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={13} />
-                          ) : (
-                            <ArrowDown size={13} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={13} />
-                        )}
-                      </span>
-                    </button>
-                  </DataTableHead>
-                  <DataTableHead className="px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <span>Reason</span>
-                      <button
-                        type="button"
-                        aria-label="Sort by reason"
-                        title="Sort by reason"
-                        onClick={() => {
-                          setSortBy("reason");
-                          setSortOrder((v) =>
-                            sortBy === "reason"
-                              ? v === "asc"
-                                ? "desc"
-                                : "asc"
-                              : "asc",
-                          );
-                        }}
-                        className="inline-flex items-center rounded-md border border-[#E3DDC9] bg-white px-2 py-1 text-[#292821] hover:bg-[#FFF9DC]"
-                      >
-                        {sortBy === "reason" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={13} />
-                          ) : (
-                            <ArrowDown size={13} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={13} />
-                        )}
-                      </button>
-                    </div>
-                  </DataTableHead>
-                  <DataTableHead className="px-3 py-2.5">
-                    <span className="mb-1 block">Status</span>
-                    <div className="relative inline-block normal-case tracking-normal">
-                      <button
-                        type="button"
-                        aria-label="Filter by status"
-                        title="Filter by status"
-                        onClick={() => setStatusMenuOpen((v) => !v)}
-                        className={
-                          "rounded-md border p-1.5 " +
-                          (status !== "ALL"
-                            ? "border-[#D7A400] bg-[#FFF0A6] text-[#292821]"
-                            : "border-[#E3DDC9] bg-white text-[#292821]")
-                        }
-                      >
-                        <Filter size={14} />
-                      </button>
-                      {statusMenuOpen && (
-                        <div className="absolute left-0 top-full z-50 mt-1 w-44 rounded-lg border bg-white p-1.5 text-[#23221E] shadow-xl">
-                          {statuses.map((s) => (
-                            <button
-                              key={s}
-                              type="button"
-                              onClick={() => {
-                                setStatus(s);
-                                setStatusMenuOpen(false);
-                                setPage(1);
-                              }}
-                              className={
-                                "block w-full rounded px-3 py-2 text-left text-xs " +
-                                (status === s
-                                  ? "bg-[#FFF0A6]"
-                                  : "hover:bg-[#FFF9DC]")
-                              }
-                            >
-                              {s === "ALL" ? "All statuses" : pretty(s)}
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </DataTableHead>
-                  <DataTableHead className="px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      <span>Created</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSortBy("createdAt");
-                          setSortOrder((v) =>
-                            sortBy === "createdAt"
-                              ? v === "asc"
-                                ? "desc"
-                                : "asc"
-                              : "desc",
-                          );
-                        }}
-                        aria-label="Sort by creation date"
-                        className="inline-flex items-center rounded-md border border-[#E3DDC9] bg-white px-2 py-1 text-[#292821] hover:bg-[#FFF9DC]"
-                      >
-                        {sortBy === "createdAt" ? (
-                          sortOrder === "asc" ? (
-                            <ArrowUp size={13} />
-                          ) : (
-                            <ArrowDown size={13} />
-                          )
-                        ) : (
-                          <ArrowUpDown size={13} />
-                        )}
-                      </button>
-                    </div>
-                  </DataTableHead>
-                  <DataTableHead className="px-3 py-2.5"></DataTableHead>
-                </DataTableRow>
-              </DataTableHeader>
+                <DataTableRow><DataTableHead className="px-3 py-2.5">Request</DataTableHead><DataTableHead className="px-3 py-2.5">Customer</DataTableHead><DataTableHead className="px-3 py-2.5">Reason</DataTableHead><DataTableHead className="px-3 py-2.5">Status</DataTableHead><DataTableHead className="px-3 py-2.5">Created</DataTableHead><DataTableHead className="px-3 py-2.5"></DataTableHead></DataTableRow>              </DataTableHeader>
               <DataTableBody className="divide-y divide-[rgb(var(--border))]">
                 {visibleRows.map((r) => (
                   <DataTableRow
