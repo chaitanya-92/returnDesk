@@ -275,7 +275,8 @@ export default function RequestDetailsPage() {
           <RefreshCw size={15}/>Refresh details</button>
           </aside>
           </div>
-          </>}</div>
-    </AppShell>
+          </>}
+        </div>
+      </AppShell>
     );
 }
