@@ -34,12 +34,12 @@ import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
+import type { RequestDraft } from "@/features/requests/types";
 import {
-  REQUEST_REASONS,
-  REQUEST_STATUSES,
-  type RequestDraft,
-  type RequestStatusFilter,
-} from "@/features/requests/types";
+  EMPTY_REQUEST_DRAFT as initialDraft,
+  REQUEST_REASON_OPTIONS as reasons,
+  REQUEST_STATUS_FILTER_OPTIONS as statuses,
+} from "@/features/requests/request-form-data";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 type RequestRow = Pick<
@@ -47,23 +47,6 @@ type RequestRow = Pick<
   "id" | "reference" | "orderNumber" | "itemName" | "customerName" |
   "customerEmail" | "reason" | "status" | "createdAt" | "quantity"
 >;
-const statuses: RequestStatusFilter[] = ["ALL", ...REQUEST_STATUSES];
-const reasons = REQUEST_REASONS.map((reason) => ({
-  value: reason,
-  label: formatRequestStatus(reason),
-}));
-
-const initialDraft: RequestDraft = {
-  orderNumber: "",
-  orderItemId: "",
-  itemName: "",
-  itemSku: "",
-  quantity: 1,
-  customerName: "",
-  customerEmail: "",
-  reason: "DAMAGED",
-  description: "",
-};
 const pretty = formatRequestStatus;
 
 function ReasonSelect() {
