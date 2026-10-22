@@ -9,7 +9,6 @@ import {
   useField,
   type FormikHelpers,
 } from "formik";
-import * as Yup from "yup";
 import { CheckCircle2, X, AlertCircle, Filter } from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
 import {
@@ -26,6 +25,9 @@ import {
   WalletCards,
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
+import { requestDraftSchema } from "@/features/requests/schemas";
+import { apiRequest } from "@/lib/client-api";
+import { REQUEST_STATUS_CLASSES, formatRequestStatus } from "@/features/requests/presentation";
 
 type RequestRow = {
   id: string;
@@ -78,61 +80,7 @@ const initialDraft: RequestDraft = {
   reason: "DAMAGED",
   description: "",
 };
-const requestSchema = Yup.object({
-  orderNumber: Yup.string()
-    .trim()
-    .max(80, "Use 80 characters or fewer")
-    .required("Order number is required"),
-  orderItemId: Yup.string()
-    .trim()
-    .max(100, "Use 100 characters or fewer")
-    .required("Order item ID is required"),
-  itemName: Yup.string()
-    .trim()
-    .max(160, "Use 160 characters or fewer")
-    .required("Item name is required"),
-  itemSku: Yup.string()
-    .trim()
-    .max(100, "Use 100 characters or fewer")
-    .required("Item SKU is required"),
-  quantity: Yup.number()
-    .typeError("Enter a valid quantity")
-    .integer("Quantity must be a whole number")
-    .min(1, "Quantity must be at least 1")
-    .max(1000, "Quantity cannot exceed 1000")
-    .required("Quantity is required"),
-  customerName: Yup.string()
-    .trim()
-    .max(120, "Use 120 characters or fewer")
-    .required("Customer name is required"),
-  customerEmail: Yup.string()
-    .trim()
-    .email("Enter a valid email address")
-    .required("Customer email is required"),
-  reason: Yup.string()
-    .oneOf(reasons, "Select a valid return reason")
-    .required("Return reason is required"),
-  description: Yup.string()
-    .trim()
-    .max(2000, "Description must be 2000 characters or fewer")
-    .required("Description is required"),
-});
-const statusStyle: Record<string, string> = {
-  OPEN: "!border-sky-300 !bg-sky-100 !text-sky-950 dark:!border-sky-800 dark:!bg-sky-950/60 dark:!text-sky-100",
-  IN_REVIEW:
-    "!border-amber-300 !bg-amber-100 !text-amber-950 dark:!border-amber-800 dark:!bg-amber-950/60 dark:!text-amber-100",
-  APPROVED:
-    "!border-violet-300 !bg-violet-100 !text-violet-950 dark:!border-violet-800 dark:!bg-violet-950/60 dark:!text-violet-100",
-  REJECTED:
-    "!border-rose-300 !bg-rose-100 !text-rose-950 dark:!border-rose-800 dark:!bg-rose-950/60 dark:!text-rose-100",
-  COMPLETED:
-    "!border-emerald-300 !bg-emerald-100 !text-emerald-950 dark:!border-emerald-800 dark:!bg-emerald-950/60 dark:!text-emerald-100",
-};
-const pretty = (value: string) =>
-  value
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/^\\w/, (c) => c.toUpperCase());
+const pretty = formatRequestStatus;
 
 function ReasonSelect() {
   const [field, meta, helpers] = useField<string>("reason");
@@ -251,16 +199,12 @@ export default function RequestsPage() {
       params.set("pageSize", String(pageSize));
       params.set("sortBy", sortBy);
       params.set("sortOrder", sortOrder);
-      const response = await fetch("/api/requests?" + params.toString(), {
-        cache: "no-store",
-      });
-      const payload = await response.json();
-      if (!response.ok)
-        throw new Error(
-          payload?.error?.message ?? "Could not load return requests.",
-        );
-      setRows(Array.isArray(payload.data?.items) ? payload.data.items : []);
-      setTotalRows(Number(payload.data?.total ?? 0));
+      const payload = await apiRequest<{
+        items: RequestRow[];
+        total: number;
+      }>("/api/requests?" + params.toString(), { cache: "no-store" });
+      setRows(Array.isArray(payload.data.items) ? payload.data.items : []);
+      setTotalRows(Number(payload.data.total ?? 0));
     } catch (e) {
       setError(
         e instanceof Error ? e.message : "Could not load return requests.",
@@ -298,14 +242,10 @@ export default function RequestsPage() {
     setSaving(true);
     setError("");
     try {
-      const response = await fetch("/api/requests", {
+      const payload = await apiRequest<RequestRow>("/api/requests", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      const payload = await response.json();
-      if (!response.ok)
-        throw new Error(payload?.error?.message ?? "Could not create request.");
       setShowCreate(false);
       setToast({
         type: "success",
@@ -446,7 +386,7 @@ export default function RequestsPage() {
               </div>
               <Formik<RequestDraft>
                 initialValues={initialDraft}
-                validationSchema={requestSchema}
+                validationSchema={requestDraftSchema}
                 onSubmit={createRequest}
               >
                 {({ isSubmitting, isValid, dirty }) => (
@@ -827,7 +767,7 @@ export default function RequestsPage() {
                             COMPLETED: "completed",
                           }[r.status] ?? "open") +
                           " inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium " +
-                          (statusStyle[r.status] ??
+                          (REQUEST_STATUS_CLASSES[r.status as keyof typeof REQUEST_STATUS_CLASSES] ??
                             "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200")
                         }
                       >

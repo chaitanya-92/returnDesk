@@ -18,6 +18,8 @@ import {
 
 import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
+import { apiRequest } from "@/lib/client-api";
+import { formatCurrencyINR, formatRequestStatus } from "@/features/requests/presentation";
 
 type RefundStatus = "ALL" | "APPROVED" | "COMPLETED";
 
@@ -69,12 +71,7 @@ function getInitialStatusFilter(): RefundStatus {
   return "ALL";
 }
 
-function formatCurrency(value: number): string {
-  return value.toLocaleString("en-IN", {
-    style: "currency",
-    currency: "INR",
-  });
-}
+const formatCurrency = formatCurrencyINR;
 
 function AnimatedNumber({
   value,
@@ -161,17 +158,12 @@ export default function RefundsPage() {
         pageSize: "100",
       });
 
-      const response = await fetch(`/api/requests?${params}`, {
-        cache: "no-store",
-      });
+      const payload = await apiRequest<{
+        items: RefundRequest[];
+        total: number;
+      }>(`/api/requests?${params}`, { cache: "no-store" });
 
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Could not load refunds");
-      }
-
-      const items: RefundRequest[] = payload.data?.items ?? [];
+      const items: RefundRequest[] = payload.data.items ?? [];
 
       setRows(
         items.filter(
@@ -201,22 +193,13 @@ export default function RefundsPage() {
     setToast("");
 
     try {
-      const response = await fetch(`/api/requests/${refund.id}/transition`, {
+      await apiRequest(`/api/requests/${refund.id}/transition`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
         body: JSON.stringify({
           status: "COMPLETED",
           note: "Refund marked as processed by operations.",
         }),
       });
-
-      const payload = await response.json();
-
-      if (!response.ok) {
-        throw new Error(payload.error ?? "Could not update refund");
-      }
 
       setToast(`Refund ${refund.reference} marked processed.`);
 
