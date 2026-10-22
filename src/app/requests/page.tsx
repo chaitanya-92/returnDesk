@@ -138,7 +138,6 @@ export default function RequestsPage() {
     <AppShell>
       <div aria-busy={loading} className="space-y-6">
         <RequestPageHeader
-          loading={loading}
           error={error}
           toast={toast}
           setToast={setToast}
