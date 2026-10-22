@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -43,7 +43,7 @@ export default function RequestDetailsPage() {
   const [decisionNote, setDecisionNote] = useState("");
   const [resolutionOpen, setResolutionOpen] = useState(false);
   const [editingAmount, setEditingAmount] = useState(false);
-  const autoReviewAttempted = useRef<string | null>(null);
+  const [reviewConfirmationOpen, setReviewConfirmationOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,25 +70,8 @@ export default function RequestDetailsPage() {
   }, [load]);
 
   useEffect(() => {
-    if (!item || item.status !== "OPEN" || autoReviewAttempted.current === id) return;
-    autoReviewAttempted.current = id;
-    async function startReviewOnOpen() {
-      setBusy(true);
-      setError("");
-      try {
-        await requestsApi.transition(id, { status: "IN_REVIEW" });
-        showToast("Request moved to In Review", "success");
-        await load();
-      } catch (cause) {
-        const message = cause instanceof Error ? cause.message : "Could not start request review";
-        setError(message);
-        showToast(message, "error");
-      } finally {
-        setBusy(false);
-      }
-    }
-    void startReviewOnOpen();
-  }, [item, id, load]);
+    setReviewConfirmationOpen(item?.status === "OPEN");
+  }, [item?.status, id]);
 
   async function returnToRequestsAfterToast(message: string) {
     setRedirectMessage(message);
@@ -191,6 +174,19 @@ export default function RequestDetailsPage() {
     return (
       <AppShell>
         <div className="relative min-w-0 space-y-5 pb-8">
+          {reviewConfirmationOpen && item?.status === "OPEN" && !loading && <div className="fixed inset-0 z-[140] flex items-center justify-center bg-black/40 p-4">
+            <section role="dialog" aria-modal="true" aria-labelledby="review-request-title" className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]">
+              <div className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#FFF5C2] text-[#725500]"><CheckCircle2 size={20}/></span>
+                <div><h2 id="review-request-title" className="text-lg font-semibold">Move request to In Review?</h2>
+                  <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">This request is still Open. Move it to In Review to begin evaluating the return and choosing a resolution.</p></div>
+              </div>
+              <div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row">
+                <button type="button" disabled={busy} onClick={() => setReviewConfirmationOpen(false)} className="rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50">Keep Open</button>
+                <button type="button" disabled={busy} onClick={async () => { const succeeded = await transition("IN_REVIEW"); if (succeeded) setReviewConfirmationOpen(false); }} className="rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] disabled:opacity-50">{busy ? "Moving to In Review…" : "Move to In Review"}</button>
+              </div>
+            </section>
+          </div>}
           {redirecting && <div role="status" aria-live="polite" className="fixed inset-0 z-[120] flex items-center justify-center bg-black/25 p-4 backdrop-blur-[2px]">
             <div className="flex w-full max-w-sm items-center gap-4 rounded-2xl border border-[rgb(var(--border))] bg-white p-5 shadow-xl dark:bg-[rgb(var(--card))]">
               <span className="h-9 w-9 shrink-0 animate-spin rounded-full border-4 border-[#F2B719]/25 border-t-[#B8872C]" />
