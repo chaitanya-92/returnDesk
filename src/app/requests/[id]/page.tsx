@@ -184,35 +184,7 @@ export default function RequestDetailsPage() {
           <button onClick={() => router.push("/requests")} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
           <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
-        {loading ? <div role="status" aria-label="Loading request details" className="space-y-6 animate-pulse">
-          <div className="flex items-start justify-between border-b border-[rgb(var(--border))] pb-5">
-          <div className="space-y-3">
-          <div className="h-3 w-28 rounded bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          <div className="h-8 w-64 max-w-[70vw] rounded-lg bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          <div className="h-3 w-48 rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>
-          </div>
-          <div className="h-7 w-24 rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          </div>
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)]">
-          <div className="space-y-6">
-          <div className="rounded-xl border border-[rgb(var(--border))] p-5">
-          <div className="mb-5 h-4 w-36 rounded bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          <div className="space-y-3">{Array.from({ length: 5 }, (_, i) => <div key={i} className="h-3 rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]" style={{ width: (92 - i * 11) + "%" }}/>)}</div>
-          </div>
-          <div className="rounded-xl border border-[rgb(var(--border))] p-5">
-          <div className="mb-5 h-4 w-40 rounded bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          <div className="space-y-4">{Array.from({ length: 3 }, (_, i) => <div key={i} className="space-y-2">
-          <div className="h-3 w-32 rounded bg-[#EAE7DE] dark:bg-[rgb(var(--muted))]"/>
-          <div className="h-3 w-4/5 rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>
-          </div>)}</div>
-          </div>
-          </div>
-          <div className="space-y-6">
-          <div className="h-56 rounded-xl border border-[rgb(var(--border))] bg-[#F8F6F0] dark:bg-[rgb(var(--muted))]"/>
-          <div className="h-44 rounded-xl border border-[rgb(var(--border))] bg-[#F8F6F0] dark:bg-[rgb(var(--muted))]"/>
-          </div>
-          </div>
-          </div> : !item ? <p>Request not found.</p> : <>
+        {loading ? <RequestDetailsSkeleton /> : !item ? <p>Request not found.</p> : <>
           <header className="sticky top-0 z-20 flex flex-wrap items-start justify-between gap-3 border-b border-[rgb(var(--border))] bg-white pb-5 pt-2 dark:bg-[rgb(var(--background))]">
           <div>
           <p className="text-sm text-[rgb(var(--muted-foreground))]">{item.reference}</p>
