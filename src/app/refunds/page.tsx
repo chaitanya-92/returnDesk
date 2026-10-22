@@ -212,8 +212,7 @@ export default function RefundsPage() {
           </div>
         )}
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <RefundSummaryCards
+        <RefundSummaryCards
           values={{ awaitingCount, processedCount, totalRefundValue }}
           loading={loading}
           onSelectStatus={(status) => {
