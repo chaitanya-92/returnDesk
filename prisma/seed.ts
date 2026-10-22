@@ -1001,10 +1001,12 @@ async function main() {
           ? ResolutionType.REFUND
           : ResolutionType.REPLACEMENT
         : null;
+    const productPrice = Number((49.99 + i * 17.35).toFixed(2));
     await prisma.returnRequest.upsert({
       where: { reference },
-      update: {},
+      update: { productPrice },
       create: {
+        productPrice,
         customerName,
         customerEmail,
         reference,
