@@ -130,7 +130,7 @@ showToast("Could not create request", "error", message);
   }
 
   const pageCount = Math.max(1, Math.ceil(totalRows / pageSize));
-  const visibleRows = rows;
+  const visibleRows = loading ? [] : rows;
   const field =
     "w-full rounded-lg border border-[rgb(var(--border))] bg-white px-3 py-2.5 text-sm text-[#23221E] outline-none focus:border-[#D7A400] focus:ring-2 focus:ring-[#F2B719]/20";
   return (
