@@ -17,7 +17,6 @@ import { RequestFilters } from "@/features/requests/components/request-filters";
 
 export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
-  const [statusMenuOpen, setStatusMenuOpen] = useState(false);
 
   const [status, setStatus] = useState<RequestStatusFilter>("ALL");
   const [statusReady, setStatusReady] = useState(false);
@@ -160,15 +159,15 @@ export default function RequestsPage() {
             setPage(1);
           }}
           createdDate={createdDate}
-          onReasonChange={(value) => {
-            setReason(value);
-            setPage(1);
-          }}
+          onReasonChange={(value) => { setReason(value); setPage(1); }}
           reason={reason}
-          onCreatedDateChange={(value) => {
-            setCreatedDate(value);
-            setPage(1);
-          }}
+          onCreatedDateChange={(value) => { setCreatedDate(value); setPage(1); }}
+          status={status}
+          onStatusChange={(value) => { setStatus(value); setPage(1); }}
+          sortBy={sortBy}
+          sortOrder={sortOrder}
+          onSortByChange={(value) => { setSortBy(value); setPage(1); }}
+          onSortOrderChange={(value) => { setSortOrder(value); setPage(1); }}
         />
         <RequestTableSection
           visibleRows={visibleRows}
@@ -176,7 +175,6 @@ export default function RequestsPage() {
           error={error}
           query={query}
           status={status}
-          statusMenuOpen={statusMenuOpen}
           actionMenuId={actionMenuId}
           sortBy={sortBy}
           sortOrder={sortOrder}
