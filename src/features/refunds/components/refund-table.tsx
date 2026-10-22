@@ -12,7 +12,6 @@ type RefundTableProps = {
   shown: RefundRequest[];
   filtered: RefundRequest[];
   loading: boolean;
-  query: string;
   statusFilter: RefundStatus;
   setStatusFilter: (status: RefundStatus) => void;
   filterMenuOpen: boolean;
@@ -32,7 +31,7 @@ const PAGE_SIZE = 10;
 const formatCurrency = formatCurrencyINR;
 
 export function RefundTable({
-  shown, filtered, loading, query, statusFilter, setStatusFilter,
+  shown, filtered, loading, statusFilter, setStatusFilter,
   filterMenuOpen, setFilterMenuOpen, handleSort,
   sortIndicator, actionMenuId, setActionMenuId, busyId, setConfirmRefund,
   page, pageCount, onPageChange,
