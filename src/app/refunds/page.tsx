@@ -91,7 +91,7 @@ export default function RefundsPage() {
 
       const payload = await requestsApi.list(params);
 
-      const items: RefundRequest[] = payload.data.items ?? [];
+      const items: RequestRecord[] = payload.data.items ?? [];
 
       setRows(
         selectRefundRequests(items),
