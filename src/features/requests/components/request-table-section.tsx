@@ -11,7 +11,6 @@ import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableH
 import { StatusBadge } from "@/components/requests/status-badge";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
-import type { RequestStatusFilter } from "@/features/requests/types";
 
 export type RequestRow = Pick<
   RequestRecord,
@@ -26,8 +25,6 @@ type RequestTableSectionProps = {
   query: string;
   status: string;
   actionMenuId: string | null;
-  setStatus: (value: RequestStatusFilter) => void;
-  setPage: (value: number) => void;
   setActionMenuId: (value: string | null | ((current: string | null) => string | null)) => void;
 };
 
