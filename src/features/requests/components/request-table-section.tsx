@@ -4,6 +4,7 @@ import {
   ArrowDown,
   ArrowUp,
   ArrowUpDown,
+  Filter,
   ArrowUpRight,
   CheckCircle2,
   Eye,
@@ -303,7 +304,7 @@ export function RequestTableSection({
                     </DataTableCell>
                   </DataTableRow>
                 ))}
-                {!loading && rows.length === 0 && (
+                {!loading && visibleRows.length === 0 && (
                   <DataTableRow>
                     <DataTableCell colSpan={6} className="px-4 py-12 text-center">
                       <Inbox className="mx-auto mb-2 text-gray-400" />
