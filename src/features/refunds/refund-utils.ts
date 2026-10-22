@@ -60,7 +60,7 @@ export function filterAndSortRefunds(
 ): RefundRequest[] {
   return refunds
     .filter((refund) => status === "ALL" || refund.status === status)
-    .toSorted((left, right) => {
+     .slice().sort((left, right) => {
       const comparison = compareRefunds(left, right, sortBy);
       return sortOrder === "asc" ? comparison : -comparison;
     });
