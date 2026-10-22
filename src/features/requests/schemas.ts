@@ -69,7 +69,7 @@ export const transitionSchema = yup
   .object({
     status: yup
       .mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "PROCESSING" | "COMPLETED">()
-      .oneOf(["IN_REVIEW", "APPROVED", "REJECTED", "PROCESSING", "COMPLETED"])
+      .oneOf(["IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"])
       .required("Status is required"),
     resolution: yup
       .mixed<"REFUND" | "REPLACEMENT" | "STORE_CREDIT">()
