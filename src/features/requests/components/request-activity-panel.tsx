@@ -27,6 +27,7 @@ export function RequestActivityPanel({
   busy,
 }: RequestActivityPanelProps) {
   return (
+    <>
 <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="flex items-center gap-2 font-semibold">
           <Clock3 size={18}/>Activity timeline</h2>
@@ -48,5 +49,6 @@ export function RequestActivityPanel({
           <Send size={15}/>Add internal note</button>
           </form>
           </section>
+    </>
   );
 }
