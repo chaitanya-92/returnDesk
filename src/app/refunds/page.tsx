@@ -14,6 +14,7 @@ import {
   type RefundRequest,
 } from "@/features/refunds/refund-utils";
 import { RefundTable } from "@/features/refunds/components/refund-table";
+import { RefundPageToolbar } from "@/features/refunds/components/refund-page-toolbar";
 import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
 
 const PAGE_SIZE = 10;
@@ -63,7 +64,7 @@ export default function RefundsPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [query, statusFilter]);
+  }, [query, statusFilter, setPage]);
 
   const processed = async (refund: RefundRequest) => {
     setBusyId(refund.id);
