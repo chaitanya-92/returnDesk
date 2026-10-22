@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  ArrowUpRight,
-  Eye,
-  Inbox,
-  MoreHorizontal,
-  WalletCards,
-} from "lucide-react";
+import { Inbox } from "lucide-react";
+import Link from "next/link";
 import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
@@ -24,8 +19,6 @@ type RequestTableSectionProps = {
   error: string;
   query: string;
   status: string;
-  actionMenuId: string | null;
-  setActionMenuId: (value: string | null | ((current: string | null) => string | null)) => void;
 };
 
 const pretty = formatRequestStatus;
@@ -36,32 +29,18 @@ export function RequestTableSection({
   error,
   query,
   status,
-  actionMenuId,
-  setActionMenuId,
 }: RequestTableSectionProps) {
   return (
 <section className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
           <DataTableContainer>
             <DataTable className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]">
               <DataTableHeader className="bg-[#FFF7D6] text-[10px] uppercase tracking-[0.09em] text-[#4C3B08] dark:bg-[#342C19] dark:text-[#F4D76B]">
-                <DataTableRow><DataTableHead className="px-3 py-2.5">Request</DataTableHead><DataTableHead className="px-3 py-2.5">Customer</DataTableHead><DataTableHead className="px-3 py-2.5">Reason</DataTableHead><DataTableHead className="px-3 py-2.5">Status</DataTableHead><DataTableHead className="px-3 py-2.5">Created</DataTableHead><DataTableHead className="px-3 py-2.5"></DataTableHead></DataTableRow>              </DataTableHeader>
+                <DataTableRow><DataTableHead className="px-3 py-2.5">Request</DataTableHead><DataTableHead className="px-3 py-2.5">Customer</DataTableHead><DataTableHead className="px-3 py-2.5">Reason</DataTableHead><DataTableHead className="px-3 py-2.5">Status</DataTableHead><DataTableHead className="px-3 py-2.5">Created</DataTableHead><DataTableHead className="px-3 py-2.5 text-right">Details</DataTableHead></DataTableRow>              </DataTableHeader>
               <DataTableBody className="divide-y divide-[rgb(var(--border))]">
                 {visibleRows.map((r) => (
                   <DataTableRow
                     key={r.id}
-                    onClick={() => {
-                      window.location.href = "/requests/" + r.id;
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" || event.key === " ") {
-                        event.preventDefault();
-                        window.location.href = "/requests/" + r.id;
-                      }
-                    }}
-                    tabIndex={0}
-                    role="link"
-                    aria-label={"View details for " + r.reference}
-                    className="cursor-pointer bg-white text-[#23221E] hover:bg-[#FFFCF0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D7A400] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))] dark:hover:bg-[#302F2A]"
+                    className="bg-white text-[#23221E] hover:bg-[#FFFCF0] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))] dark:hover:bg-[#302F2A]"
                   >
                     <DataTableCell className="px-4 py-4">
                       <p className="font-semibold">{r.reference}</p>
@@ -82,64 +61,14 @@ export function RequestTableSection({
                     <DataTableCell className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
                       {formatDate(r.createdAt)}
                     </DataTableCell>
-                    <DataTableCell className="px-4 py-4">
-                      <div className="relative flex justify-end">
-                        <button
-                          type="button"
-                          aria-label={"Actions for " + r.reference}
-                          aria-haspopup="menu"
-                          aria-expanded={actionMenuId === r.id}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            setActionMenuId((current) =>
-                              current === r.id ? null : r.id,
-                            );
-                          }}
-                          className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E1DFD6] bg-white text-[#4B493F] shadow-sm hover:bg-[#FFF9DC] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"
-                        >
-                          <MoreHorizontal size={18} />
-                        </button>
-                        {actionMenuId === r.id && (
-                          <>
-                            <button
-                              type="button"
-                              aria-label="Close actions menu"
-                              tabIndex={-1}
-                              onClick={() => setActionMenuId(null)}
-                              className="fixed inset-0 z-40 cursor-default"
-                            ></button>
-                            <div
-                              role="menu"
-                              aria-label={"Actions for " + r.reference}
-                              className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"
-                            >
-                              <a
-                                role="menuitem"
-                                href={"/requests/" + r.id}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setActionMenuId(null);
-                                }}
-                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"
-                              >
-                                <Eye size={15} /> View details{" "}
-                                <ArrowUpRight size={13} className="ml-auto" />
-                              </a>
-                              <a
-                                role="menuitem"
-                                href={"/refunds"}
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  setActionMenuId(null);
-                                }}
-                                className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"
-                              >
-                                <WalletCards size={15} /> Refund requests
-                              </a>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                    <DataTableCell className="px-4 py-4 text-right">
+                      <Link
+                        href={"/requests/" + r.id + (typeof window !== "undefined" ? window.location.search : "")}
+                        onClick={(event) => event.stopPropagation()}
+                        className="inline-flex items-center rounded-lg border border-[#E1DFD6] px-3 py-2 text-sm font-medium text-[#6B5100] transition hover:border-[#D7A400] hover:bg-[#FFF7D6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7A400] dark:border-[rgb(var(--border))] dark:text-[rgb(var(--foreground))]"
+                      >
+                        View details
+                      </Link>
                     </DataTableCell>
                   </DataTableRow>
                 ))}

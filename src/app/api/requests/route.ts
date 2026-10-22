@@ -9,8 +9,12 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const rawStatuses = params.getAll("status").map((value) => value.toUpperCase());
     const rawReasons = params.getAll("reason").map((value) => value.toUpperCase());
+    const rawResolution = params.get("resolution")?.toUpperCase();
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
+    if (rawResolution && !["REFUND", "STORE_CREDIT", "REPLACEMENT"].includes(rawResolution)) {
+      throw new AppError("Unknown resolution filter.", 400, "INVALID_RESOLUTION_FILTER");
+    }
     const rawDate = params.get("date");
     if (rawDate && !/^\d{4}-\d{2}-\d{2}$/.test(rawDate))
       throw new AppError(
@@ -68,6 +72,7 @@ export async function GET(request: NextRequest) {
     }
     const result = await listRequests({
       statuses: rawStatuses as (typeof REQUEST_STATUSES)[number][],
+      resolution: rawResolution as "REFUND" | "STORE_CREDIT" | "REPLACEMENT" | undefined,
       reasons: rawReasons,
       createdDate: date,
       search: params.get("q") ?? undefined,

@@ -26,6 +26,7 @@ export type RequestRecord = {
   orderItemId: string;
   itemName: string;
   itemSku: string;
+  productPrice?: string | number | null;
   quantity: number;
   customerName: string;
   customerEmail: string;

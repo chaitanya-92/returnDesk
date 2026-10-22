@@ -15,6 +15,7 @@ const STATUS_PREFIX: Record<RequestStatus, string> = {
   OPEN: "open",
   IN_REVIEW: "review",
   APPROVED: "approved",
+  PROCESSING: "processing",
   REJECTED: "rejected",
   COMPLETED: "completed",
 };

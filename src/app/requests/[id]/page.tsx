@@ -29,18 +29,53 @@ type RequestWithActivity = RequestRecord & {
 export default function RequestDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const returnToRequests = () => {
+    if (typeof window === "undefined") return "/requests";
+    const previousUrl = document.referrer;
+    if (previousUrl) {
+      try {
+        const previous = new URL(previousUrl);
+        if (previous.origin === window.location.origin && previous.pathname.startsWith("/requests")) {
+          return previous.pathname + previous.search + previous.hash;
+        }
+      } catch {
+        // Fall back to the requests workspace when the referrer is invalid.
+      }
+    }
+    return "/requests";
+  };
+
+  const returnToPreviousListEntry = () => {
+    if (typeof window !== "undefined") {
+      const previousUrl = document.referrer;
+      if (previousUrl) {
+        try {
+          const previous = new URL(previousUrl);
+          if (previous.origin === window.location.origin && previous.pathname.startsWith("/requests")) {
+            router.back();
+            return;
+          }
+        } catch {
+          // Fall through to the requests workspace.
+        }
+      }
+    }
+    router.replace("/requests");
+  };
 
   const [item, setItem] = useState<RequestWithActivity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const [redirectMessage, setRedirectMessage] = useState("Returning to requests…");
   const [note, setNote] = useState("");
-  const [toast, setToast] = useState("");
   const [resolution, setResolution] = useState<"REFUND" | "REPLACEMENT" | "STORE_CREDIT">("REFUND");
   const [amount, setAmount] = useState("");
   const [decisionNote, setDecisionNote] = useState("");
   const [resolutionOpen, setResolutionOpen] = useState(false);
   const [editingAmount, setEditingAmount] = useState(false);
+  const [reviewConfirmationOpen, setReviewConfirmationOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -54,7 +89,7 @@ export default function RequestDetailsPage() {
         events: data.events ?? [],
       });
       setResolution(data.resolution ?? "REFUND");
-      setAmount(data.refundAmount == null ? "" : String(data.refundAmount));
+      setAmount(data.refundAmount == null ? (data.productPrice == null ? "" : String(Number(data.productPrice) * data.quantity)) : String(data.refundAmount));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not load request");
     } finally {
@@ -65,16 +100,29 @@ export default function RequestDetailsPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    setReviewConfirmationOpen(item?.status === "OPEN");
+  }, [item?.status, id]);
+
+  async function returnToRequestsAfterToast(message: string) {
+    setRedirectMessage(message);
+    setRedirecting(true);
+    await new Promise((resolve) => window.setTimeout(resolve, 1600));
+    returnToPreviousListEntry();
+  }
+
   async function transition(
     status: "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED",
-  ) {
+    noteOverride?: string,
+  ): Promise<boolean> {
     setBusy(true);
     setError("");
 
     try {
       const input: TransitionRequestInput = {
         status,
-        note: decisionNote.trim() || undefined,
+        note: noteOverride?.trim() || decisionNote.trim() || undefined,
       };
 
       if (status === "APPROVED") {
@@ -84,14 +132,35 @@ export default function RequestDetailsPage() {
 
       await requestsApi.transition(id, input);
       setDecisionNote("");
-      setToast("Request updated.");
-      showToast("Request updated");
+
+      if (status === "IN_REVIEW") {
+        showToast("Request moved to In Review", "success");
+        await load();
+        return true;
+      }
+
+      if (status === "APPROVED") {
+        showToast("Request approved", "success", "Opening the requests table…");
+        await returnToRequestsAfterToast("Approved successfully. Returning to requests…");
+        return true;
+      }
+
+
+      if (status === "REJECTED") {
+        showToast("Request rejected", "success", "Returning to the requests table…");
+        await returnToRequestsAfterToast("Request rejected. Returning to requests…");
+        return true;
+      }
+
+      showToast("Request marked completed", "success");
       await load();
+      return true;
     } catch (cause) {
       const message =
         cause instanceof Error ? cause.message : "Could not update request";
       setError(message);
       showToast(message, "error");
+      return false;
     } finally {
       setBusy(false);
     }
@@ -107,7 +176,6 @@ export default function RequestDetailsPage() {
     try {
       await requestsApi.addNote(id, note, "Operations team");
       setNote("");
-      setToast("Internal note added.");
       showToast("Internal note added");
       await load();
     } catch (cause) {
@@ -138,8 +206,27 @@ export default function RequestDetailsPage() {
     return (
       <AppShell>
         <div className="relative min-w-0 space-y-5 pb-8">
-          <button onClick={() => router.push("/requests")} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
-          <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
+          {reviewConfirmationOpen && item?.status === "OPEN" && !loading && <div className="fixed inset-0 z-[140] flex items-center justify-center bg-black/40 p-4">
+            <section role="dialog" aria-modal="true" aria-labelledby="review-request-title" className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]">
+              <div className="flex items-start gap-3">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#FFF5C2] text-[#725500]"><span aria-hidden="true" className="text-lg font-bold">?</span></span>
+                <div><h2 id="review-request-title" className="text-lg font-semibold">Move request to In Review?</h2>
+                  <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">This request is still Open. Move it to In Review to begin evaluating the return and choosing a resolution.</p></div>
+              </div>
+              <div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row">
+                <button type="button" disabled={busy} onClick={() => setReviewConfirmationOpen(false)} className="rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50">Keep Open</button>
+                <button type="button" disabled={busy} onClick={async () => { const succeeded = await transition("IN_REVIEW"); if (succeeded) setReviewConfirmationOpen(false); }} className="rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#23221E] disabled:opacity-50">{busy ? "Moving to In Review…" : "Move to In Review"}</button>
+              </div>
+            </section>
+          </div>}
+          {redirecting && <div role="status" aria-live="polite" className="fixed inset-0 z-[120] flex items-center justify-center bg-black/25 p-4 backdrop-blur-[2px]">
+            <div className="flex w-full max-w-sm items-center gap-4 rounded-2xl border border-[rgb(var(--border))] bg-white p-5 shadow-xl dark:bg-[rgb(var(--card))]">
+              <span className="h-9 w-9 shrink-0 animate-spin rounded-full border-4 border-[#F2B719]/25 border-t-[#B8872C]" />
+              <div><p className="font-semibold text-[rgb(var(--foreground))]">{redirectMessage}</p><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Please wait while we return you to the correct table view.</p></div>
+            </div>
+          </div>}
+          <button onClick={() => router.push(returnToRequests())} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
+          <ArrowLeft size={16}/>Return requests</button>{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
         {loading ? <RequestDetailsSkeleton /> : !item ? <p>Request not found.</p> : <>
           <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgb(var(--border))] bg-white pb-5 pt-1">
@@ -178,7 +265,7 @@ export default function RequestDetailsPage() {
           onDecisionNoteChange={setDecisionNote}
           editingAmount={editingAmount}
           onEditingAmountChange={setEditingAmount}
-          onTransition={(status) => void transition(status)}
+          onTransition={(status, rejectionReason) => transition(status, rejectionReason)}
           onRefresh={() => void load()}
         />
           </div>

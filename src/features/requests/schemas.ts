@@ -13,6 +13,7 @@ export const requestDraftSchema = yup.object({
   orderItemId: requiredText("Order item ID", 100),
   itemName: requiredText("Item name"),
   itemSku: requiredText("Item SKU", 100),
+  productPrice: yup.number().transform((value, original) => (original === "" ? undefined : value)).positive("Product price must be greater than zero").max(1000000).nullable().optional(),
   quantity: yup
     .number()
     .transform((value, original) => (original === "" ? NaN : value))
@@ -42,6 +43,7 @@ export const requestDetailsUpdateSchema = yup
     orderItemId: requiredText("Order item ID", 100).optional(),
     itemName: requiredText("Item name").optional(),
     itemSku: requiredText("Item SKU", 100).optional(),
+    productPrice: yup.number().positive().max(1000000).nullable().optional(),
     quantity: yup.number().integer().min(1).max(1000).optional(),
     customerName: requiredText("Customer name").optional(),
     customerEmail: yup
@@ -66,7 +68,7 @@ export const requestDetailsUpdateSchema = yup
 export const transitionSchema = yup
   .object({
     status: yup
-      .mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED">()
+      .mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "PROCESSING" | "COMPLETED">()
       .oneOf(["IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"])
       .required("Status is required"),
     resolution: yup
@@ -98,7 +100,7 @@ export const transitionSchema = yup
             },
           ),
       }),
-    note: yup.string().trim().max(1000).optional(),
+    note: yup.string().trim().max(1000).when("status", { is: "REJECTED", then: (schema) => schema.required("A rejection reason is required").min(3, "Rejection reason must be at least 3 characters"), otherwise: (schema) => schema.optional(), }),
   })
   .noUnknown();
 

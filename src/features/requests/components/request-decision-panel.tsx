@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Check,
   CheckCircle2,
@@ -27,7 +28,7 @@ type RequestDecisionPanelProps = {
   onDecisionNoteChange: (value: string) => void;
   editingAmount: boolean;
   onEditingAmountChange: (value: boolean) => void;
-  onTransition: (status: TransitionStatus) => void;
+  onTransition: (status: TransitionStatus, note?: string) => Promise<boolean>;
   onRefresh: () => void;
 };
 
@@ -37,6 +38,8 @@ export function RequestDecisionPanel({
   decisionNote, onDecisionNoteChange, editingAmount,
   onEditingAmountChange, onTransition, onRefresh,
 }: RequestDecisionPanelProps) {
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
   return (
 <aside className="h-fit space-y-5 self-start xl:sticky xl:top-24">{review && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Decision workflow</h2>{item.status === "OPEN" && <button disabled={busy} onClick={() => void onTransition("IN_REVIEW")} className="mt-4 w-full rounded-lg border px-3 py-2.5 text-sm">Move to In Review</button>}{item.status === "IN_REVIEW" && <div className="mt-4 space-y-3">
@@ -64,17 +67,13 @@ export function RequestDecisionPanel({
           <Pencil size={15}/>
           </button>}</div>
           <p className="mt-1.5 text-[11px] leading-4 text-[#77736A]">Confirm the item price before approving. The amount is saved with the decision.</p>
-          </div>}<label className="block text-xs font-medium">Decision note<textarea value={decisionNote} onChange={e => onDecisionNoteChange(e.target.value)} rows={2} maxLength={1000} placeholder="Why is this decision appropriate?" className="mt-1.5 w-full rounded-lg border bg-white p-3 text-sm text-[#23221E]"/>
+          </div>}<label className="block text-xs font-medium">{item.status === "IN_REVIEW" ? "Decision note" : "Decision note"}<textarea value={decisionNote} onChange={e => onDecisionNoteChange(e.target.value)} rows={3} maxLength={1000} required placeholder="Add the decision reason. A clear reason is required when rejecting this request." aria-describedby="decision-note-help" className="mt-1.5 w-full rounded-lg border bg-white p-3 text-sm text-[#23221E]"/><span id="decision-note-help" className="mt-1 block text-xs text-[#77736A]">Required for rejection. This reason will be saved to the request activity.</span>
           </label>
           <button disabled={busy || (resolution === "REFUND" && !(Number(amount) > 0))} onClick={() => void onTransition("APPROVED")} className="w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E] disabled:opacity-50">
           <CheckCircle2 className="mr-1 inline" size={16}/>Approve request</button>
-          <button disabled={busy} onClick={() => void onTransition("REJECTED")} className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
-          <XCircle className="mr-1 inline" size={16}/>Reject request</button>
-          </div>}</section>}{item.status === "APPROVED" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
-          <h2 className="font-semibold">Fulfilment</h2>
-          <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Mark the approved resolution as completed after fulfilment.</p>
-          <button disabled={busy} onClick={() => void onTransition("COMPLETED")} className="mt-4 w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E]">Mark completed</button>
-          </section>}<button onClick={() => void onRefresh()} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm">
+          <button disabled={busy} onClick={() => { setRejectionReason(""); setRejectModalOpen(true); }} className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
+          <XCircle className="mr-1 inline" size={16}/>Reject request</button>{rejectModalOpen && <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 p-4"><section role="dialog" aria-modal="true" aria-labelledby="reject-request-title" className="w-full max-w-lg rounded-2xl border bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-full bg-rose-100 text-rose-700"><XCircle size={20}/></span><div><h2 id="reject-request-title" className="text-lg font-semibold">Reject request</h2><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Enter the department’s reason for rejecting this request. It will be recorded in the request activity.</p></div></div><label className="mt-5 block text-sm font-medium">Rejection reason <span className="text-rose-600">*</span><textarea autoFocus value={rejectionReason} onChange={(event) => setRejectionReason(event.target.value)} rows={4} maxLength={1000} aria-describedby="reject-reason-help" placeholder="Explain clearly why this request is being rejected…" className="mt-2 w-full rounded-lg border border-[rgb(var(--border))] bg-white p-3 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 dark:bg-[rgb(var(--background))]"/></label><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{rejectionReason.trim().length > 0 && rejectionReason.trim().length < 3 ? "Please enter at least 3 meaningful characters." : "Required. Avoid vague reasons such as “not approved”."} <span className="float-right">{rejectionReason.length}/1000</span></p><div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row"><button type="button" disabled={busy} onClick={() => setRejectModalOpen(false)} className="rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50">Cancel</button><button type="button" disabled={busy || rejectionReason.trim().length < 3} onClick={async () => { const succeeded = await onTransition("REJECTED", rejectionReason.trim()); if (succeeded) { setRejectModalOpen(false); setRejectionReason(""); } }} className="rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Rejecting…" : "Confirm rejection"}</button></div></section></div>}
+          </div>}</section>}{item.status === "APPROVED" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]"><h2 className="font-semibold">Resolution</h2><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Once the approved resolution has been completed, mark this request as completed.</p><button disabled={busy} onClick={() => void onTransition("COMPLETED")} className="mt-4 w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E]">Mark completed</button></section>}<button onClick={() => void onRefresh()} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm">
           <RefreshCw size={15}/>Refresh details</button>
           </aside>
   );

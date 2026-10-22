@@ -11,6 +11,7 @@ enum RequestStatus {
   OPEN
   IN_REVIEW
   APPROVED
+  PROCESSING
   REJECTED
   COMPLETED
 }
@@ -44,6 +45,7 @@ model ReturnRequest {
   status        RequestStatus   @default(OPEN)
   resolution    ResolutionType?
   refundAmount  Decimal?        @db.Decimal(10, 2)
+  productPrice  Decimal?        @db.Decimal(10, 2)
   archivedAt    DateTime?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt

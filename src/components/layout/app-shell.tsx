@@ -8,7 +8,6 @@ import {
   Menu,
   PackageCheck,
   PanelLeft,
-  WalletCards,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
@@ -41,7 +40,6 @@ import {
 const navigation = [
   { label: "Overview", href: "/", icon: LayoutDashboard },
   { label: "Return requests", href: "/requests", icon: PackageCheck },
-  { label: "Refund requests", href: "/refunds", icon: WalletCards },
 ];
 
 function Brand() {

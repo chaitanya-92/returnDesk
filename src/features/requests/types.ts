@@ -2,6 +2,7 @@ export const REQUEST_STATUSES = [
   "OPEN",
   "IN_REVIEW",
   "APPROVED",
+  "PROCESSING",
   "REJECTED",
   "COMPLETED",
 ] as const;
@@ -35,12 +36,14 @@ export const ACTIVE_STATUSES = [
   "OPEN",
   "IN_REVIEW",
   "APPROVED",
+  "PROCESSING",
 ] as const satisfies readonly RequestStatus[];
 
 export const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   OPEN: ["IN_REVIEW"],
   IN_REVIEW: ["APPROVED", "REJECTED"],
   APPROVED: ["COMPLETED"],
+  PROCESSING: [],
   REJECTED: [],
   COMPLETED: [],
 };
@@ -50,6 +53,7 @@ export type RequestDraft = {
   orderItemId: string;
   itemName: string;
   itemSku: string;
+  productPrice?: number | null;
   quantity: number;
   customerName: string;
   customerEmail: string;

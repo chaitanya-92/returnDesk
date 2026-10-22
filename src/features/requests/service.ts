@@ -51,6 +51,7 @@ function validateResolution(input: RequestResolution) {
 
 export type RequestListFilters = {
   statuses?: RequestStatus[];
+  resolution?: "REFUND" | "STORE_CREDIT" | "REPLACEMENT";
   reasons?: string[];
   createdDate?: Date;
   search?: string;
@@ -61,7 +62,18 @@ export type RequestListFilters = {
 };
 
 export async function listRequests(filters?: RequestListFilters) {
-  const search = filters?.search?.trim();
+  const search = filters?.search?.trim().replace(/\s+/g, " ");
+  const searchableFields = (term: string): Prisma.ReturnRequestWhereInput[] => [
+    { reference: { contains: term, mode: "insensitive" } },
+    { orderNumber: { contains: term, mode: "insensitive" } },
+    { orderItemId: { contains: term, mode: "insensitive" } },
+    { itemName: { contains: term, mode: "insensitive" } },
+    { itemSku: { contains: term, mode: "insensitive" } },
+    { customerName: { contains: term, mode: "insensitive" } },
+    { customerEmail: { contains: term, mode: "insensitive" } },
+    { reason: { contains: term, mode: "insensitive" } },
+    { description: { contains: term, mode: "insensitive" } },
+  ];
   const page = Math.max(1, filters?.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, filters?.pageSize ?? 10));
   const sortBy = filters?.sortBy ?? "createdAt";
@@ -69,6 +81,7 @@ export async function listRequests(filters?: RequestListFilters) {
   const where: Prisma.ReturnRequestWhereInput = {
     ...liveFilter,
     ...(filters?.statuses?.length ? { status: { in: filters.statuses } } : {}),
+    ...(filters?.resolution ? { resolution: filters.resolution } : {}),
     ...(filters?.reasons?.length ? { reason: { in: filters.reasons } } : {}),
     ...(filters?.createdDate
       ? {
@@ -80,12 +93,9 @@ export async function listRequests(filters?: RequestListFilters) {
       : {}),
     ...(search
       ? {
-          OR: [
-            { reference: { contains: search, mode: "insensitive" } },
-            { orderNumber: { contains: search, mode: "insensitive" } },
-            { customerName: { contains: search, mode: "insensitive" } },
-            { customerEmail: { contains: search, mode: "insensitive" } },
-          ],
+          AND: search.split(" ").filter(Boolean).map((term) => ({
+            OR: searchableFields(term),
+          })),
         }
       : {}),
   };
@@ -167,9 +177,9 @@ export async function updateRequestDetails(
   });
   if (!existing)
     throw new AppError("Return request not found.", 404, "REQUEST_NOT_FOUND");
-  if (["APPROVED", "REJECTED", "COMPLETED"].includes(existing.status)) {
+  if (["APPROVED", "PROCESSING", "REJECTED", "COMPLETED"].includes(existing.status)) {
     throw new AppError(
-      "Request details cannot be edited after approval, rejection, or completion.",
+      "Request details cannot be edited after approval, during fulfilment, after rejection, or after completion.",
       409,
       "REQUEST_DETAILS_LOCKED",
     );
@@ -219,6 +229,10 @@ export async function transitionRequest(
       );
     }
 
+    if (input.status === "REJECTED" && (!input.note?.trim() || input.note.trim().length < 3)) {
+      throw new AppError("A rejection reason of at least 3 characters is required.", 400, "REJECTION_REASON_REQUIRED");
+    }
+
     const resolutionInput =
       input.status === "APPROVED"
         ? {
@@ -245,7 +259,9 @@ export async function transitionRequest(
         type: RequestEventType.STATUS_CHANGED,
         fromStatus: existing.status,
         toStatus: input.status,
-        message: `Status changed from ${existing.status} to ${input.status}.`,
+        message: input.status === "REJECTED"
+          ? `Request rejected. Reason: ${input.note?.trim()}`
+          : `Status changed from ${existing.status} to ${input.status}.`,
       },
     });
 

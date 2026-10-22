@@ -46,6 +46,21 @@ describe("transitionSchema", () => {
       }),
     ).resolves.toMatchObject({ status: "APPROVED" });
   });
+
+  it("requires a meaningful rejection reason", async () => {
+    await expect(
+      transitionSchema.validate({ status: "REJECTED", note: "  " }),
+    ).rejects.toThrow();
+    await expect(
+      transitionSchema.validate({ status: "REJECTED", note: "No" }),
+    ).rejects.toThrow();
+    await expect(
+      transitionSchema.validate({
+        status: "REJECTED",
+        note: "Item did not meet the return policy",
+      }),
+    ).resolves.toMatchObject({ status: "REJECTED" });
+  });
 });
 describe("noteSchema", () => {
   it("rejects blank notes", async () => {
