@@ -70,41 +70,61 @@ export default function RequestDetailsPage() {
   useEffect(() => {
     void load();
   }, [load]);
-    async function transition(status: string) { setBusy(true); setError(""); try {
-        const body: Record<string, unknown> = { status, note: decisionNote.trim() || undefined };
-        if (status === "APPROVED") {
-            body.resolution = resolution;
-            if (resolution === "REFUND")
-                body.refundAmount = Number(amount);
-        }
-        await requestsApi.transition(id, body as TransitionRequestInput);
-        setDecisionNote("");
-        setToast("Request updated.");
-        showToast("Request updated");
-        await load();
+  async function transition(
+    status: "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED",
+  ) {
+    setBusy(true);
+    setError("");
+
+    try {
+      const input: TransitionRequestInput = {
+        status,
+        note: decisionNote.trim() || undefined,
+      };
+
+      if (status === "APPROVED") {
+        input.resolution = resolution;
+        if (resolution === "REFUND") input.refundAmount = Number(amount);
+      }
+
+      await requestsApi.transition(id, input);
+      setDecisionNote("");
+      setToast("Request updated.");
+      showToast("Request updated");
+      await load();
+    } catch (cause) {
+      const message =
+        cause instanceof Error ? cause.message : "Could not update request";
+      setError(message);
+      showToast(message, "error");
+    } finally {
+      setBusy(false);
     }
-    catch (e) {
-        setError(e instanceof Error ? e.message : "Could not update request");
-        showToast(e instanceof Error ? e.message : "Could not update request", "error");
+  }
+
+  async function addNote(event: FormEvent) {
+    event.preventDefault();
+    if (!note.trim()) return;
+
+    setBusy(true);
+    setError("");
+
+    try {
+      await requestsApi.addNote(id, note, "Operations team");
+      setNote("");
+      setToast("Internal note added.");
+      showToast("Internal note added");
+      await load();
+    } catch (cause) {
+      const message =
+        cause instanceof Error ? cause.message : "Could not add note";
+      setError(message);
+      showToast(message, "error");
+    } finally {
+      setBusy(false);
     }
-    finally {
-        setBusy(false);
-    } }
-    async function addNote(e: FormEvent) { e.preventDefault(); if (!note.trim())
-        return; setBusy(true); setError(""); try {
-        await requestsApi.addNote(id, note, "Operations team");
-        setNote("");
-        setToast("Internal note added.");
-        showToast("Internal note added");
-        await load();
-    }
-    catch (e) {
-        setError(e instanceof Error ? e.message : "Could not add note");
-        showToast(e instanceof Error ? e.message : "Could not add note", "error");
-    }
-    finally {
-        setBusy(false);
-    } }
+  }
+
     const review = item?.status === "OPEN" || item?.status === "IN_REVIEW";
     const activityItems = [
       ...(item?.events ?? []).map((event) => ({
