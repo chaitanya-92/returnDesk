@@ -23,7 +23,6 @@ export function RefundConfirmationDialog({
   const confirmRefund = refund;
   const processed = onConfirm;
   return (
-{refund && (
         <div
           className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
           onMouseDown={(event) => {
@@ -116,6 +115,5 @@ export function RefundConfirmationDialog({
             </div>
           </section>
         </div>
-      )}
   );
 }
