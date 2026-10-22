@@ -36,7 +36,7 @@ export default function RequestsPage() {
     "createdAt" | "customerName" | "status" | "reason" | "reference"
   >("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [reason] = useState("ALL");
+  const [reason, setReason] = useState("ALL");
   const [createdDate, setCreatedDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -153,6 +153,11 @@ export default function RequestsPage() {
             setPage(1);
           }}
           createdDate={createdDate}
+          onReasonChange={(value) => {
+            setReason(value);
+            setPage(1);
+          }}
+          reason={reason}
           onCreatedDateChange={(value) => {
             setCreatedDate(value);
             setPage(1);
