@@ -24,17 +24,7 @@ export function formatRequestStatus(status: string): string {
     .replace(/^\w/, (character) => character.toUpperCase());
 }
 
-export function formatCurrencyINR(value: number | string | null | undefined): string {
-  if (value == null || value === "" || !Number.isFinite(Number(value))) {
-    return "—";
-  }
 
-  return Number(value).toLocaleString("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 2,
-  });
-}
 
 export function formatDate(
   value: string | Date,
