@@ -1,5 +1,10 @@
 import { apiRequest } from "@/lib/client-api";
-import type { RequestDraft, RequestStatus, ResolutionType, RequestReason } from "../types";
+import type {
+  RequestDraft,
+  RequestReason,
+  RequestStatus,
+  ResolutionType,
+} from "../types";
 
 export type RequestNote = {
   id: string;
