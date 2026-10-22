@@ -55,8 +55,10 @@ export type TransitionRequestInput = {
 const CACHE_TTL_MS = 30_000;
 const responseCache = new Map<string, { expiresAt: number; value: unknown }>();
 const inFlight = new Map<string, Promise<unknown>>();
+let cacheGeneration = 0;
 
 function invalidateRequestCache() {
+  cacheGeneration += 1;
   responseCache.clear();
   inFlight.clear();
 }
@@ -69,12 +71,17 @@ function cachedRequest<T>(key: string, request: () => Promise<T>): Promise<T> {
   const existing = inFlight.get(key);
   if (existing) return existing as Promise<T>;
 
+  const generation = cacheGeneration;
   const pending = request()
     .then((value) => {
-      responseCache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
+      if (generation === cacheGeneration) {
+        responseCache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
+      }
       return value;
     })
-    .finally(() => inFlight.delete(key));
+    .finally(() => {
+      if (inFlight.get(key) === pending) inFlight.delete(key);
+    });
 
   inFlight.set(key, pending);
   return pending;
