@@ -33,6 +33,7 @@ export function RequestPageHeader({
   const field = fieldClassName;
   const createRequest = onCreateRequest;
   return (
+    <>
 <header className="flex flex-col justify-between gap-4 border-b border-[rgb(var(--border))] pb-5 sm:flex-row sm:items-end">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">
@@ -147,5 +148,6 @@ export function RequestPageHeader({
             </section>
           </div>
         )}
+    </>
   );
 }
