@@ -137,12 +137,12 @@ export default function RequestDetailsPage() {
     ].slice().sort((left, right) => new Date(left.date).getTime() - new Date(right.date).getTime());
     return (
       <AppShell>
-        <div className="relative min-h-[65vh] space-y-6">
+        <div className="relative min-w-0 space-y-5 pb-8">
           <button onClick={() => router.push("/requests")} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
           <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
         {loading ? <RequestDetailsSkeleton /> : !item ? <p>Request not found.</p> : <>
-          <header className="sticky top-0 z-20 flex flex-wrap items-start justify-between gap-3 border-b border-[rgb(var(--border))] bg-white pb-5 pt-2 dark:bg-[rgb(var(--background))]">
+          <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgb(var(--border))] bg-white pb-5 pt-1">
           <div>
           <p className="text-sm text-[rgb(var(--muted-foreground))]">{item.reference}</p>
           <h1 className="mt-1 text-3xl font-semibold">{item.itemName}</h1>
@@ -151,8 +151,8 @@ export default function RequestDetailsPage() {
           <StatusBadge status={item.status} className="px-3 py-1.5 text-sm font-semibold" />
           </header>
 
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(320px,.7fr)]">
-          <div className="min-w-0 max-h-[calc(100vh-245px)] space-y-5 overflow-y-auto overscroll-contain pr-3 [scrollbar-width:thin] [scrollbar-color:#C9C4B7_transparent]" style={{ scrollbarGutter: "stable" }}>
+        <div className="grid min-w-0 items-start gap-5 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,.65fr)]">
+          <div className="min-w-0 space-y-5">
                     <RequestInformationCard item={item} />
 
                   <RequestActivityPanel
