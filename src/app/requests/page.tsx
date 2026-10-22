@@ -22,7 +22,6 @@ export default function RequestsPage() {
   const [resolutionView, setResolutionView] = useState<"all" | "refunds" | "store-credits" | "replacements">("all");
   const [statusReady, setStatusReady] = useState(false);
   const requestSequence = useRef(0);
-  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query, 300);
   const [page, setPage] = useState(1);
@@ -206,8 +205,6 @@ showToast("Could not create request", "error", message);
           error={error}
           query={query}
           status={statuses.length === 1 ? statuses[0] : "ALL"}
-          actionMenuId={actionMenuId}
-          setActionMenuId={setActionMenuId}
         />
         <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
       </div>
