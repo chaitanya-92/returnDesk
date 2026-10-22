@@ -46,7 +46,7 @@ export function RequestFilters(props: Props) {
     <div ref={dropdownsRef} className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <div className="relative min-w-0 flex-1">
         <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/>
-        <input value={props.query} onChange={(e) => props.onQueryChange(e.target.value)} placeholder="Search reference, customer, order, item…" aria-label="Search requests" className={field + " w-full pl-9"}/>
+        <input value={props.query} onChange={(e) => props.onQueryChange(e.target.value)} placeholder="Search reference, customer, order, item, reason, SKU…" aria-label="Search requests" className={field + " w-full pl-9"}/>
       </div>
       <div className="relative">
         <button type="button" aria-expanded={filterOpen} onClick={() => { setFilterOpen(!filterOpen); setSortOpen(false); }} className={"inline-flex min-h-10 items-center gap-2 rounded-lg border px-4 text-sm font-semibold " + (activeCount ? "border-[#D7A400] bg-[#FFF7D6] text-[#5B4600]" : "border-[rgb(var(--border))] hover:bg-[#FFFCF0]")}><SlidersHorizontal size={16}/> Filter {activeCount > 0 && <span className="rounded-full bg-[#D7A400] px-1.5 py-0.5 text-xs text-white">{activeCount}</span>}<ChevronDown size={14}/></button>
