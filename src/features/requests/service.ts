@@ -30,6 +30,7 @@ function validateResolution(input: RequestResolution) {
 export type RequestListFilters = {
   status?: RequestStatus;
   reason?: string;
+  createdDate?: Date;
   search?: string;
   sortBy?: "createdAt" | "customerName" | "status" | "reason" | "reference";
   sortOrder?: "asc" | "desc";
@@ -47,6 +48,7 @@ export async function listRequests(filters?: RequestListFilters) {
     ...liveFilter,
     ...(filters?.status ? { status: filters.status } : {}),
     ...(filters?.reason ? { reason: filters.reason } : {}),
+    ...(filters?.createdDate ? { createdAt: { gte: filters.createdDate, lt: new Date(filters.createdDate.getTime() + 24 * 60 * 60 * 1000) } } : {}),
     ...(search ? { OR: [
       { reference: { contains: search, mode: "insensitive" } },
       { orderNumber: { contains: search, mode: "insensitive" } },

@@ -11,6 +11,10 @@ export async function GET(request: NextRequest) {
     const rawReason = params.get("reason")?.toUpperCase();
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
+    const rawDate = params.get("date");
+    if (rawDate && !/^\\d{4}-\\d{2}-\\d{2}$/.test(rawDate)) throw new AppError("Date must use YYYY-MM-DD format.", 400, "INVALID_DATE_FILTER");
+    const date = rawDate ? new Date(`${rawDate}T00:00:00.000Z`) : undefined;
+    if (date && Number.isNaN(date.getTime())) throw new AppError("Invalid date filter.", 400, "INVALID_DATE_FILTER");
     const page = Number(params.get("page") ?? "1");
     const pageSize = Number(params.get("pageSize") ?? "10");
     if (rawStatus && !REQUEST_STATUSES.includes(rawStatus as (typeof REQUEST_STATUSES)[number])) {
@@ -28,6 +32,7 @@ export async function GET(request: NextRequest) {
     const result = await listRequests({
       status: rawStatus as (typeof REQUEST_STATUSES)[number] | undefined,
       reason: rawReason ?? undefined,
+      createdDate: date,
       search: params.get("q") ?? undefined,
       sortBy: sortBy as "createdAt" | "customerName" | "status" | "reason" | "reference",
       sortOrder: sortOrder as "asc" | "desc",
