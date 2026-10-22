@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage, useField, type FormikHelpers } from 
 import * as Yup from "yup";
 import { CheckCircle2, X, AlertCircle, Filter } from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
-import { Plus, RefreshCw, Search, ArrowUpRight, Inbox, MoreHorizontal, Eye, WalletCards } from "lucide-react";
+import { Plus, RefreshCw, Search, ArrowUpRight, ArrowUp, ArrowDown, ArrowUpDown, Inbox, MoreHorizontal, Eye, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 
 type RequestRow = { id: string; reference: string; orderNumber: string; itemName: string; customerName: string; customerEmail: string; reason: string; status: string; createdAt: string; quantity?: number };
