@@ -43,6 +43,7 @@ import {
 } from "@/features/refunds/refund-utils";
 import { RefundSummaryCards } from "@/features/refunds/components/refund-summary-cards";
 import { RefundTable } from "@/features/refunds/components/refund-table";
+import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
 
 const PAGE_SIZE = 10;
 
@@ -272,100 +273,12 @@ export default function RefundsPage() {
         />
       </div>
 
-      {confirmRefund && (
-        <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget && !busyId) {
-              setConfirmRefund(null);
-            }
-          }}
-        >
-          <section
-            role="alertdialog"
-            aria-modal="true"
-            aria-labelledby="confirm-refund-title"
-            aria-describedby="confirm-refund-description"
-            className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]"
-          >
-            <div className="flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-              <AlertTriangle size={21} />
-            </div>
-
-            <h2
-              id="confirm-refund-title"
-              className="mt-4 text-lg font-semibold"
-            >
-              Mark refund as processed?
-            </h2>
-
-            <p
-              id="confirm-refund-description"
-              className="mt-2 text-sm leading-6 text-[rgb(var(--muted-foreground))]"
-            >
-              Confirm that the refund for{" "}
-              <strong className="text-[rgb(var(--foreground))]">
-                {confirmRefund.reference}
-              </strong>{" "}
-              has actually been processed. This will mark the request as
-              completed and record the action in its activity timeline.
-            </p>
-
-            <div className="mt-4 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-3">
-              <div className="flex items-start justify-between gap-3 text-sm">
-                <span className="text-[rgb(var(--muted-foreground))]">
-                  Order
-                </span>
-
-                <span className="text-right font-medium">
-                  {confirmRefund.orderNumber}
-                </span>
-              </div>
-
-              <div className="mt-2 flex items-start justify-between gap-3 text-sm">
-                <span className="text-[rgb(var(--muted-foreground))]">
-                  Refund amount
-                </span>
-
-                <span className="text-right font-semibold tabular-nums">
-                  {confirmRefund.refundAmount == null
-                    ? "—"
-                    : formatCurrency(Number(confirmRefund.refundAmount))}
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 flex justify-end gap-2">
-              <button
-                type="button"
-                disabled={Boolean(busyId)}
-                onClick={() => setConfirmRefund(null)}
-                className="rounded-lg border border-[rgb(var(--border))] px-4 py-2.5 text-sm font-medium disabled:opacity-50"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                disabled={Boolean(busyId)}
-                onClick={async () => {
-                  const selected = confirmRefund;
-
-                  setConfirmRefund(null);
-
-                  await processed(selected);
-                }}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#29230F] hover:bg-[#E5A900] disabled:opacity-60"
-              >
-                <CheckCircle2 size={16} />
-                {busyId === confirmRefund.id
-                  ? "Processing…"
-                  : "Confirm processed"}
-              </button>
-            </div>
-          </section>
-        </div>
-      )}
+      <RefundConfirmationDialog
+        refund={confirmRefund}
+        busyId={busyId}
+        onClose={() => setConfirmRefund(null)}
+        onConfirm={processed}
+      />
     </AppShell>
   );
 }
