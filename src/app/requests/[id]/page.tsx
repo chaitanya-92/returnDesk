@@ -209,7 +209,7 @@ export default function RequestDetailsPage() {
           {reviewConfirmationOpen && item?.status === "OPEN" && !loading && <div className="fixed inset-0 z-[140] flex items-center justify-center bg-black/40 p-4">
             <section role="dialog" aria-modal="true" aria-labelledby="review-request-title" className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]">
               <div className="flex items-start gap-3">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#FFF5C2] text-[#725500]"><CheckCircle2 size={20}/></span>
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-[#FFF5C2] text-[#725500]"><span aria-hidden="true" className="text-lg font-bold">?</span></span>
                 <div><h2 id="review-request-title" className="text-lg font-semibold">Move request to In Review?</h2>
                   <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">This request is still Open. Move it to In Review to begin evaluating the return and choosing a resolution.</p></div>
               </div>
