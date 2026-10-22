@@ -253,7 +253,8 @@ export default function RequestDetailsPage() {
           <span className="block text-sm font-medium">{option.label}</span>
           <span className="mt-0.5 block text-xs text-[#77736A]">{option.hint}</span>
           </span>{resolution === option.value && <Check size={16} className="text-[#8B6B00]"/>}</button>)}</div>
-          </>}</div>{resolution === "REFUND" && <div>
+          </>}
+        </div>{resolution === "REFUND" && <div>
           <label className="block text-xs font-medium">Refund amount (INR)</label>
           <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-[#DCDCD5] bg-white px-3 py-2 focus-within:border-[#D7A400] focus-within:ring-2 focus-within:ring-[#F2B719]/20">{editingAmount ? <input autoFocus value={amount} onChange={e => setAmount(e.target.value)} type="number" min="0.01" step="0.01" placeholder="Enter refund amount" aria-label="Refund amount in INR" className="min-w-0 flex-1 bg-transparent py-1 text-sm text-[#23221E] outline-none"/> : <span className="flex-1 py-1 text-sm font-semibold tabular-nums text-[#23221E]">{amount && Number(amount) > 0 ? Number(amount).toLocaleString("en-IN", { style: "currency", currency: "INR" }) : "Enter product refund amount"}</span>}{editingAmount ? <button type="button" aria-label="Finish editing refund amount" onClick={() => EsetAmount(false)} className="rounded-md p-1.5 text-[#725500] hover:bg-[#FFF5C2]">
           <Check size={16}/>
