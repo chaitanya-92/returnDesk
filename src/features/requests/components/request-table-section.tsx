@@ -50,7 +50,7 @@ export function RequestTableSection({
                   <DataTableRow
                     key={r.id}
                     onClick={() => {
-                      window.location.href = "/requests/" + r.id;
+                      window.location.href = "/requests/" + r.id + window.location.search;
                     }}
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
