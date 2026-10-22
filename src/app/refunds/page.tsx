@@ -1,13 +1,157 @@
 "use client";
-import {useCallback,useEffect,useMemo,useState} from "react";import Link from "next/link";import {AppShell} from "@/components/layout/app-shell";import {showToast} from "@/components/ui/toaster";import {RefreshCw,Search,WalletCards,CheckCircle2,MoreHorizontal,Eye,ArrowUpRight,Clock3,IndianRupee,AlertTriangle,Filter} from "lucide-react";
-function AnimatedNumber({value,format=(n:number)=>Math.round(n).toLocaleString("en-IN")}:{value:number;format?:(n:number)=>string}){const[shown,setShown]=useState(0);useEffect(()=>{let frame=0;let start:number|undefined;const duration=700;const tick=(now:number)=>{if(start===undefined)start=now;const progress=Math.min(1,(now-start)/duration),eased=1-Math.pow(1-progress,3);setShown(value*eased);if(progress<1)frame=requestAnimationFrame(tick)};setShown(0);frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame)},[value]);return <>{format(shown)}</>}
+import {useCallback,useEffect,useMemo,useState} from "react";
+import Link from "next/link";
+import {AppShell} from "@/components/layout/app-shell";
+import {showToast} from "@/components/ui/toaster";
+import {RefreshCw,Search,WalletCards,CheckCircle2,MoreHorizontal,Eye,ArrowUpRight,Clock3,IndianRupee,AlertTriangle,Filter} from "lucide-react";
+function AnimatedNumber({value,format=(n:number)=>Math.round(n).toLocaleString("en-IN")}:{value:number;format?:(n:number)=>string}){const[shown,setShown]=useState(0);
+useEffect(()=>{let frame=0;let start:number|undefined;
+const duration=700;
+const tick=(now:number)=>{if(start===undefined)start=now;
+const progress=Math.min(1,(now-start)/duration),eased=1-Math.pow(1-progress,3);setShown(value*eased);if(progress<1)frame=requestAnimationFrame(tick)};setShown(0);frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame)},[value]);return <>{format(shown)}</>}
 type R={id:string;reference:string;orderNumber:string;itemName:string;customerName:string;customerEmail:string;status:string;resolution:string|null;refundAmount:string|number|null;updatedAt:string};
 const badge:Record<string,string>={APPROVED:"status-badge-review border-amber-300 bg-amber-100 text-amber-950",COMPLETED:"status-badge-completed border-emerald-300 bg-emerald-100 text-emerald-950"};
-export default function RefundsPage(){const[rows,S]=useState<R[]>([]),[q,Q]=useState(""),[debouncedQ,DQ]=useState(""),[loading,L]=useState(true),[error,E]=useState(""),[toast,T]=useState(""),[busy,B]=useState(""),[page,P]=useState(1),[statusFilter,SF]=useState<"ALL"|"APPROVED"|"COMPLETED">(()=>{if(typeof window==="undefined")return "ALL";const s=new URLSearchParams(window.location.search).get("status");return s==="APPROVED"||s==="COMPLETED"?s:"ALL"});const size=10;const [actionMenuId,AM]=useState<string|null>(null),[confirmRefund,CR]=useState<R|null>(null),[filterMenuOpen,FMO]=useState(false),[sortBy,SB]=useState<"customerName"|"refundAmount"|"updatedAt">("updatedAt"),[sortOrder,SO]=useState<"asc"|"desc">("desc");
+export default function RefundsPage(){const[rows,S]=useState<R[]>([]),[q,Q]=useState(""),[debouncedQ,DQ]=useState(""),[loading,L]=useState(true),[error,E]=useState(""),[toast,T]=useState(""),[busy,B]=useState(""),[page,P]=useState(1),[statusFilter,SF]=useState<"ALL"|"APPROVED"|"COMPLETED">(()=>{if(typeof window==="undefined")return "ALL";
+const s=new URLSearchParams(window.location.search).get("status");return s==="APPROVED"||s==="COMPLETED"?s:"ALL"});
+const size=10;
+const [actionMenuId,AM]=useState<string|null>(null),[confirmRefund,CR]=useState<R|null>(null),[filterMenuOpen,FMO]=useState(false),[sortBy,SB]=useState<"customerName"|"refundAmount"|"updatedAt">("updatedAt"),[sortOrder,SO]=useState<"asc"|"desc">("desc");
 useEffect(()=>{const timer=window.setTimeout(()=>DQ(q),300);return()=>window.clearTimeout(timer)},[q]);
-const load=useCallback(async()=>{L(true);E("");try{const r=await fetch("/api/requests?"+new URLSearchParams({q:debouncedQ,page:"1",pageSize:"100"}),{cache:"no-store"}),p=await r.json();if(!r.ok)throw Error(p.error??"Could not load refunds");S((p.data?.items??[]).filter((x:R)=>x.resolution==="REFUND"&&["APPROVED","COMPLETED"].includes(x.status)))}catch(e){E(e instanceof Error?e.message:"Could not load refunds")}finally{L(false)}},[debouncedQ]);useEffect(()=>{void load()},[load]);useEffect(()=>P(1),[q,statusFilter]);
+const load=useCallback(async()=>{L(true);E("");try{const r=await fetch("/api/requests?"+new URLSearchParams({q:debouncedQ,page:"1",pageSize:"100"}),{cache:"no-store"}),p=await r.json();if(!r.ok)throw Error(p.error??"Could not load refunds");S((p.data?.items??[]).filter((x:R)=>x.resolution==="REFUND"&&["APPROVED","COMPLETED"].includes(x.status)))}catch(e){E(e instanceof Error?e.message:"Could not load refunds")}finally{L(false)}},[debouncedQ]);
+useEffect(()=>{void load()},[load]);
+useEffect(()=>P(1),[q,statusFilter]);
 async function processed(x:R){B(x.id);E("");T("");try{const r=await fetch("/api/requests/"+x.id+"/transition",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:"COMPLETED",note:"Refund marked as processed by operations."})}),p=await r.json();if(!r.ok)throw Error(p.error??"Could not update refund");T("Refund "+x.reference+" marked processed.");showToast("Refund marked processed", "success", x.reference);await load()}catch(e){E(e instanceof Error?e.message:"Could not update refund");showToast(e instanceof Error?e.message:"Could not update refund","error")}finally{B("")}}
-const filtered=useMemo(()=>rows.filter(x=>statusFilter==="ALL"||x.status===statusFilter).slice().sort((a,b)=>{const av=sortBy==="refundAmount"?Number(a.refundAmount||0):sortBy==="updatedAt"?new Date(a.updatedAt).getTime():a.customerName.toLocaleLowerCase();const bv=sortBy==="refundAmount"?Number(b.refundAmount||0):sortBy==="updatedAt"?new Date(b.updatedAt).getTime():b.customerName.toLocaleLowerCase();const cmp=typeof av==="string"&&typeof bv==="string"?av.localeCompare(bv):Number(av)-Number(bv);return sortOrder==="asc"?cmp:-cmp}),[rows,statusFilter,sortBy,sortOrder]);const count=Math.max(1,Math.ceil(filtered.length/size)),shown=filtered.slice((page-1)*size,page*size);return <AppShell><div aria-busy={loading} className="space-y-6"><header className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgb(var(--border))] pb-5"><div><h1 className="text-3xl font-semibold">Refund requests</h1><p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">Track refunds approved by operations and record processing completion.</p></div><button onClick={()=>void load()} className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-sm"><RefreshCw size={15}/>Refresh</button></header>
-{error&&<div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}{toast&&<div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950"><CheckCircle2 className="mr-2 inline" size={16}/>{toast}</div>}
-<div className="grid gap-3 sm:grid-cols-3">{[{label:"Awaiting processing",value:rows.filter(x=>x.status==="APPROVED").length,icon:Clock3,tone:"border border-amber-200 bg-amber-100 text-amber-950",href:"/refunds?status=APPROVED#refund-table"},{label:"Processed",value:rows.filter(x=>x.status==="COMPLETED").length,icon:CheckCircle2,tone:"border border-emerald-200 bg-emerald-100 text-emerald-950",href:"/refunds?status=COMPLETED#refund-table"},{label:"Total refund value",value:rows.reduce((n,x)=>n+Number(x.refundAmount||0),0),format:(n:number)=>n.toLocaleString("en-IN",{style:"currency",currency:"INR"}),icon:IndianRupee,tone:"border border-amber-200 bg-amber-100 text-amber-950",href:"/refunds#refund-table"}].map(x=><Link href={x.href} key={x.label} onClick={()=>{SF(x.label==="Awaiting processing"?"APPROVED":x.label==="Processed"?"COMPLETED":"ALL");P(1)}} className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]"><article className="group h-full rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] shadow-sm transition hover:shadow-md dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><div className="flex items-center justify-between gap-3"><p className="text-sm text-[rgb(var(--muted-foreground))]">{x.label}</p><span className={"grid size-9 place-items-center rounded-lg "+x.tone}><x.icon size={17}/></span></div><p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{typeof x.value==="number"?<AnimatedNumber value={loading?0:x.value} format={("format" in x&&typeof x.format==="function")?x.format:undefined}/>:x.value}</p></article></Link>)}</div>
-<div className="flex flex-col gap-3 sm:flex-row sm:items-center"><div className="relative w-full max-w-xl"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#77736A]"/><input value={q} onChange={e=>{Q(e.target.value);P(1)}} placeholder="Search refund reference, customer, or order…" aria-label="Search refund requests" className="w-full rounded-lg border border-[rgb(var(--border))] bg-white py-2.5 pl-9 pr-3 text-sm text-[#23221E] placeholder:text-[#77736A] focus:border-[#D7A400] focus:outline-none dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"/></div></div><section id="refund-table" className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><div className="overflow-x-auto"><table className="w-full min-w-[780px] text-left text-sm"><thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]"><tr><th className="px-3 py-2.5"><span className="mb-1 block">Refund / order</span></th><th className="px-3 py-2.5 align-middle"><button type="button" onClick={()=>{SB("customerName");SO(v=>sortBy==="customerName"?(v==="asc"?"desc":"asc"):"asc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Customer {sortBy==="customerName"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button></th><th className="px-3 py-2.5 align-middle"><button type="button" onClick={()=>{SB("refundAmount");SO(v=>sortBy==="refundAmount"?(v==="asc"?"desc":"asc"):"asc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Amount {sortBy==="refundAmount"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button></th><th className="px-3 py-2.5 align-middle"><div className="flex flex-col items-start gap-1.5"><span>Status</span><div className="relative normal-case tracking-normal"><button type="button" aria-label="Filter refunds by status" title="Filter refunds by status" onClick={()=>FMO(v=>!v)} className={"inline-flex size-7 items-center justify-center rounded-md border "+(statusFilter!=="ALL"?"border-[#D7A400] bg-[#FFF0A6] text-[#292821]":"border-[#E3DDC9] bg-white text-[#292821]")}><Filter size={14}/></button>{filterMenuOpen&&<div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border bg-white p-1.5 text-[#23221E] shadow-xl">{[{value:"ALL",label:"All refunds"},{value:"APPROVED",label:"Awaiting"},{value:"COMPLETED",label:"Processed"}].map(t=><button key={t.value} type="button" onClick={()=>{SF(t.value as typeof statusFilter);FMO(false);P(1)}} className={"block w-full rounded px-3 py-2 text-left text-xs "+(statusFilter===t.value?"bg-[#FFF0A6]":"hover:bg-[#FFF9DC]")}>{t.label}</button>)}</div>}</div></th><th className="px-3 py-2.5 align-middle"><button type="button" onClick={()=>{SB("updatedAt");SO(v=>sortBy==="updatedAt"?(v==="asc"?"desc":"asc"):"desc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Updated {sortBy==="updatedAt"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button></th><th className="px-3 py-2.5">Action</th></tr></thead><tbody className="divide-y divide-[rgb(var(--border))]">{shown.map(x=><tr key={x.id} onClick={()=>window.location.assign("/requests/"+x.id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();window.location.assign("/requests/"+x.id)}}} tabIndex={0} role="link" aria-label={"View details for "+x.reference} className="cursor-pointer bg-white hover:bg-[#FFFCF0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D7A400] dark:bg-[rgb(var(--card))] dark:hover:bg-[#302F2A]"><td className="px-4 py-4"><b>{x.reference}</b><p className="mt-1 text-xs text-[#6B685F] dark:text-[rgb(var(--muted-foreground))]">{x.orderNumber} · {x.itemName}</p></td><td className="px-4 py-4">{x.customerName}<p className="text-xs text-[#6B685F]">{x.customerEmail}</p></td><td className="px-4 py-4 font-semibold">{x.refundAmount==null?"—":Number(x.refundAmount).toLocaleString("en-IN",{style:"currency",currency:"INR"})}</td><td className="px-4 py-4"><span className={"rounded-md border px-2 py-1 text-xs font-medium "+(badge[x.status]??"border-slate-300 bg-slate-100 text-slate-900")}>{x.status==="APPROVED"?"Awaiting processing":"Processed"}</span></td><td className="px-4 py-4 text-xs">{new Date(x.updatedAt).toLocaleDateString("en-IN")}</td><td className="px-4 py-4"><div className="relative flex justify-end"><button type="button" aria-label={"Actions for "+x.reference} aria-haspopup="menu" aria-expanded={actionMenuId===x.id} onClick={e=>{e.stopPropagation();AM(current=>current===x.id?null:x.id)}} className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E1DFD6] bg-white text-[#4B493F] shadow-sm hover:bg-[#FFF9DC] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><MoreHorizontal size={18}/></button>{actionMenuId===x.id&&<><button type="button" aria-label="Close actions menu" tabIndex={-1} onClick={()=>AM(null)} className="fixed inset-0 z-40 cursor-default"></button><div role="menu" aria-label={"Actions for "+x.reference} className="absolute right-0 top-full z-50 mt-1 w-52 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><Link role="menuitem" href={"/requests/"+x.id} onClick={e=>{e.stopPropagation();AM(null)}} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"><Eye size={15}/> View details <ArrowUpRight size={13} className="ml-auto"/></Link>{x.status==="APPROVED"&&<button role="menuitem" type="button" disabled={busy===x.id} onClick={e=>{e.stopPropagation();AM(null);CR(x)}} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-[#FFF9DC] disabled:opacity-50 dark:hover:bg-[rgb(var(--muted))]"><CheckCircle2 size={15}/>{busy===x.id?"Updating…":"Mark processed"}</button>}</div></>}</div></td></tr>)}{!loading&&shown.length===0&&<tr><td colSpan={6} className="px-4 py-12 text-center"><WalletCards className="mx-auto mb-2"/><p>No refund requests found</p><p className="mt-1 text-xs">Refunds appear after a request is approved with the Refund resolution.</p></td></tr>}{loading&&Array.from({length:5},(_,i)=><tr key={"refund-skeleton-"+i} aria-hidden="true">{Array.from({length:6},(_,j)=><td key={j} className="px-4 py-5"><div className={"h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] "+(j===0?"w-28":j===1?"w-32":j===2?"w-20":j===3?"w-24":j===4?"w-20":"w-8")}/>{j<2&&<div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>}</td>)}</tr>)}</tbody></table></div><div className="flex items-center justify-between border-t border-[rgb(var(--border))] px-4 py-3 text-xs"><span>Showing {filtered.length?(page-1)*size+1:0}–{Math.min(page*size,filtered.length)} of {filtered.length}</span><div className="flex items-center gap-2"><button disabled={page<=1} onClick={()=>P(p=>p-1)} className="rounded border px-3 py-2 disabled:opacity-40">Previous</button><span>Page {page} of {count}</span><button disabled={page>=count} onClick={()=>P(p=>p+1)} className="rounded border px-3 py-2 disabled:opacity-40">Next</button></div></div></section></div>{confirmRefund&&<div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)CR(null)}}><section role="alertdialog" aria-modal="true" aria-labelledby="confirm-refund-title" aria-describedby="confirm-refund-description" className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]"><div className="flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300"><AlertTriangle size={21}/></div><h2 id="confirm-refund-title" className="mt-4 text-lg font-semibold">Mark refund as processed?</h2><p id="confirm-refund-description" className="mt-2 text-sm leading-6 text-[rgb(var(--muted-foreground))]">Confirm that the refund for <strong className="text-[rgb(var(--foreground))]">{confirmRefund.reference}</strong> has actually been processed. This will mark the request as completed and record the action in its activity timeline.</p><div className="mt-4 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-3"><div className="flex items-start justify-between gap-3 text-sm"><span className="text-[rgb(var(--muted-foreground))]">Order</span><span className="text-right font-medium">{confirmRefund.orderNumber}</span></div><div className="mt-2 flex items-start justify-between gap-3 text-sm"><span className="text-[rgb(var(--muted-foreground))]">Refund amount</span><span className="text-right font-semibold tabular-nums">{confirmRefund.refundAmount==null?"—":Number(confirmRefund.refundAmount).toLocaleString("en-IN",{style:"currency",currency:"INR"})}</span></div></div><div className="mt-6 flex justify-end gap-2"><button type="button" disabled={Boolean(busy)} onClick={()=>CR(null)} className="rounded-lg border border-[rgb(var(--border))] px-4 py-2.5 text-sm font-medium disabled:opacity-50">Cancel</button><button type="button" disabled={Boolean(busy)} onClick={async()=>{const selected=confirmRefund;CR(null);await processed(selected)}} className="inline-flex items-center gap-2 rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#29230F] hover:bg-[#E5A900] disabled:opacity-60"><CheckCircle2 size={16}/>{busy===confirmRefund.id?"Processing…":"Confirm processed"}</button></div></section></div>}</AppShell>}
+const filtered=useMemo(()=>rows.filter(x=>statusFilter==="ALL"||x.status===statusFilter).slice().sort((a,b)=>{const av=sortBy==="refundAmount"?Number(a.refundAmount||0):sortBy==="updatedAt"?new Date(a.updatedAt).getTime():a.customerName.toLocaleLowerCase();
+const bv=sortBy==="refundAmount"?Number(b.refundAmount||0):sortBy==="updatedAt"?new Date(b.updatedAt).getTime():b.customerName.toLocaleLowerCase();
+const cmp=typeof av==="string"&&typeof bv==="string"?av.localeCompare(bv):Number(av)-Number(bv);return sortOrder==="asc"?cmp:-cmp}),[rows,statusFilter,sortBy,sortOrder]);
+const count=Math.max(1,Math.ceil(filtered.length/size)),shown=filtered.slice((page-1)*size,page*size);return <AppShell>
+<div aria-busy={loading} className="space-y-6">
+<header className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgb(var(--border))] pb-5">
+<div>
+<h1 className="text-3xl font-semibold">Refund requests</h1>
+<p className="mt-2 text-sm text-[rgb(var(--muted-foreground))]">Track refunds approved by operations and record processing completion.</p>
+</div>
+<button onClick={()=>void load()} className="inline-flex items-center gap-2 rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-sm">
+<RefreshCw size={15}/>Refresh</button>
+</header>
+{error&&<div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}{toast&&<div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">
+<CheckCircle2 className="mr-2 inline" size={16}/>{toast}</div>}
+<div className="grid gap-3 sm:grid-cols-3">{[{label:"Awaiting processing",value:rows.filter(x=>x.status==="APPROVED").length,icon:Clock3,tone:"border border-amber-200 bg-amber-100 text-amber-950",href:"/refunds?status=APPROVED#refund-table"},{label:"Processed",value:rows.filter(x=>x.status==="COMPLETED").length,icon:CheckCircle2,tone:"border border-emerald-200 bg-emerald-100 text-emerald-950",href:"/refunds?status=COMPLETED#refund-table"},{label:"Total refund value",value:rows.reduce((n,x)=>n+Number(x.refundAmount||0),0),format:(n:number)=>n.toLocaleString("en-IN",{style:"currency",currency:"INR"}),icon:IndianRupee,tone:"border border-amber-200 bg-amber-100 text-amber-950",href:"/refunds#refund-table"}].map(x=>
+<Link href={x.href} key={x.label} onClick={()=>{SF(x.label==="Awaiting processing"?"APPROVED":x.label==="Processed"?"COMPLETED":"ALL");P(1)}} className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]">
+<article className="group h-full rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] shadow-sm transition hover:shadow-md dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
+<div className="flex items-center justify-between gap-3">
+<p className="text-sm text-[rgb(var(--muted-foreground))]">{x.label}</p>
+<span className={"grid size-9 place-items-center rounded-lg "+x.tone}>
+<x.icon size={17}/>
+</span>
+</div>
+<p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums">{typeof x.value==="number"?<AnimatedNumber value={loading?0:x.value} format={("format" in x&&typeof x.format==="function")?x.format:undefined}/>:x.value}</p>
+</article>
+</Link>)}</div>
+<div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+<div className="relative w-full max-w-xl">
+<Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#77736A]"/>
+<input value={q} onChange={e=>{Q(e.target.value);P(1)}} placeholder="Search refund reference, customer, or order…" aria-label="Search refund requests" className="w-full rounded-lg border border-[rgb(var(--border))] bg-white py-2.5 pl-9 pr-3 text-sm text-[#23221E] placeholder:text-[#77736A] focus:border-[#D7A400] focus:outline-none dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"/>
+</div>
+</div>
+<section id="refund-table" className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
+<div className="overflow-x-auto">
+<table className="w-full min-w-[780px] text-left text-sm">
+<thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]">
+<tr>
+<th className="px-3 py-2.5">
+<span className="mb-1 block">Refund / order</span>
+</th>
+<th className="px-3 py-2.5 align-middle">
+<button type="button" onClick={()=>{SB("customerName");SO(v=>sortBy==="customerName"?(v==="asc"?"desc":"asc"):"asc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Customer {sortBy==="customerName"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button>
+</th>
+<th className="px-3 py-2.5 align-middle">
+<button type="button" onClick={()=>{SB("refundAmount");SO(v=>sortBy==="refundAmount"?(v==="asc"?"desc":"asc"):"asc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Amount {sortBy==="refundAmount"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button>
+</th>
+<th className="px-3 py-2.5 align-middle">
+<div className="flex flex-col items-start gap-1.5">
+<span>Status</span>
+<div className="relative normal-case tracking-normal">
+<button type="button" aria-label="Filter refunds by status" title="Filter refunds by status" onClick={()=>FMO(v=>!v)} className={"inline-flex size-7 items-center justify-center rounded-md border "+(statusFilter!=="ALL"?"border-[#D7A400] bg-[#FFF0A6] text-[#292821]":"border-[#E3DDC9] bg-white text-[#292821]")}>
+<Filter size={14}/>
+</button>{filterMenuOpen&&<div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border bg-white p-1.5 text-[#23221E] shadow-xl">{[{value:"ALL",label:"All refunds"},{value:"APPROVED",label:"Awaiting"},{value:"COMPLETED",label:"Processed"}].map(t=>
+<button key={t.value} type="button" onClick={()=>{SF(t.value as typeof statusFilter);FMO(false);P(1)}} className={"block w-full rounded px-3 py-2 text-left text-xs "+(statusFilter===t.value?"bg-[#FFF0A6]":"hover:bg-[#FFF9DC]")}>{t.label}</button>)}</div>}</div>
+</th>
+<th className="px-3 py-2.5 align-middle">
+<button type="button" onClick={()=>{SB("updatedAt");SO(v=>sortBy==="updatedAt"?(v==="asc"?"desc":"asc"):"desc")}} className="inline-flex items-center gap-1.5 normal-case tracking-normal">Updated {sortBy==="updatedAt"?(sortOrder==="asc"?<span>↑</span>:<span>↓</span>):<span>↕</span>}</button>
+</th>
+<th className="px-3 py-2.5">Action</th>
+</tr>
+</thead>
+<tbody className="divide-y divide-[rgb(var(--border))]">{shown.map(x=>
+<tr key={x.id} onClick={()=>window.location.assign("/requests/"+x.id)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();window.location.assign("/requests/"+x.id)}}} tabIndex={0} role="link" aria-label={"View details for "+x.reference} className="cursor-pointer bg-white hover:bg-[#FFFCF0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D7A400] dark:bg-[rgb(var(--card))] dark:hover:bg-[#302F2A]">
+<td className="px-4 py-4">
+<b>{x.reference}</b>
+<p className="mt-1 text-xs text-[#6B685F] dark:text-[rgb(var(--muted-foreground))]">{x.orderNumber} · {x.itemName}</p>
+</td>
+<td className="px-4 py-4">{x.customerName}<p className="text-xs text-[#6B685F]">{x.customerEmail}</p>
+</td>
+<td className="px-4 py-4 font-semibold">{x.refundAmount==null?"—":Number(x.refundAmount).toLocaleString("en-IN",{style:"currency",currency:"INR"})}</td>
+<td className="px-4 py-4">
+<span className={"rounded-md border px-2 py-1 text-xs font-medium "+(badge[x.status]??"border-slate-300 bg-slate-100 text-slate-900")}>{x.status==="APPROVED"?"Awaiting processing":"Processed"}</span>
+</td>
+<td className="px-4 py-4 text-xs">{new Date(x.updatedAt).toLocaleDateString("en-IN")}</td>
+<td className="px-4 py-4">
+<div className="relative flex justify-end">
+<button type="button" aria-label={"Actions for "+x.reference} aria-haspopup="menu" aria-expanded={actionMenuId===x.id} onClick={e=>{e.stopPropagation();AM(current=>current===x.id?null:x.id)}} className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E1DFD6] bg-white text-[#4B493F] shadow-sm hover:bg-[#FFF9DC] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
+<MoreHorizontal size={18}/>
+</button>{actionMenuId===x.id&&<>
+<button type="button" aria-label="Close actions menu" tabIndex={-1} onClick={()=>AM(null)} className="fixed inset-0 z-40 cursor-default">
+</button>
+<div role="menu" aria-label={"Actions for "+x.reference} className="absolute right-0 top-full z-50 mt-1 w-52 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
+<Link role="menuitem" href={"/requests/"+x.id} onClick={e=>{e.stopPropagation();AM(null)}} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]">
+<Eye size={15}/> View details <ArrowUpRight size={13} className="ml-auto"/>
+</Link>{x.status==="APPROVED"&&<button role="menuitem" type="button" disabled={busy===x.id} onClick={e=>{e.stopPropagation();AM(null);CR(x)}} className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm hover:bg-[#FFF9DC] disabled:opacity-50 dark:hover:bg-[rgb(var(--muted))]">
+<CheckCircle2 size={15}/>{busy===x.id?"Updating…":"Mark processed"}</button>}</div>
+</>}</div>
+</td>
+</tr>)}{!loading&&shown.length===0&&<tr>
+<td colSpan={6} className="px-4 py-12 text-center">
+<WalletCards className="mx-auto mb-2"/>
+<p>No refund requests found</p>
+<p className="mt-1 text-xs">Refunds appear after a request is approved with the Refund resolution.</p>
+</td>
+</tr>}{loading&&Array.from({length:5},(_,i)=>
+<tr key={"refund-skeleton-"+i} aria-hidden="true">{Array.from({length:6},(_,j)=>
+<td key={j} className="px-4 py-5">
+<div className={"h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] "+(j===0?"w-28":j===1?"w-32":j===2?"w-20":j===3?"w-24":j===4?"w-20":"w-8")}/>{j<2&&<div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>}</td>)}</tr>)}</tbody>
+</table>
+</div>
+<div className="flex items-center justify-between border-t border-[rgb(var(--border))] px-4 py-3 text-xs">
+<span>Showing {filtered.length?(page-1)*size+1:0}–{Math.min(page*size,filtered.length)} of {filtered.length}</span>
+<div className="flex items-center gap-2">
+<button disabled={page<=1} onClick={()=>P(p=>p-1)} className="rounded border px-3 py-2 disabled:opacity-40">Previous</button>
+<span>Page {page} of {count}</span>
+<button disabled={page>=count} onClick={()=>P(p=>p+1)} className="rounded border px-3 py-2 disabled:opacity-40">Next</button>
+</div>
+</div>
+</section>
+</div>{confirmRefund&&<div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)CR(null)}}>
+<section role="alertdialog" aria-modal="true" aria-labelledby="confirm-refund-title" aria-describedby="confirm-refund-description" className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]">
+<div className="flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
+<AlertTriangle size={21}/>
+</div>
+<h2 id="confirm-refund-title" className="mt-4 text-lg font-semibold">Mark refund as processed?</h2>
+<p id="confirm-refund-description" className="mt-2 text-sm leading-6 text-[rgb(var(--muted-foreground))]">Confirm that the refund for <strong className="text-[rgb(var(--foreground))]">{confirmRefund.reference}</strong> has actually been processed. This will mark the request as completed and record the action in its activity timeline.</p>
+<div className="mt-4 rounded-xl border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-3">
+<div className="flex items-start justify-between gap-3 text-sm">
+<span className="text-[rgb(var(--muted-foreground))]">Order</span>
+<span className="text-right font-medium">{confirmRefund.orderNumber}</span>
+</div>
+<div className="mt-2 flex items-start justify-between gap-3 text-sm">
+<span className="text-[rgb(var(--muted-foreground))]">Refund amount</span>
+<span className="text-right font-semibold tabular-nums">{confirmRefund.refundAmount==null?"—":Number(confirmRefund.refundAmount).toLocaleString("en-IN",{style:"currency",currency:"INR"})}</span>
+</div>
+</div>
+<div className="mt-6 flex justify-end gap-2">
+<button type="button" disabled={Boolean(busy)} onClick={()=>CR(null)} className="rounded-lg border border-[rgb(var(--border))] px-4 py-2.5 text-sm font-medium disabled:opacity-50">Cancel</button>
+<button type="button" disabled={Boolean(busy)} onClick={async()=>{const selected=confirmRefund;CR(null);await processed(selected)}} className="inline-flex items-center gap-2 rounded-lg bg-[#F2B719] px-4 py-2.5 text-sm font-semibold text-[#29230F] hover:bg-[#E5A900] disabled:opacity-60">
+<CheckCircle2 size={16}/>{busy===confirmRefund.id?"Processing…":"Confirm processed"}</button>
+</div>
+</section>
+</div>}</div>
+</AppShell>}
