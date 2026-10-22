@@ -21,7 +21,6 @@ export function RefundPageToolbar({
   loading, error, toast, onRefresh, awaitingCount, processedCount,
   totalRefundValue, onSelectStatus, query, onQueryChange,
 }: RefundPageToolbarProps) {
-  const setPage = (_page: number) => {};
   const setStatusFilter = onSelectStatus;
   const setQuery = onQueryChange;
   const load = onRefresh;
