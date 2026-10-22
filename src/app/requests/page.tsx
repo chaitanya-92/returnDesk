@@ -79,13 +79,38 @@ export default function RequestsPage() {
   ]);
 
   useEffect(() => {
-    const initial = new URLSearchParams(window.location.search).get("status");
+    const params = new URLSearchParams(window.location.search);
     const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
-    setStatuses(initial && allowed.includes(initial as RequestStatusFilter)
-      ? [initial as RequestStatusFilter]
-      : []);
+    const initialStatus = params.get("status");
+    const restoredStatuses = params.getAll("statusFilter").filter((value): value is RequestStatusFilter => allowed.includes(value as RequestStatusFilter));
+    setStatuses(restoredStatuses.length ? restoredStatuses : initialStatus && allowed.includes(initialStatus as RequestStatusFilter) ? [initialStatus as RequestStatusFilter] : []);
+    setReasons(params.getAll("reasonFilter"));
+    setCreatedDate(params.get("createdDate") ?? "");
+    setQuery(params.get("q") ?? "");
+    const sortField = params.get("sortBy");
+    const validSortFields = ["createdAt", "customerName", "status", "reason", "reference"];
+    if (sortField && validSortFields.includes(sortField)) setSortBy(sortField as "createdAt" | "customerName" | "status" | "reason" | "reference");
+    const direction = params.get("sortOrder");
+    if (direction === "asc" || direction === "desc") setSortOrder(direction);
+    const initialPage = Number(params.get("page"));
+    if (Number.isInteger(initialPage) && initialPage > 0) setPage(initialPage);
     setStatusReady(true);
   }, []);
+
+  useEffect(() => {
+    if (!statusReady) return;
+    const params = new URLSearchParams();
+    statuses.forEach((value) => params.append("statusFilter", value));
+    reasons.forEach((value) => params.append("reasonFilter", value));
+    if (createdDate) params.set("createdDate", createdDate);
+    if (query.trim()) params.set("q", query.trim());
+    if (sortBy !== "createdAt") params.set("sortBy", sortBy);
+    if (sortOrder !== "desc") params.set("sortOrder", sortOrder);
+    if (page > 1) params.set("page", String(page));
+    const next = params.toString();
+    const current = window.location.search.slice(1);
+    if (next !== current) window.history.replaceState(null, "", next ? window.location.pathname + "?" + next : window.location.pathname);
+  }, [statusReady, statuses, reasons, createdDate, query, sortBy, sortOrder, page]);
 
   useEffect(() => {
     if (statusReady) void load();
