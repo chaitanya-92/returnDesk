@@ -50,6 +50,7 @@ export type RequestDraft = {
   orderItemId: string;
   itemName: string;
   itemSku: string;
+  productPrice?: number | null;
   quantity: number;
   customerName: string;
   customerEmail: string;
