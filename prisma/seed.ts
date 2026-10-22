@@ -971,6 +971,15 @@ const samples = [
 ];
 
 async function main() {
+  if (process.env.RESET_DATABASE === "true") {
+    console.warn("RESET_DATABASE=true: deleting all existing return requests, notes, and events.");
+    await prisma.$transaction([
+      prisma.requestEvent.deleteMany(),
+      prisma.requestNote.deleteMany(),
+      prisma.returnRequest.deleteMany(),
+    ]);
+  }
+
   for (let i = 0; i < samples.length; i++) {
     const [
       customerName,
