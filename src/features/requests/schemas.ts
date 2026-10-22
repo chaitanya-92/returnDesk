@@ -51,15 +51,7 @@ export const requestDetailsUpdateSchema = yup
       .max(254)
       .optional(),
     reason: yup
-      .mixed<
-        | "DAMAGED"
-        | "WRONG_ITEM"
-        | "WRONG_SIZE"
-        | "NOT_AS_DESCRIBED"
-        | "CHANGED_MIND"
-        | "MISSING_PARTS"
-        | "OTHER"
-      >()
+      .mixed<RequestReason>()
       .oneOf([...REQUEST_REASONS])
       .optional(),
     description: requiredText("Description", 2000).optional(),
