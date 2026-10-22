@@ -7,6 +7,7 @@ describe("request lifecycle rules", () => {
     expect(ALLOWED_TRANSITIONS.OPEN).toEqual(["IN_REVIEW"]);
     expect(ALLOWED_TRANSITIONS.IN_REVIEW).toEqual(["APPROVED", "REJECTED"]);
     expect(ALLOWED_TRANSITIONS.APPROVED).toEqual(["COMPLETED"]);
+    expect(ALLOWED_TRANSITIONS.PROCESSING).toEqual([]);
     expect(ALLOWED_TRANSITIONS.REJECTED).toEqual([]);
     expect(ALLOWED_TRANSITIONS.COMPLETED).toEqual([]);
   });
