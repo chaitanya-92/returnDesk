@@ -107,10 +107,6 @@ export default function RefundsPage() {
 
 
 
-  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const currentPage = Math.min(page, pageCount);
-
-
   return (
     <AppShell>
       <div aria-busy={loading} className="space-y-6">
