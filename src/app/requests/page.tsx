@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
 import { AppShell } from "@/components/layout/app-shell";
+import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { requestDraftSchema } from "@/features/requests/schemas";
 import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
@@ -473,14 +474,14 @@ export default function RequestsPage() {
           )}
         </div>
         <section className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]">
-              <thead className="bg-[#FFF7D6] text-[10px] uppercase tracking-[0.09em] text-[#4C3B08] dark:bg-[#342C19] dark:text-[#F4D76B]">
-                <tr>
-                  <th className="px-3 py-2.5">
+          <DataTableContainer>
+            <DataTable className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]">
+              <DataTableHeader className="bg-[#FFF7D6] text-[10px] uppercase tracking-[0.09em] text-[#4C3B08] dark:bg-[#342C19] dark:text-[#F4D76B]">
+                <DataTableRow>
+                  <DataTableHead className="px-3 py-2.5">
                     <span className="mb-1 block">Request</span>
-                  </th>
-                  <th className="px-3 py-2.5">
+                  </DataTableHead>
+                  <DataTableHead className="px-3 py-2.5">
                     <button
                       type="button"
                       onClick={() => {
@@ -508,8 +509,8 @@ export default function RequestsPage() {
                         )}
                       </span>
                     </button>
-                  </th>
-                  <th className="px-3 py-2.5">
+                  </DataTableHead>
+                  <DataTableHead className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <span>Reason</span>
                       <button
@@ -539,8 +540,8 @@ export default function RequestsPage() {
                         )}
                       </button>
                     </div>
-                  </th>
-                  <th className="px-3 py-2.5">
+                  </DataTableHead>
+                  <DataTableHead className="px-3 py-2.5">
                     <span className="mb-1 block">Status</span>
                     <div className="relative inline-block normal-case tracking-normal">
                       <button
@@ -581,8 +582,8 @@ export default function RequestsPage() {
                         </div>
                       )}
                     </div>
-                  </th>
-                  <th className="px-3 py-2.5">
+                  </DataTableHead>
+                  <DataTableHead className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <span>Created</span>
                       <button
@@ -611,13 +612,13 @@ export default function RequestsPage() {
                         )}
                       </button>
                     </div>
-                  </th>
-                  <th className="px-3 py-2.5"></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgb(var(--border))]">
+                  </DataTableHead>
+                  <DataTableHead className="px-3 py-2.5"></DataTableHead>
+                </DataTableRow>
+              </DataTableHeader>
+              <DataTableBody className="divide-y divide-[rgb(var(--border))]">
                 {visibleRows.map((r) => (
-                  <tr
+                  <DataTableRow
                     key={r.id}
                     onClick={() => {
                       window.location.href = "/requests/" + r.id;
@@ -633,26 +634,26 @@ export default function RequestsPage() {
                     aria-label={"View details for " + r.reference}
                     className="cursor-pointer bg-white text-[#23221E] hover:bg-[#FFFCF0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D7A400] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))] dark:hover:bg-[#302F2A]"
                   >
-                    <td className="px-4 py-4">
+                    <DataTableCell className="px-4 py-4">
                       <p className="font-semibold">{r.reference}</p>
                       <p className="mt-1 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
                         {r.orderNumber} · {r.itemName}
                       </p>
-                    </td>
-                    <td className="px-4 py-4">
+                    </DataTableCell>
+                    <DataTableCell className="px-4 py-4">
                       <p>{r.customerName}</p>
                       <p className="text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
                         {r.customerEmail}
                       </p>
-                    </td>
-                    <td className="px-4 py-4">{pretty(r.reason)}</td>
-                    <td className="px-4 py-4">
+                    </DataTableCell>
+                    <DataTableCell className="px-4 py-4">{pretty(r.reason)}</DataTableCell>
+                    <DataTableCell className="px-4 py-4">
                       <StatusBadge status={r.status} />
-                    </td>
-                    <td className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
+                    </DataTableCell>
+                    <DataTableCell className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
                       {formatDate(r.createdAt)}
-                    </td>
-                    <td className="px-4 py-4">
+                    </DataTableCell>
+                    <DataTableCell className="px-4 py-4">
                       <div className="relative flex justify-end">
                         <button
                           type="button"
@@ -710,12 +711,12 @@ export default function RequestsPage() {
                           </>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </DataTableCell>
+                  </DataTableRow>
                 ))}
                 {!loading && rows.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center">
+                  <DataTableRow>
+                    <DataTableCell colSpan={6} className="px-4 py-12 text-center">
                       <Inbox className="mx-auto mb-2 text-gray-400" />
                       <p className="font-medium">
                         {error ? "Requests unavailable" : "No requests found"}
@@ -725,14 +726,14 @@ export default function RequestsPage() {
                           ? "Try changing the search or status filter."
                           : "Create your first return request to get started."}
                       </p>
-                    </td>
-                  </tr>
+                    </DataTableCell>
+                  </DataTableRow>
                 )}
                 {loading &&
                   Array.from({ length: 5 }, (_, i) => (
-                    <tr key={"skeleton-" + i} aria-hidden="true">
+                    <DataTableRow key={"skeleton-" + i} aria-hidden="true">
                       {Array.from({ length: 6 }, (_, j) => (
-                        <td key={j} className="px-4 py-5">
+                        <DataTableCell key={j} className="px-4 py-5">
                           <div
                             className={
                               "h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] " +
@@ -752,13 +753,13 @@ export default function RequestsPage() {
                           {j < 2 && (
                             <div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]" />
                           )}
-                        </td>
+                        </DataTableCell>
                       ))}
-                    </tr>
+                    </DataTableRow>
                   ))}
-              </tbody>
-            </table>
-          </div>
+              </DataTableBody>
+            </DataTable>
+          </DataTableContainer>
           <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
         </section>
       </div>
