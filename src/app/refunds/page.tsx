@@ -24,9 +24,8 @@ import { formatCurrencyINR, formatDate } from "@/features/requests/presentation"
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
-import { AnimatedNumber } from "@/features/refunds/components/animated-number";
-import { REFUND_SUMMARY_CARDS } from "@/features/refunds/refund-summary-cards";
 import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, type RefundRequest, type RefundSortField, type RefundStatus, type SortOrder } from "@/features/refunds/refund-utils";
+import { RefundSummaryCards } from "@/features/refunds/components/refund-summary-cards";
 
 const PAGE_SIZE = 10;
 
@@ -151,16 +150,7 @@ export default function RefundsPage() {
 
   const { awaitingCount, processedCount, totalRefundValue } = useMemo(() => summarizeRefunds(rows), [rows]);
 
-  const summaryValues = {
-    awaitingCount,
-    processedCount,
-    totalRefundValue,
-  };
 
-  const summaryCards = REFUND_SUMMARY_CARDS.map((card) => ({
-    ...card,
-    value: summaryValues[card.valueKey],
-  }));
 
   const handleSort = (field: RefundSortField) => {
     if (sortBy === field) {
@@ -223,39 +213,14 @@ export default function RefundsPage() {
         )}
 
         <div className="grid gap-3 sm:grid-cols-3">
-          {summaryCards.map((card) => (
-            <Link
-              href={card.href}
-              key={card.label}
-              onClick={() => {
-                setStatusFilter(card.status);
-                setPage(1);
-              }}
-              className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]"
-            >
-              <article className="group h-full rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] shadow-sm transition hover:shadow-md dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-sm text-[rgb(var(--muted-foreground))]">
-                    {card.label}
-                  </p>
-
-                  <span
-                    className={`grid size-9 place-items-center rounded-lg ${card.tone}`}
-                  >
-                    <card.icon size={17} />
-                  </span>
-                </div>
-
-                <p className="mt-3 text-3xl font-semibold tracking-tight tabular-nums">
-                  <AnimatedNumber
-                    value={loading ? 0 : card.value}
-                    format={card.format}
-                  />
-                </p>
-              </article>
-            </Link>
-          ))}
-        </div>
+          <RefundSummaryCards
+          values={{ awaitingCount, processedCount, totalRefundValue }}
+          loading={loading}
+          onSelectStatus={(status) => {
+            setStatusFilter(status);
+            setPage(1);
+          }}
+        />
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative w-full max-w-xl">
