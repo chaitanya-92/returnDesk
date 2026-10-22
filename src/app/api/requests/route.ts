@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
     const params = request.nextUrl.searchParams;
     const rawStatuses = params.getAll("status").map((value) => value.toUpperCase());
     const rawReasons = params.getAll("reason").map((value) => value.toUpperCase());
+    const rawResolution = params.get("resolution")?.toUpperCase();
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
     const rawDate = params.get("date");
@@ -68,6 +69,7 @@ export async function GET(request: NextRequest) {
     }
     const result = await listRequests({
       statuses: rawStatuses as (typeof REQUEST_STATUSES)[number][],
+      resolution: rawResolution as "REFUND" | "STORE_CREDIT" | "REPLACEMENT" | undefined,
       reasons: rawReasons,
       createdDate: date,
       search: params.get("q") ?? undefined,
