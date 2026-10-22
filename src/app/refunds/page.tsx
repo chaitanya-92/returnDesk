@@ -1,66 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
+import { useRefundTableState } from "@/features/refunds/hooks/use-refund-table-state";
 import {
-  AlertTriangle,
-  ArrowUpRight,
   CheckCircle2,
-  Clock3,
-  Eye,
-  Filter,
-  IndianRupee,
-  MoreHorizontal,
-  RefreshCw,
-  Search,
-  WalletCards,
 } from "lucide-react";
 
 import { AppShell } from "@/components/layout/app-shell";
-import {
-  DataTable,
-  DataTableBody,
-  DataTableCell,
-  DataTableContainer,
-  DataTableHead,
-  DataTableHeader,
-  DataTableRow,
-} from "@/components/ui/data-table";
 import { showToast } from "@/components/ui/toaster";
 import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
-import { formatCurrencyINR } from "@/features/requests/presentation";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 import {
   filterAndSortRefunds,
-  REFUND_STATUS_FILTERS,
   selectRefundRequests,
   summarizeRefunds,
   type RefundRequest,
-  type RefundSortField,
-  type RefundStatus,
-  type SortOrder,
 } from "@/features/refunds/refund-utils";
 import { RefundTable } from "@/features/refunds/components/refund-table";
 import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
-
-const PAGE_SIZE = 10;
-
-function getInitialStatusFilter(): RefundStatus {
-  if (typeof window === "undefined") {
-    return "ALL";
-  }
-
-  const status = new URLSearchParams(window.location.search).get("status");
-
-  if (status === "APPROVED" || status === "COMPLETED") {
-    return status;
-  }
-
-  return "ALL";
-}
-
-const formatCurrency = formatCurrencyINR;
 
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
@@ -70,20 +28,11 @@ export default function RefundsPage() {
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
   const [busyId, setBusyId] = useState("");
-  const [page, setPage] = useState(1);
-
-  const [statusFilter, setStatusFilter] = useState<RefundStatus>(
-    getInitialStatusFilter,
-  );
-
-  const [actionMenuId, setActionMenuId] = useState<string | null>(null);
-  const [confirmRefund, setConfirmRefund] = useState<RefundRequest | null>(
-    null,
-  );
-  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
-
-  const [sortBy, setSortBy] = useState<RefundSortField>("updatedAt");
-  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const {
+    page, setPage, statusFilter, setStatusFilter,
+    actionMenuId, setActionMenuId, confirmRefund, setConfirmRefund,
+    filterMenuOpen, setFilterMenuOpen, sortBy, sortOrder, handleSort, sortIndicator,
+  } = useRefundTableState();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -160,23 +109,9 @@ export default function RefundsPage() {
 
 
 
-  const handleSort = (field: RefundSortField) => {
-    if (sortBy === field) {
-      setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
-      return;
-    }
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, pageCount);
 
-    setSortBy(field);
-    setSortOrder(field === "updatedAt" ? "desc" : "asc");
-  };
-
-  const sortIndicator = (field: RefundSortField) => {
-    if (sortBy !== field) {
-      return <span>↕</span>;
-    }
-
-    return <span>{sortOrder === "asc" ? "↑" : "↓"}</span>;
-  };
 
   return (
     <AppShell>
