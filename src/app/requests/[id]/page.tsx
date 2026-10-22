@@ -237,7 +237,7 @@ export default function RequestDetailsPage() {
           onDecisionNoteChange={setDecisionNote}
           editingAmount={editingAmount}
           onEditingAmountChange={setEditingAmount}
-          onTransition={(status) => void transition(status)}
+          onTransition={(status, rejectionReason) => transition(status, rejectionReason)}
           onRefresh={() => void load()}
         />
           </div>
