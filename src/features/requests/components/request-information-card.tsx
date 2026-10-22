@@ -23,8 +23,8 @@ export function RequestInformationCard({ item }: RequestInformationCardProps) {
           <div className="mt-4 flex items-center justify-between gap-4 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--muted))] p-3">
           <div>
           <p className="text-xs text-[rgb(var(--muted-foreground))]">Product price / refund amount</p>
-          <p className="mt-1 text-lg font-semibold tabular-nums">{item.refundAmount != null ? formatCurrencyINR(Number(item.refundAmount)) : "Not available"}</p>
-          <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{item.refundAmount != null ? "Saved amount on this request" : "No product catalog price is stored. Enter the verified amount in Decision workflow."}</p>
+          <p className="mt-1 text-lg font-semibold tabular-nums">{item.refundAmount != null ? formatCurrencyINR(Number(item.refundAmount)) : item.productPrice != null ? formatCurrencyINR(Number(item.productPrice) * item.quantity) : "Not available"}</p>
+          <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{item.refundAmount != null ? "Saved refund amount" : item.productPrice != null ? "Product price " + formatCurrencyINR(Number(item.productPrice)) + " × quantity " + item.quantity + ". Confirm the eligible amount before approval." : "Product price is not recorded for this request."}</p>
           </div>
           <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-[#E8D98A] bg-[#FFF9DC] text-[#725500]">
           <IndianRupee size={18}/>
