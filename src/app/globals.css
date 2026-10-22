@@ -101,3 +101,7 @@ html:not(.dark) .status-badge-completed{background:#D1FAE5!important;color:#064E
 *::-webkit-scrollbar-thumb:hover { background: #A8A18F; border: 2px solid transparent; background-clip: padding-box; }
 html.dark * { scrollbar-color: #5C584E transparent; }
 html.dark *::-webkit-scrollbar-thumb { background: #5C584E; border: 2px solid transparent; background-clip: padding-box; }
+
+/* Dashboard-specific status colors stay readable regardless of app theme state. */
+html:not(.dark) .dashboard-status-review { background:#FFF4CC!important;color:#805600!important;border-color:#E8C96A!important; }
+html.dark .dashboard-status-review { background:#3A301A!important;color:#F4D76B!important;border-color:#8A6B25!important; }
