@@ -18,7 +18,7 @@ import { RequestFilters } from "@/features/requests/components/request-filters";
 export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
 
-  const [status, setStatus] = useState<RequestStatusFilter>("ALL");
+  const [statuses, setStatuses] = useState<RequestStatusFilter[]>([]);
   const [statusReady, setStatusReady] = useState(false);
   const requestSequence = useRef(0);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function RequestsPage() {
     "createdAt" | "customerName" | "status" | "reason" | "reference"
   >("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [reason, setReason] = useState("ALL");
+  const [reasons, setReasons] = useState<string[]>([]);
   const [createdDate, setCreatedDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -48,8 +48,8 @@ export default function RequestsPage() {
     setError("");
     try {
       const params = new URLSearchParams();
-      if (status !== "ALL") params.set("status", status);
-      if (reason !== "ALL") params.set("reason", reason);
+      statuses.forEach((value) => params.append("status", value));
+      reasons.forEach((value) => params.append("reason", value));
       if (createdDate) params.set("date", createdDate);
       if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
       params.set("page", String(page));
@@ -68,9 +68,9 @@ export default function RequestsPage() {
       if (requestId === requestSequence.current) setLoading(false);
     }
   }, [
-    status,
+    statuses,
     debouncedQuery,
-    reason,
+    reasons,
     createdDate,
     page,
     pageSize,
@@ -81,9 +81,9 @@ export default function RequestsPage() {
   useEffect(() => {
     const initial = new URLSearchParams(window.location.search).get("status");
     const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
-    setStatus(initial && allowed.includes(initial as RequestStatusFilter)
-      ? (initial as RequestStatusFilter)
-      : "ALL");
+    setStatuses(initial && allowed.includes(initial as RequestStatusFilter)
+      ? [initial as RequestStatusFilter]
+      : []);
     setStatusReady(true);
   }, []);
 
@@ -92,7 +92,7 @@ export default function RequestsPage() {
   }, [load, statusReady]);
   useEffect(() => {
     setPage(1);
-  }, [query, status, reason, createdDate, sortBy, sortOrder]);
+  }, [query, statuses, reasons, createdDate, sortBy, sortOrder]);
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 3600);
@@ -159,11 +159,11 @@ export default function RequestsPage() {
             setPage(1);
           }}
           createdDate={createdDate}
-          onReasonChange={(value) => { setReason(value); setPage(1); }}
-          reason={reason}
+          onReasonsChange={(value) => { setReasons(value); setPage(1); }}
+          reasons={reasons}
           onCreatedDateChange={(value) => { setCreatedDate(value); setPage(1); }}
-          status={status}
-          onStatusChange={(value) => { setStatus(value); setPage(1); }}
+          statuses={statuses}
+          onStatusesChange={(value) => { setStatuses(value); setPage(1); }}
           sortBy={sortBy}
           sortOrder={sortOrder}
           onSortByChange={(value) => { setSortBy(value); setPage(1); }}
@@ -174,9 +174,8 @@ export default function RequestsPage() {
           loading={loading}
           error={error}
           query={query}
-          status={status}
+          status={statuses.length === 1 ? statuses[0] : "ALL"}
           actionMenuId={actionMenuId}
-          setStatusMenuOpen={setStatusMenuOpen}
           setActionMenuId={setActionMenuId}
         />
         <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
