@@ -2,10 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRefundTableState } from "@/features/refunds/hooks/use-refund-table-state";
-import {
-  CheckCircle2,
-} from "lucide-react";
-
 import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
 import { requestsApi } from "@/features/requests/api/requests-api";
@@ -19,6 +15,8 @@ import {
 } from "@/features/refunds/refund-utils";
 import { RefundTable } from "@/features/refunds/components/refund-table";
 import { RefundConfirmationDialog } from "@/features/refunds/components/refund-confirmation-dialog";
+
+const PAGE_SIZE = 10;
 
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
