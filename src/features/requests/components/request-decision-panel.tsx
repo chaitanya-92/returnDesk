@@ -38,7 +38,7 @@ export function RequestDecisionPanel({
   onEditingAmountChange, onTransition, onRefresh,
 }: RequestDecisionPanelProps) {
   return (
-<aside className="sticky top-4 h-fit space-y-5 self-start">{review && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
+<aside className="h-fit space-y-5 self-start xl:sticky xl:top-24">{review && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Decision workflow</h2>{item.status === "OPEN" && <button disabled={busy} onClick={() => void onTransition("IN_REVIEW")} className="mt-4 w-full rounded-lg border px-3 py-2.5 text-sm">Move to In Review</button>}{item.status === "IN_REVIEW" && <div className="mt-4 space-y-3">
           <div className="relative">
           <label className="block text-xs font-medium">Resolution</label>
