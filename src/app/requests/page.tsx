@@ -34,7 +34,12 @@ import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
-import { REQUEST_REASONS, REQUEST_STATUSES, type RequestDraft, type RequestStatusFilter } from "@/features/requests/types";
+import {
+  REQUEST_REASONS,
+  REQUEST_STATUSES,
+  type RequestDraft,
+  type RequestStatusFilter,
+} from "@/features/requests/types";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 type RequestRow = Pick<
