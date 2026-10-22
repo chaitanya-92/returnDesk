@@ -29,3 +29,16 @@ export function formatCurrencyINR(value: number): string {
     currency: "INR",
   });
 }
+
+export function formatDate(
+  value: string | Date,
+  options: Intl.DateTimeFormatOptions = {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  },
+): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return new Intl.DateTimeFormat("en-IN", options).format(date);
+}

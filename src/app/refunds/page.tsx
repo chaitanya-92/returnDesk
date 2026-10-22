@@ -21,6 +21,8 @@ import { showToast } from "@/components/ui/toaster";
 import { apiRequest } from "@/lib/client-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { formatCurrencyINR, formatRequestStatus } from "@/features/requests/presentation";
+import { StatusBadge } from "@/components/requests/status-badge";
+import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 type RefundStatus = "ALL" | "APPROVED" | "COMPLETED";
 
@@ -43,12 +45,6 @@ type RefundRequest = Pick<
 >;
 
 const PAGE_SIZE = 10;
-
-const STATUS_BADGES: Record<string, string> = {
-  APPROVED: "status-badge-review border-amber-300 bg-amber-100 text-amber-950",
-  COMPLETED:
-    "status-badge-completed border-emerald-300 bg-emerald-100 text-emerald-950",
-};
 
 const STATUS_FILTERS: {
   value: RefundStatus;
@@ -543,16 +539,7 @@ export default function RefundsPage() {
                     </td>
 
                     <td className="px-4 py-4">
-                      <span
-                        className={`rounded-md border px-2 py-1 text-xs font-medium ${
-                          STATUS_BADGES[refund.status] ??
-                          "border-slate-300 bg-slate-100 text-slate-900"
-                        }`}
-                      >
-                        {refund.status === "APPROVED"
-                          ? "Awaiting processing"
-                          : "Processed"}
-                      </span>
+                      <StatusBadge status={refund.status} label={refund.status === "APPROVED" ? "Awaiting processing" : "Processed"} />
                     </td>
 
                     <td className="px-4 py-4 text-xs">

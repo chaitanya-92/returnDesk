@@ -28,48 +28,20 @@ import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
 import { apiRequest } from "@/lib/client-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
-import { REQUEST_STATUS_CLASSES, formatRequestStatus } from "@/features/requests/presentation";
+import { formatRequestStatus } from "@/features/requests/presentation";
+import { StatusBadge } from "@/components/requests/status-badge";
+import { Pagination } from "@/components/requests/pagination";
+import { REQUEST_REASONS, REQUEST_STATUSES, type RequestDraft } from "@/features/requests/types";
+import type { RequestRecord } from "@/features/requests/api/requests-api";
 
-type RequestRow = {
-  id: string;
-  reference: string;
-  orderNumber: string;
-  itemName: string;
-  customerName: string;
-  customerEmail: string;
-  reason: string;
-  status: string;
-  createdAt: string;
-  quantity?: number;
-};
-const statuses = [
-  "ALL",
-  "OPEN",
-  "IN_REVIEW",
-  "APPROVED",
-  "REJECTED",
-  "COMPLETED",
-];
-const reasons = [
-  "DAMAGED",
-  "WRONG_ITEM",
-  "WRONG_SIZE",
-  "NOT_AS_DESCRIBED",
-  "CHANGED_MIND",
-  "MISSING_PARTS",
-  "OTHER",
-];
-type RequestDraft = {
-  orderNumber: string;
-  orderItemId: string;
-  itemName: string;
-  itemSku: string;
-  quantity: number;
-  customerName: string;
-  customerEmail: string;
-  reason: string;
-  description: string;
-};
+type RequestRow = Pick<
+  RequestRecord,
+  "id" | "reference" | "orderNumber" | "itemName" | "customerName" |
+  "customerEmail" | "reason" | "status" | "createdAt" | "quantity"
+>;
+const statuses = ["ALL", ...REQUEST_STATUSES];
+const reasons = [...REQUEST_REASONS];
+
 const initialDraft: RequestDraft = {
   orderNumber: "",
   orderItemId: "",
@@ -753,23 +725,7 @@ export default function RequestsPage() {
                     </td>
                     <td className="px-4 py-4">{pretty(r.reason)}</td>
                     <td className="px-4 py-4">
-                      <span
-                        className={
-                          "status-badge-" +
-                          ({
-                            OPEN: "open",
-                            IN_REVIEW: "review",
-                            APPROVED: "approved",
-                            REJECTED: "rejected",
-                            COMPLETED: "completed",
-                          }[r.status] ?? "open") +
-                          " inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium " +
-                          (REQUEST_STATUS_CLASSES[r.status as keyof typeof REQUEST_STATUS_CLASSES] ??
-                            "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200")
-                        }
-                      >
-                        {pretty(r.status)}
-                      </span>
+                      <StatusBadge status={r.status} />
                     </td>
                     <td className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
                       {new Date(r.createdAt).toLocaleDateString("en-IN")}
@@ -881,36 +837,7 @@ export default function RequestsPage() {
               </tbody>
             </table>
           </div>
-          <div className="flex flex-col gap-3 border-t border-[rgb(var(--border))] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-[rgb(var(--muted-foreground))">
-              Showing {totalRows === 0 ? 0 : (page - 1) * pageSize + 1}–
-              {Math.min(page * pageSize, totalRows)} of {totalRows} requests
-            </p>
-            <nav
-              aria-label="Request table pagination"
-              className="flex items-center gap-1.5"
-            >
-              <button
-                type="button"
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Previous
-              </button>
-              <span className="px-2 text-xs text-[rgb(var(--muted-foreground))">
-                Page {page} of {pageCount}
-              </span>
-              <button
-                type="button"
-                disabled={page >= pageCount}
-                onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-                className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Next
-              </button>
-            </nav>
-          </div>
+          <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
         </section>
       </div>
     </AppShell>
