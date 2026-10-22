@@ -1,9 +1,9 @@
+import { Children } from "react";
 import type {
   HTMLAttributes,
   TableHTMLAttributes,
   ThHTMLAttributes,
   TdHTMLAttributes,
-  Children,
 } from "react";
 
 export function DataTableContainer({
