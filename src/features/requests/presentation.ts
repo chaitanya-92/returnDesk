@@ -4,6 +4,7 @@ export const REQUEST_STATUS_LABELS: Record<RequestStatus, string> = {
   OPEN: "Open",
   IN_REVIEW: "In review",
   APPROVED: "Approved",
+  PROCESSING: "Processing",
   REJECTED: "Rejected",
   COMPLETED: "Completed",
 };
@@ -12,6 +13,7 @@ export const REQUEST_STATUS_CLASSES: Record<RequestStatus, string> = {
   OPEN: "border-sky-300 bg-sky-100 text-sky-950 dark:border-sky-800 dark:bg-sky-950/60 dark:text-sky-100",
   IN_REVIEW: "border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-100",
   APPROVED: "border-violet-300 bg-violet-100 text-violet-950 dark:border-violet-800 dark:bg-violet-950/60 dark:text-violet-100",
+  PROCESSING: "border-amber-300 bg-amber-100 text-amber-950 dark:border-amber-800 dark:bg-amber-950/60 dark:text-amber-100",
   REJECTED: "border-rose-300 bg-rose-100 text-rose-950 dark:border-rose-800 dark:bg-rose-950/60 dark:text-rose-100",
   COMPLETED: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-100",
 };
