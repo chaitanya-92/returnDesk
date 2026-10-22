@@ -105,7 +105,7 @@ export function RequestPageHeader({
         )}
         {showCreate && (
           <div
-            className="fixed inset-0 z-[9999] flex min-h-dvh items-center justify-center overflow-y-auto bg-[#171714]/60 p-4 backdrop-blur-[3px]"
+            className="fixed inset-0 z-[9999] flex min-h-dvh items-start justify-center overflow-y-auto bg-[#171714]/60 px-4 pb-6 pt-24 backdrop-blur-[3px] sm:items-center sm:py-8"
             onMouseDown={(e) => {
               if (e.target === e.currentTarget && !saving) setShowCreate(false);
             }}
@@ -114,7 +114,7 @@ export function RequestPageHeader({
               role="dialog"
               aria-modal="true"
               aria-labelledby="create-request-title"
-              className="relative my-auto max-h-[calc(100dvh-2rem)] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-2xl border border-[#E8E8E3] bg-white p-5 text-[#23221E] shadow-2xl sm:p-7"
+              className="relative my-auto max-h-[calc(100dvh-7rem)] w-full max-w-3xl overflow-y-auto overscroll-contain rounded-2xl border border-[#E8E8E3] bg-white p-5 text-[#23221E] shadow-2xl sm:max-h-[calc(100dvh-4rem)] sm:p-7"
             >
               <div className="mb-5 flex items-start justify-between gap-4 border-b border-[#ECECE7] pb-4">
                 <div>
