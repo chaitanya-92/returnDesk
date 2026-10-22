@@ -70,6 +70,7 @@ type DashboardInsightsProps = {
 export function DashboardInsights({ dashboard, loading, error }: DashboardInsightsProps) {
   const recent = dashboard?.recent ?? [];
   const metrics = dashboard?.metrics;
+  const delta = metrics ? metrics.current30Days - metrics.previous30Days : 0;
   const maxReason = useMemo(
     () => getMaximumReasonCount(dashboard?.reasons ?? []),
     [dashboard?.reasons],
