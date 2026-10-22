@@ -23,18 +23,6 @@ export const REQUEST_REASONS = [
 
 export type RequestReason = (typeof REQUEST_REASONS)[number];
 
-export const REQUEST_REASONS = [
-  "DAMAGED",
-  "WRONG_ITEM",
-  "WRONG_SIZE",
-  "NOT_AS_DESCRIBED",
-  "CHANGED_MIND",
-  "MISSING_PARTS",
-  "OTHER",
-] as const;
-
-export type RequestReason = (typeof REQUEST_REASONS)[number];
-
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export type ResolutionType = (typeof RESOLUTION_TYPES)[number];
 
