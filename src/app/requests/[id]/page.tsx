@@ -5,17 +5,8 @@ import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
 import { requestsApi, type TransitionRequestInput } from "@/features/requests/api/requests-api";
 import { ArrowLeft, CheckCircle2, Clock3, MessageSquare, RefreshCw, Send, XCircle, ChevronDown, Pencil, Check, IndianRupee } from "lucide-react";
-type N = {
-    id: string;
-    body: string;
-    author: string;
-    createdAt: string;
-};
-type E = {
-    id: string;
-    message: string;
-    createdAt: string;
-};
+type N = NonNullable<RequestRecord["notes"]>[number];
+type E = NonNullable<RequestRecord["events"]>[number];
 type R = {
     id: string;
     reference: string;

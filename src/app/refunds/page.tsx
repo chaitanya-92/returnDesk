@@ -28,18 +28,19 @@ type SortField = "customerName" | "refundAmount" | "updatedAt";
 
 type SortOrder = "asc" | "desc";
 
-type RefundRequest = {
-  id: string;
-  reference: string;
-  orderNumber: string;
-  itemName: string;
-  customerName: string;
-  customerEmail: string;
-  status: string;
-  resolution: string | null;
-  refundAmount: string | number | null;
-  updatedAt: string;
-};
+type RefundRequest = Pick<
+  RequestRecord,
+  | "id"
+  | "reference"
+  | "orderNumber"
+  | "itemName"
+  | "customerName"
+  | "customerEmail"
+  | "status"
+  | "resolution"
+  | "refundAmount"
+  | "updatedAt"
+>;
 
 const PAGE_SIZE = 10;
 
@@ -676,37 +677,14 @@ export default function RefundsPage() {
             </table>
           </div>
 
-          <div className="flex items-center justify-between border-t border-[rgb(var(--border))] px-4 py-3 text-xs">
-            <span>
-              Showing {filtered.length ? (currentPage - 1) * PAGE_SIZE + 1 : 0}–
-              {Math.min(currentPage * PAGE_SIZE, filtered.length)} of{" "}
-              {filtered.length}
-            </span>
-
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={currentPage <= 1}
-                onClick={() => setPage((current) => current - 1)}
-                className="rounded border px-3 py-2 disabled:opacity-40"
-              >
-                Previous
-              </button>
-
-              <span>
-                Page {currentPage} of {pageCount}
-              </span>
-
-              <button
-                type="button"
-                disabled={currentPage >= pageCount}
-                onClick={() => setPage((current) => current + 1)}
-                className="rounded border px-3 py-2 disabled:opacity-40"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={currentPage}
+            pageCount={pageCount}
+            total={filtered.length}
+            pageSize={PAGE_SIZE}
+            itemLabel="refunds"
+            onPageChange={setPage}
+          />
         </section>
       </div>
 
