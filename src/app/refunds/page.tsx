@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { showToast } from "@/components/ui/toaster";
 import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
@@ -236,15 +237,15 @@ export default function RefundsPage() {
           id="refund-table"
           className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"
         >
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[780px] text-left text-sm">
-              <thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]">
-                <tr>
-                  <th className="px-3 py-2.5">
+          <DataTableContainer>
+            <DataTable className="w-full min-w-[780px] text-left text-sm">
+              <DataTableHeader className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]">
+                <DataTableRow>
+                  <DataTableHead className="px-3 py-2.5">
                     <span className="mb-1 block">Refund / order</span>
-                  </th>
+                  </DataTableHead>
 
-                  <th className="px-3 py-2.5 align-middle">
+                  <DataTableHead className="px-3 py-2.5 align-middle">
                     <button
                       type="button"
                       onClick={() => handleSort("customerName")}
@@ -253,9 +254,9 @@ export default function RefundsPage() {
                       Customer
                       {sortIndicator("customerName")}
                     </button>
-                  </th>
+                  </DataTableHead>
 
-                  <th className="px-3 py-2.5 align-middle">
+                  <DataTableHead className="px-3 py-2.5 align-middle">
                     <button
                       type="button"
                       onClick={() => handleSort("refundAmount")}
@@ -264,9 +265,9 @@ export default function RefundsPage() {
                       Amount
                       {sortIndicator("refundAmount")}
                     </button>
-                  </th>
+                  </DataTableHead>
 
-                  <th className="px-3 py-2.5 align-middle">
+                  <DataTableHead className="px-3 py-2.5 align-middle">
                     <span>Status</span>
 
                     <div className="relative mt-1 normal-case tracking-normal">
@@ -317,9 +318,9 @@ export default function RefundsPage() {
                         </>
                       )}
                     </div>
-                  </th>
+                  </DataTableHead>
 
-                  <th className="px-3 py-2.5 align-middle">
+                  <DataTableHead className="px-3 py-2.5 align-middle">
                     <button
                       type="button"
                       onClick={() => handleSort("updatedAt")}
@@ -328,15 +329,15 @@ export default function RefundsPage() {
                       Updated
                       {sortIndicator("updatedAt")}
                     </button>
-                  </th>
+                  </DataTableHead>
 
-                  <th className="px-3 py-2.5">Action</th>
-                </tr>
-              </thead>
+                  <DataTableHead className="px-3 py-2.5">Action</DataTableHead>
+                </DataTableRow>
+              </DataTableHeader>
 
-              <tbody className="divide-y divide-[rgb(var(--border))]">
+              <DataTableBody className="divide-y divide-[rgb(var(--border))]">
                 {shown.map((refund) => (
-                  <tr
+                  <DataTableRow
                     key={refund.id}
                     onClick={() => {
                       window.location.assign(`/requests/${refund.id}`);
@@ -353,37 +354,37 @@ export default function RefundsPage() {
                     aria-label={`View details for ${refund.reference}`}
                     className="cursor-pointer bg-white hover:bg-[#FFFCF0] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D7A400] dark:bg-[rgb(var(--card))] dark:hover:bg-[#302F2A]"
                   >
-                    <td className="px-4 py-4">
+                    <DataTableCell className="px-4 py-4">
                       <b>{refund.reference}</b>
 
                       <p className="mt-1 text-xs text-[#6B685F] dark:text-[rgb(var(--muted-foreground))]">
                         {refund.orderNumber} · {refund.itemName}
                       </p>
-                    </td>
+                    </DataTableCell>
 
-                    <td className="px-4 py-4">
+                    <DataTableCell className="px-4 py-4">
                       {refund.customerName}
 
                       <p className="text-xs text-[#6B685F] dark:text-[rgb(var(--muted-foreground))]">
                         {refund.customerEmail}
                       </p>
-                    </td>
+                    </DataTableCell>
 
-                    <td className="px-4 py-4 font-semibold">
+                    <DataTableCell className="px-4 py-4 font-semibold">
                       {refund.refundAmount == null
                         ? "—"
                         : formatCurrency(Number(refund.refundAmount))}
-                    </td>
+                    </DataTableCell>
 
-                    <td className="px-4 py-4">
+                    <DataTableCell className="px-4 py-4">
                       <StatusBadge status={refund.status} label={refund.status === "APPROVED" ? "Awaiting processing" : "Processed"} />
-                    </td>
+                    </DataTableCell>
 
-                    <td className="px-4 py-4 text-xs">
+                    <DataTableCell className="px-4 py-4 text-xs">
                       {formatDate(refund.updatedAt)}
-                    </td>
+                    </DataTableCell>
 
-                    <td className="px-4 py-4">
+                    <DataTableCell className="px-4 py-4">
                       <div className="relative flex justify-end">
                         <button
                           type="button"
@@ -450,13 +451,13 @@ export default function RefundsPage() {
                           </>
                         )}
                       </div>
-                    </td>
-                  </tr>
+                    </DataTableCell>
+                  </DataTableRow>
                 ))}
 
                 {!loading && shown.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center">
+                  <DataTableRow>
+                    <DataTableCell colSpan={6} className="px-4 py-12 text-center">
                       <WalletCards className="mx-auto mb-2" />
 
                       <p>No refund requests found</p>
@@ -465,15 +466,15 @@ export default function RefundsPage() {
                         Refunds appear after a request is approved with the
                         Refund resolution.
                       </p>
-                    </td>
-                  </tr>
+                    </DataTableCell>
+                  </DataTableRow>
                 )}
 
                 {loading &&
                   Array.from({ length: 5 }, (_, rowIndex) => (
-                    <tr key={`refund-skeleton-${rowIndex}`} aria-hidden="true">
+                    <DataTableRow key={`refund-skeleton-${rowIndex}`} aria-hidden="true">
                       {Array.from({ length: 6 }, (_, columnIndex) => (
-                        <td key={columnIndex} className="px-4 py-5">
+                        <DataTableCell key={columnIndex} className="px-4 py-5">
                           <div
                             className={`h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] ${
                               columnIndex === 0
@@ -493,13 +494,13 @@ export default function RefundsPage() {
                           {columnIndex < 2 && (
                             <div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]" />
                           )}
-                        </td>
+                        </DataTableCell>
                       ))}
-                    </tr>
+                    </DataTableRow>
                   ))}
-              </tbody>
-            </table>
-          </div>
+              </DataTableBody>
+            </DataTable>
+          </DataTableContainer>
 
           <Pagination
             page={currentPage}
