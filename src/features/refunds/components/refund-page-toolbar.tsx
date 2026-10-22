@@ -25,6 +25,7 @@ export function RefundPageToolbar({
   const setQuery = onQueryChange;
   const load = onRefresh;
   return (
+    <>
 <header className="flex flex-wrap items-end justify-between gap-4 border-b border-[rgb(var(--border))] pb-5">
           <div>
             <h1 className="text-3xl font-semibold">Refund requests</h1>
@@ -92,5 +93,6 @@ export function RefundPageToolbar({
             />
           </div>
         </div>
+    </>
   );
 }
