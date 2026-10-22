@@ -24,26 +24,8 @@ import { formatCurrencyINR, formatDate, formatRequestStatus } from "@/features/r
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
-
-type RefundStatus = "ALL" | "APPROVED" | "COMPLETED";
-
-type SortField = "customerName" | "refundAmount" | "updatedAt";
-
-type SortOrder = "asc" | "desc";
-
-type RefundRequest = Pick<
-  RequestRecord,
-  | "id"
-  | "reference"
-  | "orderNumber"
-  | "itemName"
-  | "customerName"
-  | "customerEmail"
-  | "status"
-  | "resolution"
-  | "refundAmount"
-  | "updatedAt"
->;
+import { AnimatedNumber } from "@/features/refunds/components/animated-number";
+import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, type RefundRequest, type RefundSortField, type RefundStatus, type SortOrder } from "@/features/refunds/refund-utils";
 
 const PAGE_SIZE = 10;
 
@@ -72,46 +54,6 @@ function getInitialStatusFilter(): RefundStatus {
 
 const formatCurrency = formatCurrencyINR;
 
-function AnimatedNumber({
-  value,
-  format = (number: number) => Math.round(number).toLocaleString("en-IN"),
-}: {
-  value: number;
-  format?: (number: number) => string;
-}) {
-  const [shown, setShown] = useState(0);
-
-  useEffect(() => {
-    let frame = 0;
-    let start: number | undefined;
-
-    const duration = 700;
-
-    const tick = (now: number) => {
-      if (start === undefined) {
-        start = now;
-      }
-
-      const progress = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - progress, 3);
-
-      setShown(value * eased);
-
-      if (progress < 1) {
-        frame = requestAnimationFrame(tick);
-      }
-    };
-
-    setShown(0);
-    frame = requestAnimationFrame(tick);
-
-    return () => {
-      cancelAnimationFrame(frame);
-    };
-  }, [value]);
-
-  return <>{format(shown)}</>;
-}
 
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
@@ -133,7 +75,7 @@ export default function RefundsPage() {
   );
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
 
-  const [sortBy, setSortBy] = useState<SortField>("updatedAt");
+  const [sortBy, setSortBy] = useState<RefundSortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   const load = useCallback(async () => {
@@ -152,11 +94,7 @@ export default function RefundsPage() {
       const items: RefundRequest[] = payload.data.items ?? [];
 
       setRows(
-        items.filter(
-          (item) =>
-            item.resolution === "REFUND" &&
-            ["APPROVED", "COMPLETED"].includes(item.status),
-        ),
+        selectRefundRequests(items),
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load refunds");
@@ -200,30 +138,7 @@ export default function RefundsPage() {
     }
   };
 
-  const filtered = useMemo(() => {
-    return rows
-      .filter(
-        (refund) => statusFilter === "ALL" || refund.status === statusFilter,
-      )
-      .slice()
-      .sort((a, b) => {
-        let comparison: number;
-
-        if (sortBy === "customerName") {
-          comparison = a.customerName
-            .toLocaleLowerCase()
-            .localeCompare(b.customerName.toLocaleLowerCase());
-        } else if (sortBy === "refundAmount") {
-          comparison =
-            Number(a.refundAmount || 0) - Number(b.refundAmount || 0);
-        } else {
-          comparison =
-            new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-        }
-
-        return sortOrder === "asc" ? comparison : -comparison;
-      });
-  }, [rows, statusFilter, sortBy, sortOrder]);
+  const filtered = useMemo(() => filterAndSortRefunds(rows, statusFilter, sortBy, sortOrder), [rows, statusFilter, sortBy, sortOrder]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
 
@@ -234,18 +149,7 @@ export default function RefundsPage() {
     currentPage * PAGE_SIZE,
   );
 
-  const awaitingCount = rows.filter(
-    (refund) => refund.status === "APPROVED",
-  ).length;
-
-  const processedCount = rows.filter(
-    (refund) => refund.status === "COMPLETED",
-  ).length;
-
-  const totalRefundValue = rows.reduce(
-    (total, refund) => total + Number(refund.refundAmount || 0),
-    0,
-  );
+  const { awaitingCount, processedCount, totalRefundValue } = useMemo(() => summarizeRefunds(rows), [rows]);
 
   const summaryCards = [
     {
@@ -275,7 +179,7 @@ export default function RefundsPage() {
     },
   ];
 
-  const handleSort = (field: SortField) => {
+  const handleSort = (field: RefundSortField) => {
     if (sortBy === field) {
       setSortOrder((current) => (current === "asc" ? "desc" : "asc"));
       return;
