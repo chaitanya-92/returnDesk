@@ -3,6 +3,7 @@
 import {
   ArrowUpRight,
   RefreshCw,
+  ShieldAlert,
 } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
@@ -13,6 +14,7 @@ import { DashboardInsights } from "@/features/dashboard/components/dashboard-ins
 
 export default function HomePage() {
   const { dashboard, loading, error, refresh: loadDashboard } = useDashboardData();
+  const metrics = dashboard?.metrics;
   return (
     <AppShell>
       <div className="space-y-6" id="overview">
