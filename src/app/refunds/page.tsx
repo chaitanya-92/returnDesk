@@ -19,6 +19,7 @@ import {
 import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
 import { apiRequest } from "@/lib/client-api";
+import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { formatCurrencyINR, formatRequestStatus } from "@/features/requests/presentation";
 
 type RefundStatus = "ALL" | "APPROVED" | "COMPLETED";
@@ -117,7 +118,7 @@ function AnimatedNumber({
 export default function RefundsPage() {
   const [rows, setRows] = useState<RefundRequest[]>([]);
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
+  const debouncedQuery = useDebouncedValue(query, 300);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [toast, setToast] = useState("");
@@ -136,16 +137,6 @@ export default function RefundsPage() {
 
   const [sortBy, setSortBy] = useState<SortField>("updatedAt");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 300);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [query]);
 
   const load = useCallback(async () => {
     setLoading(true);

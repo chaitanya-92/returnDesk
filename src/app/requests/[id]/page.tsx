@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
+import { requestsApi, type TransitionRequestInput } from "@/features/requests/api/requests-api";
 import { ArrowLeft, CheckCircle2, Clock3, MessageSquare, RefreshCw, Send, XCircle, ChevronDown, Pencil, Check, IndianRupee } from "lucide-react";
 type N = {
     id: string;
@@ -42,12 +43,10 @@ export default function RequestDetailsPage() {
     }>(), router = useRouter();
     const [item, I] = useState<R | null>(null), [loading, L] = useState(true), [error, E] = useState(""), [busy, B] = useState(false), [note, N] = useState(""), [toast, T] = useState(""), [resolution, S] = useState("REFUND"), [amount, A] = useState(""), [decisionNote, D] = useState(""), [resolutionOpen, RO] = useState(false), [editingAmount, EA] = useState(false);
     const load = useCallback(async () => { L(true); E(""); try {
-        const r = await fetch("/api/requests/" + id, { cache: "no-store" }), p = await r.json();
-        if (!r.ok)
-            throw Error(p.error ?? "Could not load request");
-        I(p.data);
-        S(p.data.resolution ?? "REFUND");
-        A(p.data.refundAmount == null ? "" : String(p.data.refundAmount));
+        const { data } = await requestsApi.get(id);
+        I(data as R);
+        S(data.resolution ?? "REFUND");
+        A(data.refundAmount == null ? "" : String(data.refundAmount));
     }
     catch (e) {
         E(e instanceof Error ? e.message : "Could not load request");
@@ -63,9 +62,7 @@ export default function RequestDetailsPage() {
             if (resolution === "REFUND")
                 body.refundAmount = Number(amount);
         }
-        const r = await fetch("/api/requests/" + id + "/transition", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }), p = await r.json();
-        if (!r.ok)
-            throw Error(p.error ?? "Could not update request");
+        await requestsApi.transition(id, body as TransitionRequestInput);
         D("");
         T("Request updated.");
         showToast("Request updated");
@@ -80,9 +77,7 @@ export default function RequestDetailsPage() {
     } }
     async function addNote(e: FormEvent) { e.preventDefault(); if (!note.trim())
         return; B(true); E(""); try {
-        const r = await fetch("/api/requests/" + id + "/notes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ body: note, author: "Operations team" }) }), p = await r.json();
-        if (!r.ok)
-            throw Error(p.error ?? "Could not add note");
+        await requestsApi.addNote(id, note, "Operations team");
         N("");
         T("Internal note added.");
         showToast("Internal note added");

@@ -27,6 +27,7 @@ import {
 import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
 import { apiRequest } from "@/lib/client-api";
+import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { REQUEST_STATUS_CLASSES, formatRequestStatus } from "@/features/requests/presentation";
 
 type RequestRow = {
@@ -163,11 +164,7 @@ export default function RequestsPage() {
   });
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState("");
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedQuery(query), 300);
-    return () => window.clearTimeout(timer);
-  }, [query]);
+  const debouncedQuery = useDebouncedValue(query, 300);
   const [page, setPage] = useState(1);
   const pageSize = 10;
   const [totalRows, setTotalRows] = useState(0);
