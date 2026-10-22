@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatInteger } from "@/features/requests/presentation";
 
 export type AnimatedNumberProps = {
   value: number;
@@ -12,7 +13,7 @@ export type AnimatedNumberProps = {
 export function AnimatedNumber({
   value,
   duration = 700,
-  format = (number) => Math.round(number).toLocaleString("en-IN"),
+  format = formatInteger,
 }: AnimatedNumberProps) {
   const [shown, setShown] = useState(value);
 
