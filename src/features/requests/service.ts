@@ -50,8 +50,8 @@ function validateResolution(input: RequestResolution) {
 }
 
 export type RequestListFilters = {
-  status?: RequestStatus;
-  reason?: string;
+  statuses?: RequestStatus[];
+  reasons?: string[];
   createdDate?: Date;
   search?: string;
   sortBy?: "createdAt" | "customerName" | "status" | "reason" | "reference";
@@ -68,8 +68,8 @@ export async function listRequests(filters?: RequestListFilters) {
   const sortOrder = filters?.sortOrder ?? "desc";
   const where: Prisma.ReturnRequestWhereInput = {
     ...liveFilter,
-    ...(filters?.status ? { status: filters.status } : {}),
-    ...(filters?.reason ? { reason: filters.reason } : {}),
+    ...(filters?.statuses?.length ? { status: { in: filters.statuses } } : {}),
+    ...(filters?.reasons?.length ? { reason: { in: filters.reasons } } : {}),
     ...(filters?.createdDate
       ? {
           createdAt: {
