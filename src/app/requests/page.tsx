@@ -83,7 +83,7 @@ export default function RequestsPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
+    const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "PROCESSING", "REJECTED", "COMPLETED"];
     const initialStatus = params.get("status");
     const initialView = params.get("view");
     if (initialView === "refunds" || initialView === "store-credits" || initialView === "replacements") setResolutionView(initialView);
