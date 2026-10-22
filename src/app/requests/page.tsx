@@ -9,7 +9,7 @@ import {
   useField,
   type FormikHelpers,
 } from "formik";
-import { CheckCircle2, X, AlertCircle, Filter, Plus, RefreshCw, Search, ArrowUpRight, ArrowUp, ArrowDown, ArrowUpDown, Inbox, MoreHorizontal, Eye, WalletCards } from "lucide-react";
+import {\n  AlertCircle,\n  ArrowDown,\n  ArrowUp,\n  ArrowUpDown,\n  ArrowUpRight,\n  CheckCircle2,\n  Eye,\n  Filter,\n  Inbox,\n  MoreHorizontal,\n  Plus,\n  RefreshCw,\n  Search,\n  WalletCards,\n  X,\n} from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
 import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
@@ -18,7 +18,7 @@ import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
-import { REQUEST_REASONS, REQUEST_STATUSES, type RequestDraft } from "@/features/requests/types";
+import { REQUEST_REASONS, REQUEST_STATUSES, type RequestDraft, type RequestStatusFilter } from "@/features/requests/types";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 type RequestRow = Pick<
@@ -26,8 +26,8 @@ type RequestRow = Pick<
   "id" | "reference" | "orderNumber" | "itemName" | "customerName" |
   "customerEmail" | "reason" | "status" | "createdAt" | "quantity"
 >;
-const statuses = ["ALL", ...REQUEST_STATUSES];
-const reasons = REQUEST_REASONS.map((reason) => ({ value: reason, label: formatRequestStatus(reason) }));
+const statuses: RequestStatusFilter[] = ["ALL", ...REQUEST_STATUSES];
+const reasons = REQUEST_REASONS.map((reason) => ({\n  value: reason,\n  label: formatRequestStatus(reason),\n}));
 
 const initialDraft: RequestDraft = {
   orderNumber: "",
@@ -112,7 +112,7 @@ export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
 
-  const [status, setStatus] = useState(() => {
+  const [status, setStatus] = useState<RequestStatusFilter>(() => {
     if (typeof window === "undefined") return "ALL";
     const initial = new URLSearchParams(window.location.search).get("status");
     return ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"].includes(
