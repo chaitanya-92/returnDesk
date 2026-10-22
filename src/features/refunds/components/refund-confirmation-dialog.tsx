@@ -21,9 +21,6 @@ export function RefundConfirmationDialog({
 
   const formatCurrency = formatCurrencyINR;
   const confirmRefund = refund;
-  const setConfirmRefund = (value: RefundRequest | null) => {
-    if (value === null) onClose();
-  };
   const processed = onConfirm;
   return (
 {refund && (
