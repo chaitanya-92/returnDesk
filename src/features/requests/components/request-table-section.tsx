@@ -6,7 +6,6 @@ import {
   ArrowUpDown,
   Filter,
   ArrowUpRight,
-  CheckCircle2,
   Eye,
   Inbox,
   MoreHorizontal,
@@ -17,6 +16,7 @@ import { StatusBadge } from "@/components/requests/status-badge";
 import { REQUEST_STATUS_FILTER_OPTIONS } from "@/features/requests/request-form-data";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
+import type { RequestStatusFilter } from "@/features/requests/types";
 
 export type RequestRow = Pick<
   RequestRecord,
@@ -37,7 +37,7 @@ type RequestTableSectionProps = {
   setSortBy: (value: RequestTableSectionProps["sortBy"]) => void;
   setSortOrder: (value: "asc" | "desc" | ((current: "asc" | "desc") => "asc" | "desc")) => void;
   setStatusMenuOpen: (value: boolean | ((current: boolean) => boolean)) => void;
-  setStatus: (value: any) => void;
+  setStatus: (value: RequestStatusFilter) => void;
   setPage: (value: number) => void;
   setActionMenuId: (value: string | null | ((current: string | null) => string | null)) => void;
 };
