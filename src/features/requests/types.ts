@@ -1,5 +1,15 @@
-export const REQUEST_STATUSES = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"] as const;
-export const RESOLUTION_TYPES = ["REFUND", "REPLACEMENT", "STORE_CREDIT"] as const;
+export const REQUEST_STATUSES = [
+  "OPEN",
+  "IN_REVIEW",
+  "APPROVED",
+  "REJECTED",
+  "COMPLETED",
+] as const;
+export const RESOLUTION_TYPES = [
+  "REFUND",
+  "REPLACEMENT",
+  "STORE_CREDIT",
+] as const;
 
 export type RequestStatus = (typeof REQUEST_STATUSES)[number];
 export type ResolutionType = (typeof RESOLUTION_TYPES)[number];
@@ -9,7 +19,11 @@ export type RequestResolution = {
   refundAmount: number | null;
 };
 
-export const ACTIVE_STATUSES: RequestStatus[] = ["OPEN", "IN_REVIEW", "APPROVED"];
+export const ACTIVE_STATUSES: RequestStatus[] = [
+  "OPEN",
+  "IN_REVIEW",
+  "APPROVED",
+];
 
 export const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   OPEN: ["IN_REVIEW"],

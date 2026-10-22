@@ -16,7 +16,8 @@ function ThemeBridge({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = window.localStorage.getItem("returndesk-theme");
-      if (saved === "light" || saved === "dark") dispatch(setTheme(saved as ThemeMode));
+      if (saved === "light" || saved === "dark")
+        dispatch(setTheme(saved as ThemeMode));
     } catch {
       // Keep the default light theme when browser storage is unavailable.
     } finally {
@@ -44,5 +45,9 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
   const storeRef = useRef<AppStore | null>(null);
   if (!storeRef.current) storeRef.current = makeStore();
 
-  return <Provider store={storeRef.current}><ThemeBridge>{children}</ThemeBridge></Provider>;
+  return (
+    <Provider store={storeRef.current}>
+      <ThemeBridge>{children}</ThemeBridge>
+    </Provider>
+  );
 }

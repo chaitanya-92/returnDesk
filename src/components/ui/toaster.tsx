@@ -1,6 +1,89 @@
 "use client";
 import { useEffect, useState } from "react";
 import { CheckCircle2, XCircle, Info, X } from "lucide-react";
-type ToastMessage={id:number;title:string;description?:string;kind:"success"|"error"|"info"};
-export function showToast(title:string,kind:ToastMessage["kind"]="success",description?:string){if(typeof window!=="undefined")window.dispatchEvent(new CustomEvent("returndesk:toast",{detail:{title,kind,description}}))}
-export function Toaster(){const[items,setItems]=useState<ToastMessage[]>([]);useEffect(()=>{let nextId=0;const handler=(event:Event)=>{const detail=(event as CustomEvent<Omit<ToastMessage,"id">>).detail;const id=++nextId;setItems(current=>[...current,{...detail,id}].slice(-4));window.setTimeout(()=>setItems(current=>current.filter(item=>item.id!==id)),4200)};window.addEventListener("returndesk:toast",handler);return()=>window.removeEventListener("returndesk:toast",handler)},[]);return <div aria-live="polite" className="pointer-events-none fixed right-4 top-4 z-[100] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2">{items.map(item=>{const Icon=item.kind==="success"?CheckCircle2:item.kind==="error"?XCircle:Info;return <div key={item.id} role={item.kind==="error"?"alert":"status"} className="pointer-events-auto flex items-start gap-3 rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] shadow-xl dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><Icon size={19} className={item.kind==="success"?"mt-0.5 shrink-0 text-emerald-600":item.kind==="error"?"mt-0.5 shrink-0 text-rose-600":"mt-0.5 shrink-0 text-amber-600"}/><div className="min-w-0 flex-1"><p className="text-sm font-semibold">{item.title}</p>{item.description&&<p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{item.description}</p>}</div><button type="button" aria-label="Dismiss notification" onClick={()=>setItems(current=>current.filter(x=>x.id!==item.id))} className="rounded-md p-1 hover:bg-[rgb(var(--muted))]"><X size={15}/></button></div>})}</div>}
+type ToastMessage = {
+  id: number;
+  title: string;
+  description?: string;
+  kind: "success" | "error" | "info";
+};
+export function showToast(
+  title: string,
+  kind: ToastMessage["kind"] = "success",
+  description?: string,
+) {
+  if (typeof window !== "undefined")
+    window.dispatchEvent(
+      new CustomEvent("returndesk:toast", {
+        detail: { title, kind, description },
+      }),
+    );
+}
+export function Toaster() {
+  const [items, setItems] = useState<ToastMessage[]>([]);
+  useEffect(() => {
+    let nextId = 0;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<Omit<ToastMessage, "id">>).detail;
+      const id = ++nextId;
+      setItems((current) => [...current, { ...detail, id }].slice(-4));
+      window.setTimeout(
+        () => setItems((current) => current.filter((item) => item.id !== id)),
+        4200,
+      );
+    };
+    window.addEventListener("returndesk:toast", handler);
+    return () => window.removeEventListener("returndesk:toast", handler);
+  }, []);
+  return (
+    <div
+      aria-live="polite"
+      className="pointer-events-none fixed right-4 top-4 z-[100] flex w-[min(24rem,calc(100vw-2rem))] flex-col gap-2"
+    >
+      {items.map((item) => {
+        const Icon =
+          item.kind === "success"
+            ? CheckCircle2
+            : item.kind === "error"
+              ? XCircle
+              : Info;
+        return (
+          <div
+            key={item.id}
+            role={item.kind === "error" ? "alert" : "status"}
+            className="pointer-events-auto flex items-start gap-3 rounded-xl border border-[rgb(var(--border))] bg-white p-4 text-[#23221E] shadow-xl dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"
+          >
+            <Icon
+              size={19}
+              className={
+                item.kind === "success"
+                  ? "mt-0.5 shrink-0 text-emerald-600"
+                  : item.kind === "error"
+                    ? "mt-0.5 shrink-0 text-rose-600"
+                    : "mt-0.5 shrink-0 text-amber-600"
+              }
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold">{item.title}</p>
+              {item.description && (
+                <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">
+                  {item.description}
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              aria-label="Dismiss notification"
+              onClick={() =>
+                setItems((current) => current.filter((x) => x.id !== item.id))
+              }
+              className="rounded-md p-1 hover:bg-[rgb(var(--muted))]"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
