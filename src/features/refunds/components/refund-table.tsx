@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, CheckCircle2, Eye, MoreHorizontal, WalletCards } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Eye, Filter, MoreHorizontal, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { Pagination } from "@/components/requests/pagination";
@@ -110,7 +110,7 @@ export function RefundTable({
                                 onClick={() => {
                                   setStatusFilter(filter.value);
                                   setFilterMenuOpen(false);
-                                  setPage(1);
+                                  onPageChange(1);
                                 }}
                                 className={`block w-full rounded px-3 py-2 text-left text-xs ${
                                   statusFilter === filter.value
