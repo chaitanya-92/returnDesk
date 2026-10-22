@@ -4,17 +4,17 @@ import { useMemo } from "react";
 import {
   ArrowUpRight,
   CheckCircle2,
-  Clock3,
+
   Inbox,
-  PackageCheck,
+
   RefreshCw,
   ShieldAlert,
-  TrendingUp,
+  TrendingUp
 } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
-import { AnimatedNumber } from "@/features/refunds/components/animated-number";
 import { useDashboardData } from "@/features/dashboard/hooks/use-dashboard-data";
+import { DashboardMetricCards } from "@/features/dashboard/components/dashboard-metric-cards";
 import {
   DASHBOARD_REASON_COLORS,
   DASHBOARD_STATUS_CLASSES,
@@ -22,51 +22,14 @@ import {
   formatDurationHours,
   getMaximumReasonCount,
   getReasonBarWidth,
-  humanizeDashboardValue,
+  humanizeDashboardValue
 } from "@/features/dashboard/dashboard-utils";
 
-function MetricCard({
-  label,
-  value,
-  helper,
-  icon: Icon,
-  href,
-}: {
-  label: string;
-  value: number | string;
-  helper: string;
-  icon: typeof Inbox;
-  href: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]"
-    >
-      <article className="h-full rounded-xl border border-[#D8D2C2] bg-white p-4 transition-shadow hover:shadow-md dark:border-[#514D40] dark:bg-[rgb(var(--card))] sm:p-5">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">
-            {label}
-          </p>
-          <span className="grid size-9 place-items-center rounded-lg border border-[#D8D2C2] bg-[#F1EEE5] text-[#292821] dark:border-[#514D40] dark:bg-[#343229] dark:text-[#F2EBD8]">
-            <Icon size={17} strokeWidth={2.1} />
-          </span>
-        </div>
-        <p className="mt-4 text-3xl font-semibold tracking-tight text-[rgb(var(--foreground))]">
-          {typeof value === "number" ? <AnimatedNumber value={value} /> : value}
-        </p>
-        <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">
-          {helper}
-        </p>
-      </article>
-    </Link>
-  );
-}
 function Panel({
   title,
   description,
   children,
-  action,
+  action
 }: {
   title: string;
   description?: string;
@@ -152,36 +115,7 @@ export default function HomePage() {
           </div>
         )}
 
-        <section className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
-          <MetricCard
-            label="Open requests"
-            value={loading && !metrics ? "—" : (metrics?.open ?? 0)}
-            helper="Waiting to be reviewed"
-            icon={Inbox}
-            href="/requests?status=OPEN"
-          />
-          <MetricCard
-            label="In review"
-            value={loading && !metrics ? "—" : (metrics?.inReview ?? 0)}
-            helper="Needs an operational decision"
-            icon={Clock3}
-            href="/requests?status=IN_REVIEW"
-          />
-          <MetricCard
-            label="Approved"
-            value={loading && !metrics ? "—" : (metrics?.approved ?? 0)}
-            helper="Ready to be fulfilled"
-            icon={PackageCheck}
-            href="/requests?status=APPROVED"
-          />
-          <MetricCard
-            label="Completed"
-            value={loading && !metrics ? "—" : (metrics?.completed ?? 0)}
-            helper="Successfully resolved"
-            icon={CheckCircle2}
-            href="/requests?status=COMPLETED"
-          />
-        </section>
+        <DashboardMetricCards metrics={metrics} loading={loading} />
 
         <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
           <Panel
@@ -273,8 +207,8 @@ export default function HomePage() {
                         style={{
                           width: getReasonBarWidth(item.count, maxReason),
                           backgroundColor:
-                            DASHBOARD_REASON_COLORS[index % DASHBOARD_REASON_COLORS.length],
-                        }}
+                            DASHBOARD_REASON_COLORS[index % DASHBOARD_REASON_COLORS.length]
+}}
                       />
                     </div>
                   </div>
