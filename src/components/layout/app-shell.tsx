@@ -1,6 +1,7 @@
 "use client";
 
 import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, Sun, WalletCards } from "lucide-react";
+import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
@@ -102,6 +103,7 @@ function WorkspaceNavbar() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
+      <Toaster />
       <WorkspaceSidebar />
       <div className="min-w-0 flex-1">
         <WorkspaceNavbar />

@@ -8,14 +8,33 @@ export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
     const rawStatus = params.get("status")?.toUpperCase();
+    const rawReason = params.get("reason")?.toUpperCase();
+    const sortBy = params.get("sortBy") ?? "createdAt";
+    const sortOrder = params.get("sortOrder") ?? "desc";
+    const page = Number(params.get("page") ?? "1");
+    const pageSize = Number(params.get("pageSize") ?? "10");
     if (rawStatus && !REQUEST_STATUSES.includes(rawStatus as (typeof REQUEST_STATUSES)[number])) {
       throw new AppError("Unknown request status filter.", 400, "INVALID_STATUS_FILTER");
     }
-    const requests = await listRequests({
+    if (rawReason && !["DAMAGED", "WRONG_ITEM", "WRONG_SIZE", "NOT_AS_DESCRIBED", "CHANGED_MIND", "MISSING_PARTS", "OTHER"].includes(rawReason)) {
+      throw new AppError("Unknown request reason filter.", 400, "INVALID_REASON_FILTER");
+    }
+    if (!Number.isInteger(page) || page < 1 || !Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+      throw new AppError("Page must be positive and pageSize must be between 1 and 100.", 400, "INVALID_PAGINATION");
+    }
+    if (!["createdAt", "customerName", "status", "reason", "reference"].includes(sortBy) || !["asc", "desc"].includes(sortOrder)) {
+      throw new AppError("Invalid sort field or direction.", 400, "INVALID_SORT");
+    }
+    const result = await listRequests({
       status: rawStatus as (typeof REQUEST_STATUSES)[number] | undefined,
+      reason: rawReason ?? undefined,
       search: params.get("q") ?? undefined,
+      sortBy: sortBy as "createdAt" | "customerName" | "status" | "reason" | "reference",
+      sortOrder: sortOrder as "asc" | "desc",
+      page,
+      pageSize,
     });
-    return apiSuccess(requests);
+    return apiSuccess(result);
   } catch (error) {
     return apiError(error);
   }

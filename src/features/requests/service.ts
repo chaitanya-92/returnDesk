@@ -27,23 +27,44 @@ function validateResolution(input: RequestResolution) {
   }
 }
 
-export async function listRequests(filters?: { status?: RequestStatus; search?: string }) {
+export type RequestListFilters = {
+  status?: RequestStatus;
+  reason?: string;
+  search?: string;
+  sortBy?: "createdAt" | "customerName" | "status" | "reason" | "reference";
+  sortOrder?: "asc" | "desc";
+  page?: number;
+  pageSize?: number;
+};
+
+export async function listRequests(filters?: RequestListFilters) {
   const search = filters?.search?.trim();
-  return prisma.returnRequest.findMany({
-    where: {
-      ...liveFilter,
-      ...(filters?.status ? { status: filters.status } : {}),
-      ...(search ? { OR: [
-        { reference: { contains: search, mode: "insensitive" } },
-        { orderNumber: { contains: search, mode: "insensitive" } },
-        { customerName: { contains: search, mode: "insensitive" } },
-        { customerEmail: { contains: search, mode: "insensitive" } },
-      ] } : {}),
-    },
-    include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } },
-    orderBy: { createdAt: "desc" },
-    take: 100,
-  });
+  const page = Math.max(1, filters?.page ?? 1);
+  const pageSize = Math.min(100, Math.max(1, filters?.pageSize ?? 10));
+  const sortBy = filters?.sortBy ?? "createdAt";
+  const sortOrder = filters?.sortOrder ?? "desc";
+  const where: Prisma.ReturnRequestWhereInput = {
+    ...liveFilter,
+    ...(filters?.status ? { status: filters.status } : {}),
+    ...(filters?.reason ? { reason: filters.reason } : {}),
+    ...(search ? { OR: [
+      { reference: { contains: search, mode: "insensitive" } },
+      { orderNumber: { contains: search, mode: "insensitive" } },
+      { customerName: { contains: search, mode: "insensitive" } },
+      { customerEmail: { contains: search, mode: "insensitive" } },
+    ] } : {}),
+  };
+  const [items, total] = await prisma.$transaction([
+    prisma.returnRequest.findMany({
+      where,
+      include: { notes: { orderBy: { createdAt: "asc" } }, events: { orderBy: { createdAt: "asc" } } },
+      orderBy: [{ [sortBy]: sortOrder }, { id: "asc" }],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+    prisma.returnRequest.count({ where }),
+  ]);
+  return { items, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
 }
 
 export async function getRequest(id: string) {

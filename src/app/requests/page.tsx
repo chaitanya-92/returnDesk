@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Formik, Form, Field, ErrorMessage, useField, type FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { CheckCircle2, X, AlertCircle } from "lucide-react";
+import { showToast } from "@/components/ui/toaster";
 import { Plus, RefreshCw, Search, ArrowUpRight, Inbox, MoreHorizontal, Eye, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -46,6 +47,10 @@ export default function RequestsPage() {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
   const pageSize = 10;
+  const [totalRows, setTotalRows] = useState(0);
+  const [sortBy, setSortBy] = useState<"createdAt" | "customerName" | "status" | "reason" | "reference">("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [reason, setReason] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showCreate, setShowCreate] = useState(false);
@@ -57,17 +62,19 @@ export default function RequestsPage() {
     try {
       const params = new URLSearchParams();
       if (status !== "ALL") params.set("status", status);
+      if (reason !== "ALL") params.set("reason", reason);
       if (query.trim()) params.set("q", query.trim());
+      params.set("page", String(page)); params.set("pageSize", String(pageSize)); params.set("sortBy", sortBy); params.set("sortOrder", sortOrder);
       const response = await fetch("/api/requests?" + params.toString(), { cache: "no-store" });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error?.message ?? "Could not load return requests.");
-      setRows(Array.isArray(payload.data) ? payload.data : []);
+      setRows(Array.isArray(payload.data?.items) ? payload.data.items : []); setTotalRows(Number(payload.data?.total ?? 0));
     } catch (e) { setError(e instanceof Error ? e.message : "Could not load return requests."); }
     finally { setLoading(false); }
-  }, [status, query]);
+  }, [status, query, reason, page, pageSize, sortBy, sortOrder]);
 
   useEffect(() => { void load(); }, [load]);
-  useEffect(() => { setPage(1); }, [query, status]);
+  useEffect(() => { setPage(1); }, [query, status, reason, sortBy, sortOrder]);
   useEffect(() => { if (!toast) return; const timer = window.setTimeout(() => setToast(null), 3600); return () => window.clearTimeout(timer); }, [toast]);
 
   async function createRequest(values: RequestDraft, helpers: FormikHelpers<RequestDraft>) {
@@ -76,14 +83,14 @@ export default function RequestsPage() {
       const response = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(values) });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload?.error?.message ?? "Could not create request.");
-      setShowCreate(false); setToast({ type: "success", message: "Return request created successfully." });
+      setShowCreate(false); setToast({ type: "success", message: "Return request created successfully." }); showToast("Return request created", "success", payload.data?.reference ? `Reference ${payload.data.reference}` : undefined);
       helpers.resetForm(); setPage(1); await load();
-    } catch (e) { const message = e instanceof Error ? e.message : "Could not create request."; setError(message); setToast({ type: "error", message }); }
+    } catch (e) { const message = e instanceof Error ? e.message : "Could not create request."; setError(message); setToast({ type: "error", message }); showToast("Could not create request", "error", message); }
     finally { setSaving(false); helpers.setSubmitting(false); }
   }
 
-  const pageCount = Math.max(1, Math.ceil(rows.length / pageSize));
-  const visibleRows = rows.slice((page - 1) * pageSize, page * pageSize);
+  const pageCount = Math.max(1, Math.ceil(totalRows / pageSize));
+  const visibleRows = rows;
   const field = "w-full rounded-lg border border-[rgb(var(--border))] bg-white px-3 py-2.5 text-sm text-[#23221E] outline-none focus:border-[#D7A400] focus:ring-2 focus:ring-[#F2B719]/20";
   return <AppShell><div aria-busy={loading} className="space-y-6">
     <header className="flex flex-col justify-between gap-4 border-b border-[rgb(var(--border))] pb-5 sm:flex-row sm:items-end">
@@ -110,12 +117,12 @@ export default function RequestsPage() {
     </section></div>}
     <section className="overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white text-[#23221E] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]">
       <div className="flex flex-col gap-3 border-b border-[rgb(var(--border))] p-4 sm:flex-row"><div className="relative flex-1"><Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"/><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search reference, customer, order, item…" className="w-full rounded-lg border border-[rgb(var(--border))] bg-white py-2.5 pl-9 pr-3 text-sm text-[#23221E] outline-none focus:border-[#D7A400] [color-scheme:light]"/></div><div className="relative shrink-0"><button type="button" aria-haspopup="listbox" aria-expanded={statusMenuOpen} onClick={() => setStatusMenuOpen(v => !v)} className="flex min-w-36 items-center justify-between gap-3 rounded-lg border border-[#DCDCD5] bg-white px-3 py-2.5 text-sm font-medium text-[#23221E] shadow-sm hover:bg-[#FFFDF5] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/40"><span>{status === "ALL" ? "All statuses" : pretty(status)}</span><span aria-hidden="true" className="text-[#59523D]">⌄</span></button>{statusMenuOpen && <><button aria-label="Close status menu" tabIndex={-1} className="fixed inset-0 z-40 cursor-default" onClick={() => setStatusMenuOpen(false)}></button><div role="listbox" aria-label="Filter by status" className="absolute right-0 top-full z-50 mt-2 w-44 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5">{statuses.map(s => <button key={s} type="button" role="option" aria-selected={status === s} onClick={() => { setStatus(s); setStatusMenuOpen(false); }} className={"flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors " + (status === s ? "bg-[#FFF0A6] text-[#23221E]" : "bg-white text-[#38362F] hover:bg-[#FFF9DC] hover:text-[#23221E]")}>{s === "ALL" ? "All statuses" : pretty(s)}{status === s && <span aria-hidden="true">✓</span>}</button>)}</div></>}</div></div>
-      <div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]"><thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]"><tr><th className="px-4 py-3">Request</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Created</th><th className="px-4 py-3"></th></tr></thead><tbody className="divide-y divide-[rgb(var(--border))]">
+      <div className="flex flex-wrap gap-2 px-4 pb-3"><select aria-label="Filter by reason" value={reason} onChange={e=>setReason(e.target.value)} className="rounded-lg border px-3 py-2 text-sm"><option value="ALL">All reasons</option><option value="DAMAGED">Damaged</option><option value="WRONG_ITEM">Wrong item</option><option value="WRONG_SIZE">Size issue</option><option value="NOT_AS_DESCRIBED">Not as described</option><option value="CHANGED_MIND">Changed mind</option><option value="MISSING_PARTS">Missing parts</option><option value="OTHER">Other</option></select><select aria-label="Sort requests by" value={sortBy} onChange={e=>setSortBy(e.target.value as typeof sortBy)} className="rounded-lg border px-3 py-2 text-sm"><option value="createdAt">Created date</option><option value="customerName">Customer</option><option value="status">Status</option><option value="reason">Reason</option><option value="reference">Reference</option></select><button type="button" onClick={()=>setSortOrder(v=>v==="asc"?"desc":"asc")} className="rounded-lg border px-3 py-2 text-sm">Sort: {sortOrder==="asc"?"Ascending":"Descending"}</button></div><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm text-[#23221E] dark:text-[rgb(var(--foreground))]"><thead className="bg-[#FFF9DC] text-[10px] uppercase tracking-wider text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]"><tr><th className="px-4 py-3">Request</th><th className="px-4 py-3">Customer</th><th className="px-4 py-3">Reason</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Created</th><th className="px-4 py-3"></th></tr></thead><tbody className="divide-y divide-[rgb(var(--border))]">
       {visibleRows.map(r => <tr key={r.id} className="bg-white text-[#23221E] hover:bg-[#FFFCF0] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))] dark:hover:bg-[#302F2A]"><td className="px-4 py-4"><p className="font-semibold">{r.reference}</p><p className="mt-1 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">{r.orderNumber} · {r.itemName}</p></td><td className="px-4 py-4"><p>{r.customerName}</p><p className="text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">{r.customerEmail}</p></td><td className="px-4 py-4">{pretty(r.reason)}</td><td className="px-4 py-4"><span className={"status-badge-" + ({OPEN:"open",IN_REVIEW:"review",APPROVED:"approved",REJECTED:"rejected",COMPLETED:"completed"}[r.status] ?? "open") + " inline-flex whitespace-nowrap rounded-md border px-2 py-1 text-xs font-medium " + (statusStyle[r.status] ?? "border-gray-200 bg-gray-50 text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200")}>{pretty(r.status)}</span></td><td className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">{new Date(r.createdAt).toLocaleDateString("en-IN")}</td><td className="px-4 py-4"><div className="relative flex justify-end"><button type="button" aria-label={"Actions for " + r.reference} aria-haspopup="menu" aria-expanded={actionMenuId === r.id} onClick={() => setActionMenuId(current => current === r.id ? null : r.id)} className="inline-flex size-9 items-center justify-center rounded-lg border border-[#E1DFD6] bg-white text-[#4B493F] shadow-sm hover:bg-[#FFF9DC] focus:outline-none focus:ring-2 focus:ring-[#F2B719]/50 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><MoreHorizontal size={18}/></button>{actionMenuId === r.id && <><button type="button" aria-label="Close actions menu" tabIndex={-1} onClick={() => setActionMenuId(null)} className="fixed inset-0 z-40 cursor-default"></button><div role="menu" aria-label={"Actions for " + r.reference} className="absolute right-0 top-full z-50 mt-1 w-48 rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5 dark:border-[rgb(var(--border))] dark:bg-[rgb(var(--card))] dark:text-[rgb(var(--foreground))]"><a role="menuitem" href={"/requests/" + r.id} onClick={() => setActionMenuId(null)} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"><Eye size={15}/> View details <ArrowUpRight size={13} className="ml-auto"/></a><a role="menuitem" href={"/refunds"} onClick={() => setActionMenuId(null)} className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm hover:bg-[#FFF9DC] dark:hover:bg-[rgb(var(--muted))]"><WalletCards size={15}/> Refund requests</a></div></>}</div></td></tr>)}
       {!loading && rows.length === 0 && <tr><td colSpan={6} className="px-4 py-12 text-center"><Inbox className="mx-auto mb-2 text-gray-400"/><p className="font-medium">{error ? "Requests unavailable" : "No requests found"}</p><p className="mt-1 text-xs text-gray-500">{query || status !== "ALL" ? "Try changing the search or status filter." : "Create your first return request to get started."}</p></td></tr>}
       {loading && Array.from({length:5},(_,i)=><tr key={"skeleton-"+i} aria-hidden="true">{Array.from({length:6},(_,j)=><td key={j} className="px-4 py-5"><div className={"h-3 animate-pulse rounded-md bg-[#EAE7DE] dark:bg-[rgb(var(--muted))] "+(j===0?"w-28":j===1?"w-32":j===2?"w-20":j===3?"w-16":j===4?"w-20":"w-8")}/>{j<2&&<div className="mt-2 h-2.5 w-24 animate-pulse rounded bg-[#F0EEE8] dark:bg-[rgb(var(--muted))]"/>}</td>)}</tr>)}
       </tbody></table></div>
-      <div className="flex flex-col gap-3 border-t border-[rgb(var(--border))] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs text-[rgb(var(--muted-foreground))">Showing {rows.length === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, rows.length)} of {rows.length} requests</p><nav aria-label="Request table pagination" className="flex items-center gap-1.5"><button type="button" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Previous</button><span className="px-2 text-xs text-[rgb(var(--muted-foreground))">Page {page} of {pageCount}</span><button type="button" disabled={page >= pageCount} onClick={() => setPage(p => Math.min(pageCount, p + 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Next</button></nav></div>
+      <div className="flex flex-col gap-3 border-t border-[rgb(var(--border))] px-4 py-3 sm:flex-row sm:items-center sm:justify-between"><p className="text-xs text-[rgb(var(--muted-foreground))">Showing {totalRows === 0 ? 0 : (page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalRows)} of {totalRows} requests</p><nav aria-label="Request table pagination" className="flex items-center gap-1.5"><button type="button" disabled={page <= 1} onClick={() => setPage(p => Math.max(1, p - 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Previous</button><span className="px-2 text-xs text-[rgb(var(--muted-foreground))">Page {page} of {pageCount}</span><button type="button" disabled={page >= pageCount} onClick={() => setPage(p => Math.min(pageCount, p + 1))} className="rounded-lg border border-[rgb(var(--border))] px-3 py-2 text-xs font-medium text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] disabled:cursor-not-allowed disabled:opacity-40">Next</button></nav></div>
     </section>
         
   </div></AppShell>;
