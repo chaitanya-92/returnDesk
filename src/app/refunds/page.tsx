@@ -137,8 +137,6 @@ export default function RefundsPage() {
           setStatusFilter={setStatusFilter}
           filterMenuOpen={filterMenuOpen}
           setFilterMenuOpen={setFilterMenuOpen}
-          sortBy={sortBy}
-          sortOrder={sortOrder}
           handleSort={handleSort}
           sortIndicator={sortIndicator}
           actionMenuId={actionMenuId}
