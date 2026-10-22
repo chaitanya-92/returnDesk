@@ -77,6 +77,7 @@ export function DashboardInsights({ dashboard, loading, error }: DashboardInsigh
   );
 
   return (
+    <>
 <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
           <Panel
             title="Pending approvals"
@@ -351,5 +352,6 @@ export function DashboardInsights({ dashboard, loading, error }: DashboardInsigh
             </DataTableContainer>
           </Panel>
         </section>
+    </>
   );
 }
