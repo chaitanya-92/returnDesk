@@ -14,7 +14,7 @@ import { DashboardInsights } from "@/features/dashboard/components/dashboard-ins
 
 export default function HomePage() {
   const { dashboard, loading, error, refresh: loadDashboard } = useDashboardData();
-  const metrics = dashboard?.metrics;
+  const metrics = dashboard?.metrics ?? null;
   return (
     <AppShell>
       <div className="space-y-6" id="overview">
