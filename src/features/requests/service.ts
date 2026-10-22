@@ -91,9 +91,11 @@ export async function listRequests(filters?: RequestListFilters) {
           },
         }
       : {}),
-    ...(searchVariants.length
+    ...(search
       ? {
           AND: search.split(" ").filter(Boolean).map((term) => ({
+            OR: searchableFields(term),
+          })),
         }
       : {}),
   };
