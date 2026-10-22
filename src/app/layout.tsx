@@ -4,8 +4,7 @@ import { AppProviders } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "ReturnDesk | Returns Operations",
-  description:
-    "A clear workspace for managing return and replacement requests.",
+  description: "A clear workspace for managing return and replacement requests.",
 };
 
 export default function RootLayout({
@@ -16,7 +15,7 @@ export default function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `try { var t = localStorage.getItem("returndesk-theme"); if (t === "dark") { document.documentElement.classList.add("dark"); document.documentElement.dataset.theme = "dark"; document.documentElement.style.colorScheme = "dark"; } else { document.documentElement.classList.remove("dark"); document.documentElement.dataset.theme = "light"; document.documentElement.style.colorScheme = "light"; } } catch (_) {}`,
+            __html: 'try { document.documentElement.classList.remove("dark"); document.documentElement.dataset.theme = "light"; document.documentElement.style.colorScheme = "light"; } catch (_) {}',
           }}
         />
       </head>
