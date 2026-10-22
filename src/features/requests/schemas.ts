@@ -13,6 +13,7 @@ export const requestDraftSchema = yup.object({
   orderItemId: requiredText("Order item ID", 100),
   itemName: requiredText("Item name"),
   itemSku: requiredText("Item SKU", 100),
+  productPrice: yup.number().transform((value, original) => (original === "" ? undefined : value)).positive("Product price must be greater than zero").max(1000000).nullable().optional(),
   quantity: yup
     .number()
     .transform((value, original) => (original === "" ? NaN : value))
@@ -42,6 +43,7 @@ export const requestDetailsUpdateSchema = yup
     orderItemId: requiredText("Order item ID", 100).optional(),
     itemName: requiredText("Item name").optional(),
     itemSku: requiredText("Item SKU", 100).optional(),
+    productPrice: yup.number().positive().max(1000000).nullable().optional(),
     quantity: yup.number().integer().min(1).max(1000).optional(),
     customerName: requiredText("Customer name").optional(),
     customerEmail: yup
