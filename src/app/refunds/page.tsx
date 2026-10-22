@@ -20,7 +20,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
 import { apiRequest } from "@/lib/client-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
-import { formatCurrencyINR, formatRequestStatus } from "@/features/requests/presentation";
+import { formatCurrencyINR, formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
@@ -543,7 +543,7 @@ export default function RefundsPage() {
                     </td>
 
                     <td className="px-4 py-4 text-xs">
-                      {new Date(refund.updatedAt).toLocaleDateString("en-IN")}
+                      {formatDate(refund.updatedAt)}
                     </td>
 
                     <td className="px-4 py-4">

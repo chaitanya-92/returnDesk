@@ -1,4 +1,5 @@
 import * as yup from "yup";
+import { REQUEST_REASONS, type RequestReason } from "./types";
 
 const requiredText = (label: string, max = 180) =>
   yup
@@ -28,23 +29,9 @@ export const requestDraftSchema = yup.object({
     .required("Customer email is required"),
   reason: yup
     .mixed<
-      | "DAMAGED"
-      | "WRONG_ITEM"
-      | "WRONG_SIZE"
-      | "NOT_AS_DESCRIBED"
-      | "CHANGED_MIND"
-      | "MISSING_PARTS"
-      | "OTHER"
+      RequestReason
     >()
-    .oneOf([
-      "DAMAGED",
-      "WRONG_ITEM",
-      "WRONG_SIZE",
-      "NOT_AS_DESCRIBED",
-      "CHANGED_MIND",
-      "MISSING_PARTS",
-      "OTHER",
-    ])
+    .oneOf([...REQUEST_REASONS])
     .required("Reason is required"),
   description: requiredText("Description", 2000),
 });
@@ -73,15 +60,7 @@ export const requestDetailsUpdateSchema = yup
         | "MISSING_PARTS"
         | "OTHER"
       >()
-      .oneOf([
-        "DAMAGED",
-        "WRONG_ITEM",
-        "WRONG_SIZE",
-        "NOT_AS_DESCRIBED",
-        "CHANGED_MIND",
-        "MISSING_PARTS",
-        "OTHER",
-      ])
+      .oneOf([...REQUEST_REASONS])
       .optional(),
     description: requiredText("Description", 2000).optional(),
   })

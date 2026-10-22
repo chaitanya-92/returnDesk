@@ -8,25 +8,7 @@ import { StatusBadge } from "@/components/requests/status-badge";
 import { ArrowLeft, CheckCircle2, Clock3, MessageSquare, RefreshCw, Send, XCircle, ChevronDown, Pencil, Check, IndianRupee } from "lucide-react";
 type N = NonNullable<RequestRecord["notes"]>[number];
 type E = NonNullable<RequestRecord["events"]>[number];
-type R = {
-    id: string;
-    reference: string;
-    orderNumber: string;
-    orderItemId: string;
-    itemName: string;
-    itemSku: string;
-    quantity: number;
-    customerName: string;
-    customerEmail: string;
-    reason: string;
-    description: string;
-    status: string;
-    resolution: string | null;
-    refundAmount: string | number | null;
-    createdAt: string;
-    notes: N[];
-    events: E[];
-};
+type R = RequestRecord & { notes: N[]; events: E[] };
 const pretty = (s: string) => s.replaceAll("_", " ").toLowerCase().replace(/^\w/, c => c.toUpperCase());
 export default function RequestDetailsPage() {
     const { id } = useParams<{

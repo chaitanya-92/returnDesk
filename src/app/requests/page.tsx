@@ -28,7 +28,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
 import { apiRequest } from "@/lib/client-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
-import { formatRequestStatus } from "@/features/requests/presentation";
+import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import { REQUEST_REASONS, REQUEST_STATUSES, type RequestDraft } from "@/features/requests/types";
@@ -728,7 +728,7 @@ export default function RequestsPage() {
                       <StatusBadge status={r.status} />
                     </td>
                     <td className="px-4 py-4 text-xs text-gray-500 dark:text-[rgb(var(--muted-foreground))]">
-                      {new Date(r.createdAt).toLocaleDateString("en-IN")}
+                      {formatDate(r.createdAt)}
                     </td>
                     <td className="px-4 py-4">
                       <div className="relative flex justify-end">
