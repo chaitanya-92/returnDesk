@@ -100,7 +100,7 @@ export const transitionSchema = yup
             },
           ),
       }),
-    note: yup.string().trim().max(1000).optional(),
+    note: yup.string().trim().max(1000).when("status", { is: "REJECTED", then: (schema) => schema.required("A rejection reason is required").min(3, "Rejection reason must be at least 3 characters"), otherwise: (schema) => schema.optional(), }),
   })
   .noUnknown();
 
