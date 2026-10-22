@@ -229,6 +229,10 @@ export async function transitionRequest(
       );
     }
 
+    if (input.status === "REJECTED" && (!input.note?.trim() || input.note.trim().length < 3)) {
+      throw new AppError("A rejection reason of at least 3 characters is required.", 400, "REJECTION_REASON_REQUIRED");
+    }
+
     const resolutionInput =
       input.status === "APPROVED"
         ? {
