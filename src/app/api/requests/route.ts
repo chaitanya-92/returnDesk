@@ -12,6 +12,9 @@ export async function GET(request: NextRequest) {
     const rawResolution = params.get("resolution")?.toUpperCase();
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
+    if (rawResolution && !["REFUND", "STORE_CREDIT", "REPLACEMENT"].includes(rawResolution)) {
+      throw new AppError("Unknown resolution filter.", 400, "INVALID_RESOLUTION_FILTER");
+    }
     const rawDate = params.get("date");
     if (rawDate && !/^\d{4}-\d{2}-\d{2}$/.test(rawDate))
       throw new AppError(
