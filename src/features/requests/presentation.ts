@@ -16,6 +16,7 @@ export const REQUEST_STATUS_CLASSES: Record<RequestStatus, string> = {
   COMPLETED: "border-emerald-300 bg-emerald-100 text-emerald-950 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-100",
 };
 
+/** Convert enum-like values into readable UI labels. */
 export function formatRequestStatus(status: string): string {
   return status
     .replaceAll("_", " ")
@@ -41,4 +42,12 @@ export function formatDate(
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
   return new Intl.DateTimeFormat("en-IN", options).format(date);
+}
+
+export function formatDurationHours(hours: number | null | undefined): string {
+  if (hours == null || !Number.isFinite(hours)) return "—";
+  if (hours < 24) return `${Math.round(hours)}h`;
+
+  const days = hours / 24;
+  return `${days.toFixed(days >= 10 ? 0 : 1)}d`;
 }
