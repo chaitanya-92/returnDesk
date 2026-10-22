@@ -1,7 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpRight, CheckCircle2, Clock3, Inbox, PackageCheck, RefreshCw, Search, ShieldAlert, TrendingUp } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowUpRight, CheckCircle2, Clock3, Inbox, PackageCheck, RefreshCw, ShieldAlert, TrendingUp } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 
@@ -113,7 +113,7 @@ export default function HomePage() {
           <div className="overflow-x-auto"><table className="w-full min-w-[540px] border-collapse text-left"><thead><tr className="bg-[#FFF9DC] text-[10px] uppercase tracking-[0.1em] text-[#5B4A10] dark:bg-[#342C19] dark:text-[#F4D76B]"><th className="rounded-l-md px-3 py-3 font-semibold">Request</th><th className="px-3 py-3 font-semibold">Customer</th><th className="px-3 py-3 font-semibold">Status</th><th className="rounded-r-md px-3 py-3 font-semibold">Created</th></tr></thead><tbody>
             {recent.map((row) => <tr key={row.id} onClick={()=>window.location.assign("/requests/"+row.id)} onKeyDown={event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();window.location.assign("/requests/"+row.id)}}} tabIndex={0} role="link" aria-label={"View request "+row.reference} className="cursor-pointer border-b border-[rgb(var(--border))] transition-colors hover:bg-[#FFFBE8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#D6A100] dark:hover:bg-[#34301F] last:border-0"><td className="px-3 py-3"><p className="text-xs font-semibold text-[rgb(var(--foreground))]">{row.reference}</p><p className="mt-1 max-w-40 truncate text-[10px] text-[rgb(var(--muted-foreground))]">{row.itemName}</p></td><td className="px-3 py-3"><p className="max-w-32 truncate text-xs text-[rgb(var(--foreground))]">{row.customerName}</p><p className="mt-1 max-w-32 truncate text-[10px] text-[rgb(var(--muted-foreground))]">{humanize(row.reason)}</p></td><td className="px-3 py-3"><span className={"inline-flex whitespace-nowrap rounded-md border px-2.5 py-1 text-[10px] font-bold shadow-sm " + (statusStyle[row.status] ?? "")}>{humanize(row.status)}</span></td><td className="whitespace-nowrap px-3 py-3 text-[10px] text-[rgb(var(--muted-foreground))]">{formatDate(row.createdAt)}</td></tr>)}
             {loading && !dashboard && <tr><td colSpan={4} className="px-3 py-10 text-center text-xs text-[rgb(var(--muted-foreground))]">Loading live data…</td></tr>}
-            {!loading && !error && recent.length === 0 && <tr><td colSpan={4} className="px-3 py-10 text-center"><Inbox className="mx-auto size-7 text-[rgb(var(--muted-foreground))]" /><p className="mt-2 text-xs font-semibold text-[rgb(var(--foreground))]">"No return requests yet"</p><p className="mt-1 text-[10px] text-[rgb(var(--muted-foreground))]">"Create a request to start tracking returns."</p></td></tr>}
+            {!loading && !error && recent.length === 0 && <tr><td colSpan={4} className="px-3 py-10 text-center"><Inbox className="mx-auto size-7 text-[rgb(var(--muted-foreground))]" /><p className="mt-2 text-xs font-semibold text-[rgb(var(--foreground))]">No return requests yet</p><p className="mt-1 text-[10px] text-[rgb(var(--muted-foreground))]">Create a request to start tracking returns.</p></td></tr>}
           </tbody></table></div>
         </Panel>
       </section>
