@@ -99,14 +99,15 @@ export default function RequestDetailsPage() {
 
   async function transition(
     status: "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED",
-  ) {
+    noteOverride?: string,
+  ): Promise<boolean> {
     setBusy(true);
     setError("");
 
     try {
       const input: TransitionRequestInput = {
         status,
-        note: decisionNote.trim() || undefined,
+        note: noteOverride?.trim() || decisionNote.trim() || undefined,
       };
 
       if (status === "APPROVED") {
@@ -120,29 +121,31 @@ export default function RequestDetailsPage() {
       if (status === "IN_REVIEW") {
         showToast("Request moved to In Review", "success");
         await load();
-        return;
+        return true;
       }
 
       if (status === "APPROVED") {
         showToast("Request approved", "success", "Opening the requests table…");
         await returnToRequestsAfterToast("Approved successfully. Returning to requests…");
-        return;
+        return true;
       }
 
 
       if (status === "REJECTED") {
         showToast("Request rejected", "success", "Returning to the requests table…");
         await returnToRequestsAfterToast("Request rejected. Returning to requests…");
-        return;
+        return true;
       }
 
       showToast("Request marked completed", "success");
       await load();
+      return true;
     } catch (cause) {
       const message =
         cause instanceof Error ? cause.message : "Could not update request";
       setError(message);
       showToast(message, "error");
+      return false;
     } finally {
       setBusy(false);
     }
