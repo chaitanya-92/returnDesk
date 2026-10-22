@@ -36,11 +36,11 @@ function formatDuration(hours: number | null) {
 }
 
 function AnimatedCount({value,duration=700}:{value:number;duration?:number}){const[shown,setShown]=useState(0);useEffect(()=>{let frame=0;let start:number|undefined;const tick=(now:number)=>{if(start===undefined)start=now;const p=Math.min(1,(now-start)/duration);setShown(Math.round(value*(1-Math.pow(1-p,3))));if(p<1)frame=requestAnimationFrame(tick)};setShown(0);frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame)},[value,duration]);return <>{shown.toLocaleString("en-IN")}</>}
-function MetricCard({ label, value, helper, icon: Icon, tone }: { label: string; value: number | string; helper: string; icon: typeof Inbox; tone: string }) {
-  return <article className="rounded-xl border border-[rgb(var(--border))] bg-white p-4 transition-shadow hover:shadow-sm dark:bg-[rgb(var(--card))] sm:p-5">
+function MetricCard({ label, value, helper, icon: Icon, tone, href }: { label: string; value: number | string; helper: string; icon: typeof Inbox; tone: string; href: string }) {
+  return <Link href={href} className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]"><article className="h-full rounded-xl border border-[rgb(var(--border))] bg-white p-4 transition-shadow hover:shadow-md dark:bg-[rgb(var(--card))] sm:p-5">
     <div className="flex items-start justify-between gap-3"><p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">{label}</p><span className={"grid size-9 place-items-center rounded-lg " + tone}><Icon size={17} strokeWidth={1.8} /></span></div>
     <p className="mt-4 text-3xl font-semibold tracking-tight text-[rgb(var(--foreground))]">{typeof value==="number"?<AnimatedCount value={value}/>:value}</p><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{helper}</p>
-  </article>;
+  </article></Link>;
 }
 function Panel({ title, description, children, action }: { title: string; description?: string; children: React.ReactNode; action?: React.ReactNode }) {
   return <section className="min-w-0 overflow-hidden rounded-xl border border-[rgb(var(--border))] bg-white dark:bg-[rgb(var(--card))]">
@@ -84,10 +84,10 @@ export default function HomePage() {
       {error && <div role="alert" className="flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-semibold">Dashboard data could not be loaded</p><p className="mt-1">{error}</p></div><button type="button" onClick={() => void loadDashboard()} className="inline-flex items-center gap-2 self-start rounded-lg border border-rose-300 px-3 py-2 text-xs font-semibold"><RefreshCw size={13} /> Try again</button></div>}
 
       <section className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Open requests" value={loading && !metrics ? "—" : metrics?.open ?? 0} helper="Waiting to be reviewed" icon={Inbox} tone="border border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300" />
-        <MetricCard label="In review" value={loading && !metrics ? "—" : metrics?.inReview ?? 0} helper="Needs an operational decision" icon={Clock3} tone="border border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300" />
-        <MetricCard label="Approved" value={loading && !metrics ? "—" : metrics?.approved ?? 0} helper="Ready to be fulfilled" icon={PackageCheck} tone="border border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-900 dark:bg-violet-950/40 dark:text-violet-300" />
-        <MetricCard label="Completed" value={loading && !metrics ? "—" : metrics?.completed ?? 0} helper="Successfully resolved" icon={CheckCircle2} tone="border border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300" />
+        <MetricCard label="Open requests" value={loading && !metrics ? "—" : metrics?.open ?? 0} helper="Waiting to be reviewed" icon={Inbox} href="/requests?status=OPEN" tone="border border-sky-200 bg-sky-100 text-slate-800 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300" />
+        <MetricCard label="In review" value={loading && !metrics ? "—" : metrics?.inReview ?? 0} helper="Needs an operational decision" icon={Clock3} href="/requests?status=IN_REVIEW" tone="border border-amber-200 bg-amber-100 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300" />
+        <MetricCard label="Approved" value={loading && !metrics ? "—" : metrics?.approved ?? 0} helper="Ready to be fulfilled" icon={PackageCheck} href="/requests?status=APPROVED" tone="border border-violet-200 bg-violet-100 text-slate-900 dark:border-violet-900 dark:bg-violet-950/40 dark:text-violet-300" />
+        <MetricCard label="Completed" value={loading && !metrics ? "—" : metrics?.completed ?? 0} helper="Successfully resolved" icon={CheckCircle2} href="/requests?status=COMPLETED" tone="border border-emerald-200 bg-emerald-100 text-slate-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300" />
       </section>
 
       <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
@@ -98,7 +98,7 @@ export default function HomePage() {
         </Panel>
 
         <Panel title="Return reasons" description="Distribution across current, non-archived requests.">
-          {!dashboard && loading ? <div className="h-44 animate-pulse rounded-lg bg-[rgb(var(--muted))]" /> : dashboard?.reasons.length ? <div className="space-y-4">{dashboard.reasons.slice(0, 6).map((item) => <div key={item.reason}><div className="mb-2 flex items-center justify-between gap-3 text-xs"><span className="truncate font-medium text-[rgb(var(--foreground))]">{item.reason}</span><span className="shrink-0 tabular-nums text-[rgb(var(--muted-foreground))]">{item.count} · {metrics?.total ? Math.round(item.count / metrics.total * 100) : 0}%</span></div><div className="h-2 overflow-hidden rounded-full bg-[#F4F1E7] dark:bg-[#34332D]"><div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: (item.count / maxReason * 100) + "%", backgroundColor: ["#D6A100","#B8872C","#8D9467","#A68A64","#687C83","#C3A65D"][dashboard?.reasons.findIndex(r=>r.reason===item.reason)??0] ?? "#D6A100" }} /></div></div>)}</div> : <div className="py-8 text-center text-sm text-[rgb(var(--muted-foreground))]">No return reasons to display yet.</div>}
+          {!dashboard && loading ? <div className="h-44 animate-pulse rounded-lg bg-[rgb(var(--muted))]" /> : dashboard?.reasons.length ? <div className="space-y-4">{dashboard.reasons.slice(0, 6).map((item) => <div key={item.reason}><div className="mb-2 flex items-center justify-between gap-3 text-xs"><span className="truncate font-medium text-[rgb(var(--foreground))]">{item.reason}</span><span className="shrink-0 tabular-nums text-[rgb(var(--muted-foreground))]">{item.count} · {metrics?.total ? Math.round(item.count / metrics.total * 100) : 0}%</span></div><div className="h-2 overflow-hidden rounded-full bg-[#F4F1E7] dark:bg-[#34332D]"><div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: (item.count / maxReason * 100) + "%", backgroundColor: ["#B8872C","#9A7B42","#78815B","#9B8064","#60777E","#A58D51"][dashboard?.reasons.findIndex(r=>r.reason===item.reason)??0] ?? "#B8872C" }} /></div></div>)}</div> : <div className="py-8 text-center text-sm text-[rgb(var(--muted-foreground))]">No return reasons to display yet.</div>}
         </Panel>
       </section>
 
