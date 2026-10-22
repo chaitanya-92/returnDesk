@@ -259,7 +259,9 @@ export async function transitionRequest(
         type: RequestEventType.STATUS_CHANGED,
         fromStatus: existing.status,
         toStatus: input.status,
-        message: `Status changed from ${existing.status} to ${input.status}.`,
+        message: input.status === "REJECTED"
+          ? `Request rejected. Reason: ${input.note?.trim()}`
+          : `Status changed from ${existing.status} to ${input.status}.`,
       },
     });
 
