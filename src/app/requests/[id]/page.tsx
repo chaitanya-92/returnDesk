@@ -54,7 +54,7 @@ export default function RequestDetailsPage() {
         events: data.events ?? [],
       });
       setResolution(data.resolution ?? "REFUND");
-      setAmount(data.refundAmount == null ? "" : String(data.refundAmount));
+      setAmount(data.refundAmount == null ? (data.productPrice == null ? "" : String(Number(data.productPrice) * data.quantity)) : String(data.refundAmount));
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Could not load request");
     } finally {
