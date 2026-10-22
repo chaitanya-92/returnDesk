@@ -1,10 +1,8 @@
 "use client";
+
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { AppShell } from "@/components/layout/app-shell";
-import { showToast } from "@/components/ui/toaster";
 import {
-  requestsApi,
   ArrowLeft,
   Check,
   CheckCircle2,
@@ -14,6 +12,20 @@ import {
   Send,
   XCircle,
 } from "lucide-react";
+import { AppShell } from "@/components/layout/app-shell";
+import { showToast } from "@/components/ui/toaster";
+import {
+  requestsApi,
+  type RequestEvent,
+  type RequestNote,
+  type RequestRecord,
+  type TransitionRequestInput,
+} from "@/features/requests/api/requests-api";
+import { StatusBadge } from "@/components/requests/status-badge";
+import { RequestDetailsSkeleton } from "@/features/requests/components/request-details-skeleton";
+import { RequestActivityPanel } from "@/features/requests/components/request-activity-panel";
+import { RequestInformationCard } from "@/features/requests/components/request-information-card";
+
 type RequestWithActivity = RequestRecord & {
   notes: RequestNote[];
   events: RequestEvent[];
