@@ -253,7 +253,7 @@ export default function HomePage() {
               <div className="h-44 animate-pulse rounded-lg bg-[rgb(var(--muted))]" />
             ) : dashboard?.reasons.length ? (
               <div className="space-y-4">
-                {dashboard.reasons.slice(0, 6).map((item) => (
+                {dashboard.reasons.slice(0, 6).map((item, index) => (
                   <div key={item.reason}>
                     <div className="mb-2 flex items-center justify-between gap-3 text-xs">
                       <span className="truncate font-medium text-[rgb(var(--foreground))]">
@@ -272,10 +272,8 @@ export default function HomePage() {
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
                           width: getReasonBarWidth(item.count, maxReason),
-                          backgroundColor: DASHBOARD_REASON_COLORS[
-                            dashboard.reasons.findIndex((reason) => reason.reason === item.reason) %
-                              DASHBOARD_REASON_COLORS.length
-                          ],
+                          backgroundColor:
+                            DASHBOARD_REASON_COLORS[index % DASHBOARD_REASON_COLORS.length],
                         }}
                       />
                     </div>
