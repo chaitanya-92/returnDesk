@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, Sun, WalletCards } from "lucide-react";
+import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Sun, WalletCards } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,7 +9,6 @@ import { toggleTheme } from "@/lib/store/theme-slice";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 
 const navigation = [
@@ -72,12 +71,7 @@ function WorkspaceNavbar() {
         {isMobile && <SidebarTrigger><Menu size={18} /></SidebarTrigger>}
         <div className="sm:hidden"><Brand /></div>
       </div>
-      <div className="flex w-full max-w-64 justify-self-center">
-        <div className="relative hidden w-full md:block">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#59523D] dark:text-[#B8B3A5]" />
-          <Input aria-label="Search requests" placeholder="Search requests..." className="h-9 border-[#F2E097] bg-white pl-9 pr-3 text-xs shadow-none placeholder:text-[#969081] dark:border-[#434037] dark:bg-[#2F2E29]" />
-        </div>
-      </div>
+      <div className="justify-self-center" aria-hidden="true" />
       <div className="flex items-center justify-self-end gap-2 sm:gap-3">
         <Button variant="ghost" size="icon" aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} onClick={() => dispatch(toggleTheme())}>{dark ? <Sun size={17} /> : <Moon size={17} />}</Button>
         <Button variant="ghost" size="icon" aria-label="Notifications" className="relative"><Bell size={17} /></Button>

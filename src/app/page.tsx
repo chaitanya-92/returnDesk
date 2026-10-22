@@ -36,9 +36,9 @@ function formatDuration(hours: number | null) {
 }
 
 function AnimatedCount({value,duration=700}:{value:number;duration?:number}){const[shown,setShown]=useState(0);useEffect(()=>{let frame=0;let start:number|undefined;const tick=(now:number)=>{if(start===undefined)start=now;const p=Math.min(1,(now-start)/duration);setShown(Math.round(value*(1-Math.pow(1-p,3))));if(p<1)frame=requestAnimationFrame(tick)};setShown(0);frame=requestAnimationFrame(tick);return()=>cancelAnimationFrame(frame)},[value,duration]);return <>{shown.toLocaleString("en-IN")}</>}
-function MetricCard({ label, value, helper, icon: Icon, tone, href }: { label: string; value: number | string; helper: string; icon: typeof Inbox; tone: string; href: string }) {
+function MetricCard({ label, value, helper, icon: Icon, href }: { label: string; value: number | string; helper: string; icon: typeof Inbox; href: string }) {
   return <Link href={href} className="block rounded-xl outline-none transition-transform hover:-translate-y-0.5 focus-visible:ring-2 focus-visible:ring-[#D6A100]"><article className="h-full rounded-xl border border-[rgb(var(--border))] bg-white p-4 transition-shadow hover:shadow-md dark:bg-[rgb(var(--card))] sm:p-5">
-    <div className="flex items-start justify-between gap-3"><p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">{label}</p><span className={"grid size-9 place-items-center rounded-lg " + tone}><Icon size={17} strokeWidth={1.8} /></span></div>
+    <div className="flex items-start justify-between gap-3"><p className="text-sm font-medium text-[rgb(var(--muted-foreground))]">{label}</p><span className="grid size-9 place-items-center rounded-lg border border-[#D8D2C2] bg-[#F1EEE5] text-[#292821] dark:border-[#514D40] dark:bg-[#343229] dark:text-[#F2EBD8]"><Icon size={17} strokeWidth={2.1} /></span></div>
     <p className="mt-4 text-3xl font-semibold tracking-tight text-[rgb(var(--foreground))]">{typeof value==="number"?<AnimatedCount value={value}/>:value}</p><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">{helper}</p>
   </article></Link>;
 }
@@ -84,10 +84,10 @@ export default function HomePage() {
       {error && <div role="alert" className="flex flex-col gap-3 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-200 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-semibold">Dashboard data could not be loaded</p><p className="mt-1">{error}</p></div><button type="button" onClick={() => void loadDashboard()} className="inline-flex items-center gap-2 self-start rounded-lg border border-rose-300 px-3 py-2 text-xs font-semibold"><RefreshCw size={13} /> Try again</button></div>}
 
       <section className="grid grid-cols-1 gap-3 min-[480px]:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Open requests" value={loading && !metrics ? "—" : metrics?.open ?? 0} helper="Waiting to be reviewed" icon={Inbox} href="/requests?status=OPEN" tone="border border-sky-200 bg-sky-100 text-slate-800 dark:border-sky-900 dark:bg-sky-950/40 dark:text-sky-300" />
-        <MetricCard label="In review" value={loading && !metrics ? "—" : metrics?.inReview ?? 0} helper="Needs an operational decision" icon={Clock3} href="/requests?status=IN_REVIEW" tone="border border-amber-200 bg-amber-100 text-amber-950 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300" />
-        <MetricCard label="Approved" value={loading && !metrics ? "—" : metrics?.approved ?? 0} helper="Ready to be fulfilled" icon={PackageCheck} href="/requests?status=APPROVED" tone="border border-violet-200 bg-violet-100 text-slate-900 dark:border-violet-900 dark:bg-violet-950/40 dark:text-violet-300" />
-        <MetricCard label="Completed" value={loading && !metrics ? "—" : metrics?.completed ?? 0} helper="Successfully resolved" icon={CheckCircle2} href="/requests?status=COMPLETED" tone="border border-emerald-200 bg-emerald-100 text-slate-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300" />
+        <MetricCard label="Open requests" value={loading && !metrics ? "—" : metrics?.open ?? 0} helper="Waiting to be reviewed" icon={Inbox} href="/requests?status=OPEN" />
+        <MetricCard label="In review" value={loading && !metrics ? "—" : metrics?.inReview ?? 0} helper="Needs an operational decision" icon={Clock3} href="/requests?status=IN_REVIEW" />
+        <MetricCard label="Approved" value={loading && !metrics ? "—" : metrics?.approved ?? 0} helper="Ready to be fulfilled" icon={PackageCheck} href="/requests?status=APPROVED" />
+        <MetricCard label="Completed" value={loading && !metrics ? "—" : metrics?.completed ?? 0} helper="Successfully resolved" icon={CheckCircle2} href="/requests?status=COMPLETED" />
       </section>
 
       <section className="grid grid-cols-1 gap-5 xl:grid-cols-[1.15fr_0.85fr]">
