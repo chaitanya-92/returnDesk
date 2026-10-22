@@ -3,6 +3,7 @@ import type {
   TableHTMLAttributes,
   ThHTMLAttributes,
   TdHTMLAttributes,
+  Children,
 } from "react";
 
 export function DataTableContainer({
@@ -34,7 +35,7 @@ export function DataTableHeader({
   children,
   ...props
 }: HTMLAttributes<HTMLTableSectionElement>) {
-  return <thead className={`border-b border-[rgb(var(--border))] ${className}`.trim()} {...props}>{children}</thead>;
+  return <thead className={`border-b border-[rgb(var(--border))] ${className}`.trim()} {...props}>{Children.toArray(children).filter((child) => typeof child !== "string" || child.trim().length > 0)}</thead>;
 }
 
 export function DataTableBody({
