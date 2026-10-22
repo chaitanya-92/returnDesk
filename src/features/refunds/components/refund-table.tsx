@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ArrowUpRight, CheckCircle2, Eye, MoreHorizontal, WalletCards, IndianRupee } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Eye, MoreHorizontal, WalletCards } from "lucide-react";
 import Link from "next/link";
 import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableHead, DataTableHeader, DataTableRow } from "@/components/ui/data-table";
 import { Pagination } from "@/components/requests/pagination";
