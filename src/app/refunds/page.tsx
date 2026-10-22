@@ -25,6 +25,7 @@ import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 import { AnimatedNumber } from "@/features/refunds/components/animated-number";
+import { REFUND_SUMMARY_CARDS } from "@/features/refunds/refund-summary-cards";
 import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, type RefundRequest, type RefundSortField, type RefundStatus, type SortOrder } from "@/features/refunds/refund-utils";
 
 const PAGE_SIZE = 10;
@@ -150,33 +151,16 @@ export default function RefundsPage() {
 
   const { awaitingCount, processedCount, totalRefundValue } = useMemo(() => summarizeRefunds(rows), [rows]);
 
-  const summaryCards = [
-    {
-      label: "Awaiting processing",
-      value: awaitingCount,
-      icon: Clock3,
-      tone: "border border-amber-200 bg-amber-100 text-amber-950",
-      href: "/refunds?status=APPROVED#refund-table",
-      status: "APPROVED" as RefundStatus,
-    },
-    {
-      label: "Processed",
-      value: processedCount,
-      icon: CheckCircle2,
-      tone: "border border-emerald-200 bg-emerald-100 text-emerald-950",
-      href: "/refunds?status=COMPLETED#refund-table",
-      status: "COMPLETED" as RefundStatus,
-    },
-    {
-      label: "Total refund value",
-      value: totalRefundValue,
-      format: formatCurrency,
-      icon: IndianRupee,
-      tone: "border border-amber-200 bg-amber-100 text-amber-950",
-      href: "/refunds#refund-table",
-      status: "ALL" as RefundStatus,
-    },
-  ];
+  const summaryValues = {
+    awaitingCount,
+    processedCount,
+    totalRefundValue,
+  };
+
+  const summaryCards = REFUND_SUMMARY_CARDS.map((card) => ({
+    ...card,
+    value: summaryValues[card.valueKey],
+  }));
 
   const handleSort = (field: RefundSortField) => {
     if (sortBy === field) {
