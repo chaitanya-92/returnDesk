@@ -24,19 +24,10 @@ import { formatCurrencyINR, formatDate } from "@/features/requests/presentation"
 import { StatusBadge } from "@/components/requests/status-badge";
 import { Pagination } from "@/components/requests/pagination";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
-import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, type RefundRequest, type RefundSortField, type RefundStatus, type SortOrder } from "@/features/refunds/refund-utils";
+import { filterAndSortRefunds, selectRefundRequests, summarizeRefunds, REFUND_REFUND_STATUS_FILTERS, type RefundRequest, type RefundSortField, type RefundStatus, type SortOrder } from "@/features/refunds/refund-utils";
 import { RefundSummaryCards } from "@/features/refunds/components/refund-summary-cards";
 
 const PAGE_SIZE = 10;
-
-const STATUS_FILTERS: {
-  value: RefundStatus;
-  label: string;
-}[] = [
-  { value: "ALL", label: "All refunds" },
-  { value: "APPROVED", label: "Awaiting" },
-  { value: "COMPLETED", label: "Processed" },
-];
 
 function getInitialStatusFilter(): RefundStatus {
   if (typeof window === "undefined") {
@@ -304,7 +295,7 @@ export default function RefundsPage() {
                           />
 
                           <div className="absolute left-0 top-full z-50 mt-1 w-36 rounded-lg border bg-white p-1.5 text-[#23221E] shadow-xl">
-                            {STATUS_FILTERS.map((filter) => (
+                            {REFUND_STATUS_FILTERS.map((filter) => (
                               <button
                                 key={filter.value}
                                 type="button"
