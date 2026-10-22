@@ -22,10 +22,8 @@ export default function RequestsPage() {
   const [status, setStatus] = useState<RequestStatusFilter>(() => {
     if (typeof window === "undefined") return "ALL";
     const initial = new URLSearchParams(window.location.search).get("status");
-    return ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"].includes(
-      initial ?? "",
-    )
-      ? initial!
+    return initial && ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"].includes(initial)
+      ? (initial as RequestStatusFilter)
       : "ALL";
   });
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
