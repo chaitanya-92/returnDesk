@@ -6,7 +6,7 @@ import { DataTable, DataTableBody, DataTableCell, DataTableContainer, DataTableH
 import { Pagination } from "@/components/requests/pagination";
 import { StatusBadge } from "@/components/requests/status-badge";
 import { formatCurrencyINR, formatDate } from "@/features/requests/presentation";
-import type { RefundRequest, RefundSortField, RefundStatus } from "@/features/refunds/refund-utils";
+import { REFUND_STATUS_FILTERS, type RefundRequest, type RefundSortField, type RefundStatus } from "@/features/refunds/refund-utils";
 
 type RefundTableProps = {
   shown: RefundRequest[];
