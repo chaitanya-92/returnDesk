@@ -19,6 +19,7 @@ export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
 
   const [statuses, setStatuses] = useState<RequestStatusFilter[]>([]);
+  const [resolutionView, setResolutionView] = useState<"all" | "refunds" | "store-credits" | "replacements">("all");
   const [statusReady, setStatusReady] = useState(false);
   const requestSequence = useRef(0);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
@@ -49,6 +50,7 @@ export default function RequestsPage() {
     try {
       const params = new URLSearchParams();
       statuses.forEach((value) => params.append("status", value));
+      if (resolutionView !== "all") params.set("resolution", resolutionView === "refunds" ? "REFUND" : resolutionView === "store-credits" ? "STORE_CREDIT" : "REPLACEMENT");
       reasons.forEach((value) => params.append("reason", value));
       if (createdDate) params.set("date", createdDate);
       if (debouncedQuery.trim()) params.set("q", debouncedQuery.trim());
@@ -69,6 +71,7 @@ export default function RequestsPage() {
     }
   }, [
     statuses,
+    resolutionView,
     debouncedQuery,
     reasons,
     createdDate,
@@ -82,6 +85,8 @@ export default function RequestsPage() {
     const params = new URLSearchParams(window.location.search);
     const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
     const initialStatus = params.get("status");
+    const initialView = params.get("view");
+    if (initialView === "refunds" || initialView === "store-credits" || initialView === "replacements") setResolutionView(initialView);
     const restoredStatuses = params.getAll("statusFilter").filter((value): value is RequestStatusFilter => allowed.includes(value as RequestStatusFilter));
     setStatuses(restoredStatuses.length ? restoredStatuses : initialStatus && allowed.includes(initialStatus as RequestStatusFilter) ? [initialStatus as RequestStatusFilter] : []);
     setReasons(params.getAll("reasonFilter"));
@@ -103,6 +108,7 @@ export default function RequestsPage() {
     statuses.forEach((value) => params.append("statusFilter", value));
     reasons.forEach((value) => params.append("reasonFilter", value));
     if (createdDate) params.set("createdDate", createdDate);
+    if (resolutionView !== "all") params.set("view", resolutionView);
     if (query.trim()) params.set("q", query.trim());
     if (sortBy !== "createdAt") params.set("sortBy", sortBy);
     if (sortOrder !== "desc") params.set("sortOrder", sortOrder);
@@ -110,14 +116,14 @@ export default function RequestsPage() {
     const next = params.toString();
     const current = window.location.search.slice(1);
     if (next !== current) window.history.replaceState(null, "", next ? window.location.pathname + "?" + next : window.location.pathname);
-  }, [statusReady, statuses, reasons, createdDate, query, sortBy, sortOrder, page]);
+  }, [statusReady, statuses, reasons, createdDate, query, sortBy, sortOrder, page, resolutionView]);
 
   useEffect(() => {
     if (statusReady) void load();
   }, [load, statusReady]);
   useEffect(() => {
     setPage(1);
-  }, [query, statuses, reasons, createdDate, sortBy, sortOrder]);
+  }, [query, statuses, reasons, createdDate, sortBy, sortOrder, resolutionView]);
   useEffect(() => {
     if (!toast) return;
     const timer = window.setTimeout(() => setToast(null), 3600);
@@ -172,6 +178,11 @@ showToast("Could not create request", "error", message);
           fieldClassName={field}
           onCreateRequest={createRequest}
         />
+        <div className="flex flex-wrap gap-2" role="tablist" aria-label="Request views">
+          {[{value:"all",label:"All requests"},{value:"refunds",label:"Refunds"},{value:"store-credits",label:"Store credits"},{value:"replacements",label:"Replacements"}].map((view) => (
+            <button key={view.value} type="button" role="tab" aria-selected={resolutionView === view.value} onClick={() => { setResolutionView(view.value as typeof resolutionView); setPage(1); }} className={"rounded-lg border px-4 py-2 text-sm font-medium transition " + (resolutionView === view.value ? "border-[#D7A400] bg-[#FFF4C2] text-[#5B4600]" : "border-[rgb(var(--border))] bg-white hover:bg-[#FFFCF0]")}>{view.label}</button>
+          ))}
+        </div>
         <RequestFilters
           query={query}
           onQueryChange={(value) => {
