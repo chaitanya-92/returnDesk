@@ -133,7 +133,6 @@ export default function RefundsPage() {
           shown={shown}
           filtered={filtered}
           loading={loading}
-          query={query}
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
           filterMenuOpen={filterMenuOpen}
