@@ -55,7 +55,7 @@ export function RequestTableSection({
                     onKeyDown={(event) => {
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
-                        window.location.href = "/requests/" + r.id;
+                        window.location.href = "/requests/" + r.id + window.location.search;
                       }
                     }}
                     tabIndex={0}
