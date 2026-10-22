@@ -23,7 +23,7 @@ export function RefundConfirmationDialog({
   const confirmRefund = refund;
   return (
         <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]"
+          className="fixed inset-0 z-[90] flex items-start justify-center overflow-y-auto bg-black/40 px-4 pb-6 pt-24 backdrop-blur-[2px] sm:items-center sm:py-8"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !busyId) {
               onClose();
@@ -35,7 +35,7 @@ export function RefundConfirmationDialog({
             aria-modal="true"
             aria-labelledby="confirm-refund-title"
             aria-describedby="confirm-refund-description"
-            className="w-full max-w-md rounded-2xl border border-[rgb(var(--border))] bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]"
+            className="my-auto max-h-[calc(100dvh-7rem)] w-full max-w-md overflow-y-auto rounded-2xl border border-[rgb(var(--border))] bg-white p-6 text-[#23221E] shadow-2xl sm:max-h-[calc(100dvh-4rem)]"
           >
             <div className="flex size-11 items-center justify-center rounded-xl bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300">
               <AlertTriangle size={21} />
