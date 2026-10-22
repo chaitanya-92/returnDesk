@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -13,101 +13,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
+import { AnimatedNumber } from "@/features/refunds/components/animated-number";
+import { useDashboardData } from "@/features/dashboard/hooks/use-dashboard-data";
+import {
+  DASHBOARD_REASON_COLORS,
+  DASHBOARD_STATUS_CLASSES,
+  formatDashboardDate,
+  formatDurationHours,
+  getMaximumReasonCount,
+  getReasonBarWidth,
+  humanizeDashboardValue,
+} from "@/features/dashboard/dashboard-utils";
 
-type Status = "OPEN" | "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED";
-type RequestRow = {
-  id: string;
-  reference: string;
-  orderNumber: string;
-  itemName: string;
-  customerName: string;
-  customerEmail: string;
-  reason: string;
-  status: Status;
-  createdAt: string;
-  updatedAt: string;
-};
-type PendingRow = {
-  id: string;
-  reference: string;
-  itemName: string;
-  customerName: string;
-  reason: string;
-  createdAt: string;
-};
-type DashboardData = {
-  metrics: {
-    total: number;
-    open: number;
-    inReview: number;
-    approved: number;
-    rejected: number;
-    completed: number;
-    previous30Days: number;
-    current30Days: number;
-    averageResolutionHours: number | null;
-    resolvedCount: number;
-  };
-  reasons: { reason: string; count: number }[];
-  pendingApprovals: PendingRow[];
-  recent: RequestRow[];
-  resolutionHistory: { date: string; hours: number }[];
-};
-
-const statusStyle: Record<Status, string> = {
-  OPEN: "border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-900 dark:bg-sky-950/50 dark:text-sky-300",
-  IN_REVIEW:
-    "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-300",
-  APPROVED:
-    "border-violet-200 bg-violet-50 text-violet-800 dark:border-violet-900 dark:bg-violet-950/40 dark:text-violet-300",
-  REJECTED:
-    "border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/40 dark:text-rose-300",
-  COMPLETED:
-    "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300",
-};
-
-function humanize(value: string) {
-  return value
-    .replaceAll("_", " ")
-    .toLowerCase()
-    .replace(/^\w/, (letter) => letter.toUpperCase());
-}
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "short",
-  });
-}
-function formatDuration(hours: number | null) {
-  if (hours == null) return "—";
-  return hours < 24
-    ? Math.round(hours) + "h"
-    : (hours / 24).toFixed(hours / 24 >= 10 ? 0 : 1) + "d";
-}
-
-function AnimatedCount({
-  value,
-  duration = 700,
-}: {
-  value: number;
-  duration?: number;
-}) {
-  const [shown, setShown] = useState(0);
-  useEffect(() => {
-    let frame = 0;
-    let start: number | undefined;
-    const tick = (now: number) => {
-      if (start === undefined) start = now;
-      const p = Math.min(1, (now - start) / duration);
-      setShown(Math.round(value * (1 - Math.pow(1 - p, 3))));
-      if (p < 1) frame = requestAnimationFrame(tick);
-    };
-    setShown(0);
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [value, duration]);
-  return <>{shown.toLocaleString("en-IN")}</>;
-}
 function MetricCard({
   label,
   value,
@@ -136,7 +53,7 @@ function MetricCard({
           </span>
         </div>
         <p className="mt-4 text-3xl font-semibold tracking-tight text-[rgb(var(--foreground))]">
-          {typeof value === "number" ? <AnimatedCount value={value} /> : value}
+          {typeof value === "number" ? <AnimatedNumber value={value} /> : value}
         </p>
         <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">
           {helper}
@@ -177,45 +94,13 @@ function Panel({
 }
 
 export default function HomePage() {
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const loadDashboard = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const response = await fetch("/api/dashboard", { cache: "no-store" });
-      const payload = await response.json();
-      if (!response.ok)
-        throw new Error(
-          payload?.error?.message ??
-            payload?.message ??
-            "Unable to load dashboard data.",
-        );
-      if (!payload?.data?.metrics || !Array.isArray(payload.data.recent))
-        throw new Error("The dashboard returned an unexpected response.");
-      setDashboard(payload.data as DashboardData);
-    } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Unable to load dashboard data.",
-      );
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-  useEffect(() => {
-    void loadDashboard();
-  }, [loadDashboard]);
-
+  const { dashboard, loading, error, refresh: loadDashboard } = useDashboardData();
   const recent = dashboard?.recent ?? [];
   const metrics = dashboard?.metrics;
   const delta = metrics ? metrics.current30Days - metrics.previous30Days : 0;
-  const maxReason = Math.max(
-    1,
-    ...(dashboard?.reasons.map((item) => item.count) ?? []),
+  const maxReason = useMemo(
+    () => getMaximumReasonCount(dashboard?.reasons ?? []),
+    [dashboard?.reasons],
   );
 
   return (
@@ -333,7 +218,7 @@ export default function HomePage() {
                         {request.customerName} · {request.itemName}
                       </p>
                       <p className="mt-1 text-[11px] text-[rgb(var(--muted-foreground))]">
-                        {humanize(request.reason)}
+                        {humanizeDashboardValue(request.reason)}
                       </p>
                     </div>
                     <div className="shrink-0 text-right">
@@ -341,7 +226,7 @@ export default function HomePage() {
                         In review
                       </span>
                       <p className="mt-1 text-[10px] text-[rgb(var(--muted-foreground))]">
-                        {formatDate(request.createdAt)}
+                        {formatDashboardDate(request.createdAt)}
                       </p>
                     </div>
                   </Link>
@@ -386,20 +271,11 @@ export default function HomePage() {
                       <div
                         className="h-full rounded-full transition-all duration-700 ease-out"
                         style={{
-                          width: (item.count / maxReason) * 100 + "%",
-                          backgroundColor:
-                            [
-                              "#B8872C",
-                              "#9A7B42",
-                              "#78815B",
-                              "#9B8064",
-                              "#60777E",
-                              "#A58D51",
-                            ][
-                              dashboard?.reasons.findIndex(
-                                (r) => r.reason === item.reason,
-                              ) ?? 0
-                            ] ?? "#B8872C",
+                          width: getReasonBarWidth(item.count, maxReason),
+                          backgroundColor: DASHBOARD_REASON_COLORS[
+                            dashboard.reasons.findIndex((reason) => reason.reason === item.reason) %
+                              DASHBOARD_REASON_COLORS.length
+                          ],
                         }}
                       />
                     </div>
@@ -427,7 +303,7 @@ export default function HomePage() {
                 <p className="mt-2 text-2xl font-semibold tracking-tight text-[rgb(var(--foreground))]">
                   {loading && !metrics
                     ? "—"
-                    : formatDuration(metrics?.averageResolutionHours ?? null)}
+                    : formatDurationHours(metrics?.averageResolutionHours ?? null)}
                 </p>
                 <p className="mt-1 text-[10px] text-[rgb(var(--muted-foreground))]">
                   From request creation
@@ -441,7 +317,7 @@ export default function HomePage() {
                   {loading && !metrics ? (
                     "—"
                   ) : (
-                    <AnimatedCount value={metrics?.resolvedCount ?? 0} />
+                    <AnimatedNumber value={metrics?.resolvedCount ?? 0} />
                   )}
                 </p>
                 <p className="mt-1 text-[10px] text-[rgb(var(--muted-foreground))]">
@@ -461,7 +337,7 @@ export default function HomePage() {
                   {loading && !metrics ? (
                     "—"
                   ) : (
-                    <AnimatedCount value={metrics?.current30Days ?? 0} />
+                    <AnimatedNumber value={metrics?.current30Days ?? 0} />
                   )}
                 </p>
                 {metrics && (
@@ -474,7 +350,7 @@ export default function HomePage() {
               <p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">
                 Previous period:{" "}
                 {metrics ? (
-                  <AnimatedCount value={metrics.previous30Days} />
+                  <AnimatedNumber value={metrics.previous30Days} />
                 ) : (
                   "—"
                 )}{" "}
@@ -537,21 +413,21 @@ export default function HomePage() {
                           {row.customerName}
                         </p>
                         <p className="mt-1 max-w-32 truncate text-[10px] text-[rgb(var(--muted-foreground))]">
-                          {humanize(row.reason)}
+                          {humanizeDashboardValue(row.reason)}
                         </p>
                       </td>
                       <td className="px-3 py-3">
                         <span
                           className={
                             "inline-flex whitespace-nowrap rounded-md border px-2.5 py-1 text-[10px] font-bold shadow-sm " +
-                            (statusStyle[row.status] ?? "")
+                            (DASHBOARD_STATUS_CLASSES[row.status] ?? "")
                           }
                         >
-                          {humanize(row.status)}
+                          {humanizeDashboardValue(row.status)}
                         </span>
                       </td>
                       <td className="whitespace-nowrap px-3 py-3 text-[10px] text-[rgb(var(--muted-foreground))]">
-                        {formatDate(row.createdAt)}
+                        {formatDashboardDate(row.createdAt)}
                       </td>
                     </tr>
                   ))}
