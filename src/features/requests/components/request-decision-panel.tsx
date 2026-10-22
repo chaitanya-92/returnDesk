@@ -64,11 +64,11 @@ export function RequestDecisionPanel({
           <Pencil size={15}/>
           </button>}</div>
           <p className="mt-1.5 text-[11px] leading-4 text-[#77736A]">Confirm the item price before approving. The amount is saved with the decision.</p>
-          </div>}<label className="block text-xs font-medium">Decision note<textarea value={decisionNote} onChange={e => onDecisionNoteChange(e.target.value)} rows={2} maxLength={1000} placeholder="Why is this decision appropriate?" className="mt-1.5 w-full rounded-lg border bg-white p-3 text-sm text-[#23221E]"/>
+          </div>}<label className="block text-xs font-medium">{item.status === "IN_REVIEW" ? "Decision note" : "Decision note"}<textarea value={decisionNote} onChange={e => onDecisionNoteChange(e.target.value)} rows={3} maxLength={1000} required placeholder="Add the decision reason. A clear reason is required when rejecting this request." aria-describedby="decision-note-help" className="mt-1.5 w-full rounded-lg border bg-white p-3 text-sm text-[#23221E]"/><span id="decision-note-help" className="mt-1 block text-xs text-[#77736A]">Required for rejection. This reason will be saved to the request activity.</span>
           </label>
           <button disabled={busy || (resolution === "REFUND" && !(Number(amount) > 0))} onClick={() => void onTransition("APPROVED")} className="w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E] disabled:opacity-50">
           <CheckCircle2 className="mr-1 inline" size={16}/>Approve request</button>
-          <button disabled={busy} onClick={() => void onTransition("REJECTED")} className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
+          <button disabled={busy || !decisionNote.trim()} onClick={() => void onTransition("REJECTED") className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
           <XCircle className="mr-1 inline" size={16}/>Reject request</button>
           </div>}</section>}{item.status === "APPROVED" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Fulfilment</h2>
