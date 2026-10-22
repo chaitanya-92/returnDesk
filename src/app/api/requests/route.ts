@@ -7,8 +7,8 @@ import { createRequest, listRequests } from "@/features/requests/service";
 export async function GET(request: NextRequest) {
   try {
     const params = request.nextUrl.searchParams;
-    const rawStatus = params.get("status")?.toUpperCase();
-    const rawReason = params.get("reason")?.toUpperCase();
+    const rawStatuses = params.getAll("status").map((value) => value.toUpperCase());
+    const rawReasons = params.getAll("reason").map((value) => value.toUpperCase());
     const sortBy = params.get("sortBy") ?? "createdAt";
     const sortOrder = params.get("sortOrder") ?? "desc";
     const rawDate = params.get("date");
@@ -24,8 +24,7 @@ export async function GET(request: NextRequest) {
     const page = Number(params.get("page") ?? "1");
     const pageSize = Number(params.get("pageSize") ?? "10");
     if (
-      rawStatus &&
-      !REQUEST_STATUSES.includes(rawStatus as (typeof REQUEST_STATUSES)[number])
+      rawStatuses.some((value) => !REQUEST_STATUSES.includes(value as (typeof REQUEST_STATUSES)[number]))
     ) {
       throw new AppError(
         "Unknown request status filter.",
@@ -34,16 +33,7 @@ export async function GET(request: NextRequest) {
       );
     }
     if (
-      rawReason &&
-      ![
-        "DAMAGED",
-        "WRONG_ITEM",
-        "WRONG_SIZE",
-        "NOT_AS_DESCRIBED",
-        "CHANGED_MIND",
-        "MISSING_PARTS",
-        "OTHER",
-      ].includes(rawReason)
+      rawReasons.some((value) => !["DAMAGED", "WRONG_ITEM", "WRONG_SIZE", "NOT_AS_DESCRIBED", "CHANGED_MIND", "MISSING_PARTS", "OTHER"].includes(value))
     ) {
       throw new AppError(
         "Unknown request reason filter.",
@@ -77,8 +67,8 @@ export async function GET(request: NextRequest) {
       );
     }
     const result = await listRequests({
-      status: rawStatus as (typeof REQUEST_STATUSES)[number] | undefined,
-      reason: rawReason ?? undefined,
+      statuses: rawStatuses as (typeof REQUEST_STATUSES)[number][],
+      reasons: rawReasons,
       createdDate: date,
       search: params.get("q") ?? undefined,
       sortBy: sortBy as
