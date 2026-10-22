@@ -29,7 +29,39 @@ type RequestWithActivity = RequestRecord & {
 export default function RequestDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const returnToRequests = () => "/requests" + (typeof window !== "undefined" ? window.location.search : "");
+  const returnToRequests = () => {
+    if (typeof window === "undefined") return "/requests";
+    const previousUrl = document.referrer;
+    if (previousUrl) {
+      try {
+        const previous = new URL(previousUrl);
+        if (previous.origin === window.location.origin && previous.pathname.startsWith("/requests")) {
+          return previous.pathname + previous.search + previous.hash;
+        }
+      } catch {
+        // Fall back to the requests workspace when the referrer is invalid.
+      }
+    }
+    return "/requests";
+  };
+
+  const returnToPreviousListEntry = () => {
+    if (typeof window !== "undefined") {
+      const previousUrl = document.referrer;
+      if (previousUrl) {
+        try {
+          const previous = new URL(previousUrl);
+          if (previous.origin === window.location.origin && previous.pathname.startsWith("/requests")) {
+            router.back();
+            return;
+          }
+        } catch {
+          // Fall through to the requests workspace.
+        }
+      }
+    }
+    router.replace("/requests");
+  };
 
   const [item, setItem] = useState<RequestWithActivity | null>(null);
   const [loading, setLoading] = useState(true);
@@ -77,7 +109,7 @@ export default function RequestDetailsPage() {
     setRedirectMessage(message);
     setRedirecting(true);
     await new Promise((resolve) => window.setTimeout(resolve, 1600));
-    router.push(returnToRequests());
+    returnToPreviousListEntry();
   }
 
   async function transition(
