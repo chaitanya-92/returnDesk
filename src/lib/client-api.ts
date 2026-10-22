@@ -1,7 +1,8 @@
 /**
  * Shared browser-side API client.
  *
- * Keeps response parsing and API error normalization out of page components.
+ * Centralizes response parsing and normalizes API errors so page components
+ * can focus on rendering and user interactions.
  */
 export type ApiErrorBody = {
   message?: string;
@@ -34,12 +35,15 @@ export async function apiRequest<T>(
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<ApiEnvelope<T>> {
+  const headers = new Headers(init?.headers);
+
+  if (init?.body && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
+
   const response = await fetch(input, {
     ...init,
-    headers: {
-      ...(init?.body ? { "Content-Type": "application/json" } : {}),
-      ...init?.headers,
-    },
+    headers,
   });
 
   const payload = (await response.json().catch(() => null)) as
@@ -50,7 +54,6 @@ export async function apiRequest<T>(
     const message =
       getErrorMessage(payload?.error) ??
       `Request failed with status ${response.status}.`;
-
     const code =
       typeof payload?.error === "object" && payload.error
         ? payload.error.code
