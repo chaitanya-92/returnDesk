@@ -180,11 +180,8 @@ export default function RefundsPage() {
 
     try {
       await requestsApi.transition(refund.id, {
-        method: "POST",
-        body: JSON.stringify({
-          status: "COMPLETED",
-          note: "Refund marked as processed by operations.",
-        }),
+        status: "COMPLETED",
+        note: "Refund marked as processed by operations.",
       });
 
       setToast(`Refund ${refund.reference} marked processed.`);

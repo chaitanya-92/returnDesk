@@ -208,10 +208,7 @@ export default function RequestsPage() {
     setSaving(true);
     setError("");
     try {
-      const payload = await requestsApi.create({
-        method: "POST",
-        body: JSON.stringify(values),
-      });
+      const payload = await requestsApi.create(values);
       setShowCreate(false);
       setToast({
         type: "success",
