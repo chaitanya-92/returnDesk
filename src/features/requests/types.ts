@@ -31,11 +31,11 @@ export type RequestResolution = {
   refundAmount: number | null;
 };
 
-export const ACTIVE_STATUSES: RequestStatus[] = [
+export const ACTIVE_STATUSES = [
   "OPEN",
   "IN_REVIEW",
   "APPROVED",
-];
+] as const satisfies readonly RequestStatus[];
 
 export const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   OPEN: ["IN_REVIEW"],
