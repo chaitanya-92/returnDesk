@@ -95,6 +95,11 @@ export function RequestCreateForm({
                       />
                     </label>
                     <label className="space-y-1.5 text-xs font-medium">
+                      Product price (INR)
+                      <Field name="productPrice" type="number" min="0.01" step="0.01" placeholder="e.g. 799.00" className={field} />
+                      <ErrorMessage name="productPrice" component="span" className="block text-xs font-medium text-rose-600" />
+                    </label>
+                    <label className="space-y-1.5 text-xs font-medium">
                       Quantity *
                       <Field
                         name="quantity"
