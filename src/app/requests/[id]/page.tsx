@@ -276,6 +276,6 @@ export default function RequestDetailsPage() {
           </aside>
           </div>
           </>}</div>
-    </AppShell>;
+    </AppShell>
     );
 }
