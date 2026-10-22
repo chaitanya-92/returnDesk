@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormikHelpers } from "formik";
 
 import { showToast } from "@/components/ui/toaster";
@@ -19,13 +19,9 @@ export default function RequestsPage() {
   const [rows, setRows] = useState<RequestRow[]>([]);
   const [statusMenuOpen, setStatusMenuOpen] = useState(false);
 
-  const [status, setStatus] = useState<RequestStatusFilter>(() => {
-    if (typeof window === "undefined") return "ALL";
-    const initial = new URLSearchParams(window.location.search).get("status");
-    return initial && ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"].includes(initial)
-      ? (initial as RequestStatusFilter)
-      : "ALL";
-  });
+  const [status, setStatus] = useState<RequestStatusFilter>("ALL");
+  const [statusReady, setStatusReady] = useState(false);
+  const requestSequence = useRef(0);
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebouncedValue(query, 300);
@@ -48,6 +44,7 @@ export default function RequestsPage() {
   } | null>(null);
 
   const load = useCallback(async () => {
+    const requestId = ++requestSequence.current;
     setLoading(true);
     setError("");
     try {
@@ -61,14 +58,15 @@ export default function RequestsPage() {
       params.set("sortBy", sortBy);
       params.set("sortOrder", sortOrder);
       const payload = await requestsApi.list(params);
+      if (requestId !== requestSequence.current) return;
       setRows(Array.isArray(payload.data.items) ? payload.data.items : []);
       setTotalRows(Number(payload.data.total ?? 0));
     } catch (e) {
-      setError(
-        e instanceof Error ? e.message : "Could not load return requests.",
-      );
+      if (requestId === requestSequence.current) {
+        setError(e instanceof Error ? e.message : "Could not load return requests.");
+      }
     } finally {
-      setLoading(false);
+      if (requestId === requestSequence.current) setLoading(false);
     }
   }, [
     status,
@@ -82,8 +80,17 @@ export default function RequestsPage() {
   ]);
 
   useEffect(() => {
-    void load();
-  }, [load]);
+    const initial = new URLSearchParams(window.location.search).get("status");
+    const allowed: RequestStatusFilter[] = ["OPEN", "IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"];
+    setStatus(initial && allowed.includes(initial as RequestStatusFilter)
+      ? (initial as RequestStatusFilter)
+      : "ALL");
+    setStatusReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (statusReady) void load();
+  }, [load, statusReady]);
   useEffect(() => {
     setPage(1);
   }, [query, status, reason, createdDate, sortBy, sortOrder]);
