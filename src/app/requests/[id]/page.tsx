@@ -84,8 +84,27 @@ export default function RequestDetailsPage() {
 
       await requestsApi.transition(id, input);
       setDecisionNote("");
-      setToast("Request updated.");
-      showToast("Request updated");
+
+      if (status === "IN_REVIEW") {
+        setToast("Request moved to In Review.");
+        showToast("Request moved to In Review", "success");
+        await load();
+        return;
+      }
+
+      if (status === "APPROVED") {
+        showToast("Request approved", "success", "The request is ready for fulfilment.");
+        router.push("/requests");
+        return;
+      }
+
+      if (status === "REJECTED") {
+        showToast("Request rejected", "error", "The request was returned to the Return Requests table.");
+        router.push("/requests");
+        return;
+      }
+
+      showToast("Request marked completed", "success");
       await load();
     } catch (cause) {
       const message =
