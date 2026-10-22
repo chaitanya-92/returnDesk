@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
 } from "lucide-react";
@@ -29,6 +29,8 @@ type RequestWithActivity = RequestRecord & {
 export default function RequestDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnToRequests = "/requests" + (searchParams.toString() ? "?" + searchParams.toString() : "");
 
   const [item, setItem] = useState<RequestWithActivity | null>(null);
   const [loading, setLoading] = useState(true);
@@ -94,13 +96,13 @@ export default function RequestDetailsPage() {
 
       if (status === "APPROVED") {
         showToast("Request approved", "success", "The request is ready for fulfilment.");
-        router.push("/requests");
+        router.push(returnToRequests);
         return;
       }
 
       if (status === "REJECTED") {
         showToast("Request rejected", "error", "The request was returned to the Return Requests table.");
-        router.push("/requests");
+        router.push(returnToRequests);
         return;
       }
 
@@ -157,7 +159,7 @@ export default function RequestDetailsPage() {
     return (
       <AppShell>
         <div className="relative min-w-0 space-y-5 pb-8">
-          <button onClick={() => router.push("/requests")} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
+          <button onClick={() => router.push(returnToRequests)} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
           <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
         {loading ? <RequestDetailsSkeleton /> : !item ? <p>Request not found.</p> : <>
