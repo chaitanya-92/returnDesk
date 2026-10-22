@@ -62,7 +62,21 @@ export type RequestListFilters = {
 };
 
 export async function listRequests(filters?: RequestListFilters) {
-  const search = filters?.search?.trim();
+  const search = filters?.search?.trim().replace(/\s+/g, " ");
+  const searchVariants = search
+    ? [...new Set([search, search.replace(/\s+/g, "_"), search.replace(/_/g, " ")])]
+    : [];
+  const searchableFields = (term: string): Prisma.ReturnRequestWhereInput[] => [
+    { reference: { contains: term, mode: "insensitive" } },
+    { orderNumber: { contains: term, mode: "insensitive" } },
+    { orderItemId: { contains: term, mode: "insensitive" } },
+    { itemName: { contains: term, mode: "insensitive" } },
+    { itemSku: { contains: term, mode: "insensitive" } },
+    { customerName: { contains: term, mode: "insensitive" } },
+    { customerEmail: { contains: term, mode: "insensitive" } },
+    { reason: { contains: term, mode: "insensitive" } },
+    { description: { contains: term, mode: "insensitive" } },
+  ];
   const page = Math.max(1, filters?.page ?? 1);
   const pageSize = Math.min(100, Math.max(1, filters?.pageSize ?? 10));
   const sortBy = filters?.sortBy ?? "createdAt";
@@ -80,14 +94,9 @@ export async function listRequests(filters?: RequestListFilters) {
           },
         }
       : {}),
-    ...(search
+    ...(searchVariants.length
       ? {
-          OR: [
-            { reference: { contains: search, mode: "insensitive" } },
-            { orderNumber: { contains: search, mode: "insensitive" } },
-            { customerName: { contains: search, mode: "insensitive" } },
-            { customerEmail: { contains: search, mode: "insensitive" } },
-          ],
+          OR: searchVariants.flatMap((term) => searchableFields(term)),
         }
       : {}),
   };
