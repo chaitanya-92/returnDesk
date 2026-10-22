@@ -21,8 +21,6 @@ import { RequestCreateForm } from "@/features/requests/components/request-create
 import type { RequestDraft } from "@/features/requests/types";
 import {
   EMPTY_REQUEST_DRAFT as initialDraft,
-  REQUEST_REASON_OPTIONS as reasons,
-  REQUEST_STATUS_FILTER_OPTIONS as statuses,
 } from "@/features/requests/request-form-data";
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 import { RequestTableSection, type RequestRow } from "@/features/requests/components/request-table-section";
@@ -323,7 +321,6 @@ export default function RequestsPage() {
           setActionMenuId={setActionMenuId}
         />
         <Pagination page={page} pageCount={pageCount} total={totalRows} pageSize={pageSize} itemLabel="requests" onPageChange={setPage} />
-        </section>
       </div>
     </AppShell>
   );
