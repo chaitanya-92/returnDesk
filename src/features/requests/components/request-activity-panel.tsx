@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import type { FormEvent } from "react";
 import { Clock3, MessageSquare, Send } from "lucide-react";
 import { formatDate } from "@/features/requests/presentation";
 
