@@ -1,6 +1,8 @@
 "use client";
 
-import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, ShieldCheck, Sun } from "lucide-react";
+import { Bell, ChevronDown, Command, LayoutDashboard, Menu, Moon, PackageCheck, PanelLeft, Search, Sun, WalletCards } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
 import { toggleTheme } from "@/lib/store/theme-slice";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -10,23 +12,24 @@ import { Input } from "@/components/ui/input";
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 
 const navigation = [
-  { label: "Overview", href: "#overview", icon: LayoutDashboard },
-  { label: "Return requests", href: "#requests", icon: PackageCheck },
-  { label: "Workflow", href: "#workflow", icon: ShieldCheck },
+  { label: "Overview", href: "/", icon: LayoutDashboard },
+  { label: "Return requests", href: "/requests", icon: PackageCheck },
+  { label: "Refund requests", href: "/refunds", icon: WalletCards },
 ];
 
 function Brand() {
   const { collapsed, isMobile } = useSidebar();
   const compact = collapsed && !isMobile;
   return (
-    <a href="#overview" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
+    <Link href="/" aria-label="ReturnDesk overview" className={`flex min-w-0 items-center ${compact ? "justify-center" : "gap-3"}`}>
       <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-[#F2B719] text-[#23221E]"><Command size={21} strokeWidth={2.2} /></span>
       {!compact && <span className="min-w-0"><span className="block text-[15px] font-semibold tracking-[-0.03em]">ReturnDesk</span><span className="mt-0.5 block text-xs text-[#59523D] dark:text-[#B8B3A5]">Returns workspace</span></span>}
-    </a>
+    </Link>
   );
 }
 
 function WorkspaceSidebar() {
+  const pathname = usePathname();
   const { collapsed, isMobile } = useSidebar();
   const compact = collapsed && !isMobile;
   return (
@@ -36,9 +39,9 @@ function WorkspaceSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>Workspace</SidebarGroupLabel>
           <SidebarMenu>
-            {navigation.map(({ label, href, icon: Icon }, index) => (
+            {navigation.map(({ label, href, icon: Icon }) => (
               <SidebarMenuItem key={label}>
-                <SidebarMenuButton href={href} isActive={index === 0} title={label}>
+                <SidebarMenuButton href={href} isActive={pathname === href || (href !== "/" && pathname.startsWith(href + "/"))} title={label}>
                   <Icon size={18} strokeWidth={1.8} />
                   {!compact && <span className="flex-1">{label}</span>}
                 </SidebarMenuButton>
