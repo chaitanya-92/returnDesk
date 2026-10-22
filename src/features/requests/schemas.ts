@@ -68,8 +68,8 @@ export const requestDetailsUpdateSchema = yup
 export const transitionSchema = yup
   .object({
     status: yup
-      .mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED">()
-      .oneOf(["IN_REVIEW", "APPROVED", "REJECTED", "COMPLETED"])
+      .mixed<"IN_REVIEW" | "APPROVED" | "REJECTED" | "PROCESSING" | "COMPLETED">()
+      .oneOf(["IN_REVIEW", "APPROVED", "REJECTED", "PROCESSING", "COMPLETED"])
       .required("Status is required"),
     resolution: yup
       .mixed<"REFUND" | "REPLACEMENT" | "STORE_CREDIT">()
