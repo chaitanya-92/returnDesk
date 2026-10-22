@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Check,
   CheckCircle2,
@@ -37,6 +38,7 @@ export function RequestDecisionPanel({
   decisionNote, onDecisionNoteChange, editingAmount,
   onEditingAmountChange, onTransition, onRefresh,
 }: RequestDecisionPanelProps) {
+  const [rejectModalOpen, setRejectModalOpen] = useState(false);
   return (
 <aside className="h-fit space-y-5 self-start xl:sticky xl:top-24">{review && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Decision workflow</h2>{item.status === "OPEN" && <button disabled={busy} onClick={() => void onTransition("IN_REVIEW")} className="mt-4 w-full rounded-lg border px-3 py-2.5 text-sm">Move to In Review</button>}{item.status === "IN_REVIEW" && <div className="mt-4 space-y-3">
@@ -68,8 +70,8 @@ export function RequestDecisionPanel({
           </label>
           <button disabled={busy || (resolution === "REFUND" && !(Number(amount) > 0))} onClick={() => void onTransition("APPROVED")} className="w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E] disabled:opacity-50">
           <CheckCircle2 className="mr-1 inline" size={16}/>Approve request</button>
-          <button disabled={busy || !decisionNote.trim()} onClick={() => void onTransition("REJECTED")} className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
-          <XCircle className="mr-1 inline" size={16}/>Reject request</button>
+          <button disabled={busy} onClick={() => setRejectModalOpen(true)} className="mt-2 w-full rounded-lg border border-rose-300 px-3 py-2.5 text-sm font-semibold text-rose-900">
+          <XCircle className="mr-1 inline" size={16}/>Reject request</button>{rejectModalOpen && <div className="fixed inset-0 z-[150] flex items-center justify-center bg-black/40 p-4"><section role="dialog" aria-modal="true" aria-labelledby="reject-request-title" className="w-full max-w-lg rounded-2xl border bg-white p-6 shadow-2xl dark:bg-[rgb(var(--card))]"><div className="flex items-start gap-3"><span className="grid size-10 place-items-center rounded-full bg-rose-100 text-rose-700"><XCircle size={20}/></span><div><h2 id="reject-request-title" className="text-lg font-semibold">Reject request</h2><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Enter the department’s reason for rejecting this request. It will be recorded in the request activity.</p></div></div><label className="mt-5 block text-sm font-medium">Rejection reason <span className="text-rose-600">*</span><textarea autoFocus value={decisionNote} onChange={(event) => onDecisionNoteChange(event.target.value)} rows={4} maxLength={1000} placeholder="Explain clearly why this request is being rejected…" className="mt-2 w-full rounded-lg border border-[rgb(var(--border))] bg-white p-3 text-sm outline-none focus:border-rose-400 focus:ring-2 focus:ring-rose-100 dark:bg-[rgb(var(--background))]"/></label><p className="mt-1 text-xs text-[rgb(var(--muted-foreground))]">Enter at least 3 characters.</p><div className="mt-6 flex flex-col-reverse justify-end gap-2 sm:flex-row"><button type="button" disabled={busy} onClick={() => setRejectModalOpen(false)} className="rounded-lg border px-4 py-2.5 text-sm font-medium disabled:opacity-50">Cancel</button><button type="button" disabled={busy || decisionNote.trim().length < 3} onClick={() => { setRejectModalOpen(false); onTransition("REJECTED"); }} className="rounded-lg bg-rose-600 px-4 py-2.5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50">{busy ? "Rejecting…" : "Confirm rejection"}</button></div></section></div>}
           </div>}</section>}{item.status === "APPROVED" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Fulfilment</h2>
           <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Start fulfilment for the approved resolution.</p>
