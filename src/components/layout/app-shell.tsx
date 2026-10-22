@@ -6,17 +6,13 @@ import {
   Command,
   LayoutDashboard,
   Menu,
-  Moon,
   PackageCheck,
   PanelLeft,
-  Sun,
   WalletCards,
 } from "lucide-react";
 import { Toaster } from "@/components/ui/toaster";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/store/hooks";
-import { toggleTheme } from "@/lib/store/theme-slice";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -123,8 +119,6 @@ function WorkspaceSidebar() {
 }
 
 function WorkspaceNavbar() {
-  const dispatch = useAppDispatch();
-  const dark = useAppSelector((state) => state.theme.mode === "dark");
   const { collapsed, isMobile, setCollapsed } = useSidebar();
   return (
     <header className="sticky top-0 z-30 grid h-[76px] grid-cols-[1fr_auto_1fr] items-center bg-white/95 px-4 text-[#23221E] backdrop-blur-md dark:bg-[#1C1C1A]/95 dark:text-[#F5F2EA] sm:px-6 lg:px-8">
@@ -150,14 +144,6 @@ function WorkspaceNavbar() {
       </div>
       <div className="justify-self-center" aria-hidden="true" />
       <div className="flex items-center justify-self-end gap-2 sm:gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={dark ? "Switch to light mode" : "Switch to dark mode"}
-          onClick={() => dispatch(toggleTheme())}
-        >
-          {dark ? <Sun size={17} /> : <Moon size={17} />}
-        </Button>
         <Button
           variant="ghost"
           size="icon"
