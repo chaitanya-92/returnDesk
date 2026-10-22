@@ -64,9 +64,10 @@ function Panel({
 type DashboardInsightsProps = {
   dashboard: DashboardData | null;
   loading: boolean;
+  error: string;
 };
 
-export function DashboardInsights({ dashboard, loading }: DashboardInsightsProps) {
+export function DashboardInsights({ dashboard, loading, error }: DashboardInsightsProps) {
   const recent = dashboard?.recent ?? [];
   const metrics = dashboard?.metrics;
   const maxReason = useMemo(
