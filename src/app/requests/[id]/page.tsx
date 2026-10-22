@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   ArrowLeft,
@@ -38,12 +38,12 @@ export default function RequestDetailsPage() {
   const [redirecting, setRedirecting] = useState(false);
   const [redirectMessage, setRedirectMessage] = useState("Returning to requests…");
   const [note, setNote] = useState("");
-  const [toast, setToast] = useState("");
   const [resolution, setResolution] = useState<"REFUND" | "REPLACEMENT" | "STORE_CREDIT">("REFUND");
   const [amount, setAmount] = useState("");
   const [decisionNote, setDecisionNote] = useState("");
   const [resolutionOpen, setResolutionOpen] = useState(false);
   const [editingAmount, setEditingAmount] = useState(false);
+  const autoReviewAttempted = useRef<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -68,6 +68,32 @@ export default function RequestDetailsPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!item || item.status !== "OPEN" || autoReviewAttempted.current === id) return;
+    autoReviewAttempted.current = id;
+    let cancelled = false;
+    async function startReviewOnOpen() {
+      setBusy(true);
+      setError("");
+      try {
+        await requestsApi.transition(id, { status: "IN_REVIEW" });
+        if (cancelled) return;
+        showToast("Request moved to In Review", "success");
+        await load();
+      } catch (cause) {
+        if (cancelled) return;
+        const message = cause instanceof Error ? cause.message : "Could not start request review";
+        setError(message);
+        showToast(message, "error");
+      } finally {
+        if (!cancelled) setBusy(false);
+      }
+    }
+    void startReviewOnOpen();
+    return () => { cancelled = true; };
+  }, [item, id, load]);
+
   async function returnToRequestsAfterToast(message: string) {
     setRedirectMessage(message);
     setRedirecting(true);
@@ -96,7 +122,6 @@ export default function RequestDetailsPage() {
       setDecisionNote("");
 
       if (status === "IN_REVIEW") {
-        setToast("Request moved to In Review.");
         showToast("Request moved to In Review", "success");
         await load();
         return;
@@ -142,7 +167,6 @@ export default function RequestDetailsPage() {
     try {
       await requestsApi.addNote(id, note, "Operations team");
       setNote("");
-      setToast("Internal note added.");
       showToast("Internal note added");
       await load();
     } catch (cause) {
@@ -180,7 +204,7 @@ export default function RequestDetailsPage() {
             </div>
           </div>}
           <button onClick={() => router.push(returnToRequests())} className="inline-flex items-center gap-2 text-sm font-medium text-[#7A5B00]">
-          <ArrowLeft size={16}/>Return requests</button>{toast && <div role="status" className="rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-950">{toast}</div>}{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
+          <ArrowLeft size={16}/>Return requests</button>{error && <div role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-950">{error}</div>}
 
         {loading ? <RequestDetailsSkeleton /> : !item ? <p>Request not found.</p> : <>
           <header className="flex flex-wrap items-start justify-between gap-4 border-b border-[rgb(var(--border))] bg-white pb-5 pt-1">
