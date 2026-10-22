@@ -63,9 +63,6 @@ export type RequestListFilters = {
 
 export async function listRequests(filters?: RequestListFilters) {
   const search = filters?.search?.trim().replace(/\s+/g, " ");
-  const searchVariants = search
-    ? [...new Set([search, search.replace(/\s+/g, "_"), search.replace(/_/g, " ")])]
-    : [];
   const searchableFields = (term: string): Prisma.ReturnRequestWhereInput[] => [
     { reference: { contains: term, mode: "insensitive" } },
     { orderNumber: { contains: term, mode: "insensitive" } },
