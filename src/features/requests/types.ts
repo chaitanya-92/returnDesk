@@ -36,6 +36,7 @@ export const ACTIVE_STATUSES = [
   "OPEN",
   "IN_REVIEW",
   "APPROVED",
+  "PROCESSING",
 ] as const satisfies readonly RequestStatus[];
 
 export const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
