@@ -11,6 +11,7 @@ enum RequestStatus {
   OPEN
   IN_REVIEW
   APPROVED
+  PROCESSING
   REJECTED
   COMPLETED
 }
