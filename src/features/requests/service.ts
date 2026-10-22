@@ -51,6 +51,7 @@ function validateResolution(input: RequestResolution) {
 
 export type RequestListFilters = {
   statuses?: RequestStatus[];
+  resolution?: "REFUND" | "STORE_CREDIT" | "REPLACEMENT";
   reasons?: string[];
   createdDate?: Date;
   search?: string;
@@ -69,6 +70,7 @@ export async function listRequests(filters?: RequestListFilters) {
   const where: Prisma.ReturnRequestWhereInput = {
     ...liveFilter,
     ...(filters?.statuses?.length ? { status: { in: filters.statuses } } : {}),
+    ...(filters?.resolution ? { resolution: filters.resolution } : {}),
     ...(filters?.reasons?.length ? { reason: { in: filters.reasons } } : {}),
     ...(filters?.createdDate
       ? {
