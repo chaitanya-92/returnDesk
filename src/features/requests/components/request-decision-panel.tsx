@@ -11,7 +11,7 @@ import {
 import type { RequestRecord } from "@/features/requests/api/requests-api";
 
 type Resolution = "REFUND" | "REPLACEMENT" | "STORE_CREDIT";
-type TransitionStatus = "IN_REVIEW" | "APPROVED" | "REJECTED" | "COMPLETED";
+type TransitionStatus = "IN_REVIEW" | "APPROVED" | "PROCESSING" | "REJECTED" | "COMPLETED";
 
 type RequestDecisionPanelProps = {
   item: RequestRecord;
@@ -72,9 +72,9 @@ export function RequestDecisionPanel({
           <XCircle className="mr-1 inline" size={16}/>Reject request</button>
           </div>}</section>}{item.status === "APPROVED" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]">
           <h2 className="font-semibold">Fulfilment</h2>
-          <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Mark the approved resolution as completed after fulfilment.</p>
-          <button disabled={busy} onClick={() => void onTransition("COMPLETED")} className="mt-4 w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E]">Mark completed</button>
-          </section>}<button onClick={() => void onRefresh()} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm">
+          <p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Start fulfilment for the approved resolution.</p>
+          <button disabled={busy} onClick={() => void onTransition("PROCESSING")} className="mt-4 w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E]">Start fulfilment</button>
+          </section>}{item.status === "PROCESSING" && <section className="rounded-xl border border-[rgb(var(--border))] bg-white p-5 dark:bg-[rgb(var(--card))]"><h2 className="font-semibold">Fulfilment in progress</h2><p className="mt-1 text-sm text-[rgb(var(--muted-foreground))]">Confirm the refund, store credit, or replacement succeeded before completing this request.</p><button disabled={busy} onClick={() => void onTransition("COMPLETED")} className="mt-4 w-full rounded-lg bg-[#F2B719] px-3 py-2.5 text-sm font-semibold text-[#23221E]">Mark completed</button></section>}<button onClick={() => void onRefresh()} className="inline-flex w-full items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm">
           <RefreshCw size={15}/>Refresh details</button>
           </aside>
   );
