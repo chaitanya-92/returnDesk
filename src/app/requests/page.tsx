@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
-import { apiRequest } from "@/lib/client-api";
+import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
@@ -168,10 +168,7 @@ export default function RequestsPage() {
       params.set("pageSize", String(pageSize));
       params.set("sortBy", sortBy);
       params.set("sortOrder", sortOrder);
-      const payload = await apiRequest<{
-        items: RequestRow[];
-        total: number;
-      }>("/api/requests?" + params.toString(), { cache: "no-store" });
+      const payload = await requestsApi.list(params);
       setRows(Array.isArray(payload.data.items) ? payload.data.items : []);
       setTotalRows(Number(payload.data.total ?? 0));
     } catch (e) {
@@ -211,7 +208,7 @@ export default function RequestsPage() {
     setSaving(true);
     setError("");
     try {
-      const payload = await apiRequest<RequestRow>("/api/requests", {
+      const payload = await requestsApi.create({
         method: "POST",
         body: JSON.stringify(values),
       });

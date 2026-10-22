@@ -18,7 +18,7 @@ import {
 
 import { AppShell } from "@/components/layout/app-shell";
 import { showToast } from "@/components/ui/toaster";
-import { apiRequest } from "@/lib/client-api";
+import { requestsApi } from "@/features/requests/api/requests-api";
 import { useDebouncedValue } from "@/features/requests/hooks/use-debounced-value";
 import { formatCurrencyINR, formatDate, formatRequestStatus } from "@/features/requests/presentation";
 import { StatusBadge } from "@/components/requests/status-badge";
@@ -147,10 +147,7 @@ export default function RefundsPage() {
         pageSize: "100",
       });
 
-      const payload = await apiRequest<{
-        items: RefundRequest[];
-        total: number;
-      }>(`/api/requests?${params}`, { cache: "no-store" });
+      const payload = await requestsApi.list(params);
 
       const items: RefundRequest[] = payload.data.items ?? [];
 
@@ -182,7 +179,7 @@ export default function RefundsPage() {
     setToast("");
 
     try {
-      await apiRequest(`/api/requests/${refund.id}/transition`, {
+      await requestsApi.transition(refund.id, {
         method: "POST",
         body: JSON.stringify({
           status: "COMPLETED",
