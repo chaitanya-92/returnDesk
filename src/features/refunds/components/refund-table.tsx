@@ -310,12 +310,12 @@ export function RefundTable({
           </DataTableContainer>
 
           <Pagination
-            page={currentPage}
+            page={page}
             pageCount={pageCount}
             total={filtered.length}
             pageSize={PAGE_SIZE}
             itemLabel="refunds"
-            onPageChange={setPage}
+            onPageChange={onPageChange}
           />
         </section>
   );
