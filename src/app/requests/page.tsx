@@ -9,21 +9,8 @@ import {
   useField,
   type FormikHelpers,
 } from "formik";
-import { CheckCircle2, X, AlertCircle, Filter } from "lucide-react";
+import { CheckCircle2, X, AlertCircle, Filter, Plus, RefreshCw, Search, ArrowUpRight, ArrowUp, ArrowDown, ArrowUpDown, Inbox, MoreHorizontal, Eye, WalletCards } from "lucide-react";
 import { showToast } from "@/components/ui/toaster";
-import {
-  Plus,
-  RefreshCw,
-  Search,
-  ArrowUpRight,
-  ArrowUp,
-  ArrowDown,
-  ArrowUpDown,
-  Inbox,
-  MoreHorizontal,
-  Eye,
-  WalletCards,
-} from "lucide-react";
 import { AppShell } from "@/components/layout/app-shell";
 import { requestDraftSchema } from "@/features/requests/schemas";
 import { requestsApi } from "@/features/requests/api/requests-api";
@@ -40,7 +27,7 @@ type RequestRow = Pick<
   "customerEmail" | "reason" | "status" | "createdAt" | "quantity"
 >;
 const statuses = ["ALL", ...REQUEST_STATUSES];
-const reasons = [...REQUEST_REASONS];
+const reasons = REQUEST_REASONS.map((reason) => ({ value: reason, label: formatRequestStatus(reason) }));
 
 const initialDraft: RequestDraft = {
   orderNumber: "",
@@ -87,26 +74,26 @@ function ReasonSelect() {
             aria-label="Return reason"
             className="absolute left-0 top-full z-50 mt-2 max-h-56 w-full overflow-y-auto rounded-xl border border-[#E1DFD6] bg-white p-1.5 text-[#23221E] shadow-xl ring-1 ring-black/5"
           >
-            {reasons.map((reason) => (
+            {reasons.map(({ value, label }) => (
               <button
                 key={reason}
                 type="button"
                 role="option"
-                aria-selected={field.value === reason}
+                aria-selected={field.value === value}
                 onClick={() => {
-                  void helpers.setValue(reason);
+                  void helpers.setValue(value);
                   void helpers.setTouched(true);
                   setOpen(false);
                 }}
                 className={
                   "flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors " +
-                  (field.value === reason
+                  (field.value === value
                     ? "bg-[#FFF0A6] text-[#23221E]"
                     : "bg-white text-[#38362F] hover:bg-[#FFF9DC] hover:text-[#23221E]")
                 }
               >
-                {pretty(reason)}
-                {field.value === reason && <span aria-hidden="true">✓</span>}
+                {label}
+                {field.value === value && <span aria-hidden="true">✓</span>}
               </button>
             ))}
           </div>
