@@ -52,6 +52,34 @@ export type TransitionRequestInput = {
   note?: string;
 };
 
+const CACHE_TTL_MS = 30_000;
+const responseCache = new Map<string, { expiresAt: number; value: unknown }>();
+const inFlight = new Map<string, Promise<unknown>>();
+
+function invalidateRequestCache() {
+  responseCache.clear();
+  inFlight.clear();
+}
+
+function cachedRequest<T>(key: string, request: () => Promise<T>): Promise<T> {
+  const cached = responseCache.get(key);
+  if (cached && cached.expiresAt > Date.now()) return Promise.resolve(cached.value as T);
+  if (cached) responseCache.delete(key);
+
+  const existing = inFlight.get(key);
+  if (existing) return existing as Promise<T>;
+
+  const pending = request()
+    .then((value) => {
+      responseCache.set(key, { value, expiresAt: Date.now() + CACHE_TTL_MS });
+      return value;
+    })
+    .finally(() => inFlight.delete(key));
+
+  inFlight.set(key, pending);
+  return pending;
+}
+
 const json = (method: "POST" | "PATCH", body: unknown): RequestInit => ({
   method,
   body: JSON.stringify(body),
@@ -59,47 +87,69 @@ const json = (method: "POST" | "PATCH", body: unknown): RequestInit => ({
 
 export const requestsApi = {
   get(id: string) {
-    return apiRequest<RequestRecord>(`/api/requests/${encodeURIComponent(id)}`, {
-      cache: "no-store",
-    });
+    const key = `request:${id}`;
+    return cachedRequest(key, () =>
+      apiRequest<RequestRecord>(`/api/requests/${encodeURIComponent(id)}`, {
+        cache: "no-store",
+      }),
+    );
   },
 
   list(query: URLSearchParams, signal?: AbortSignal) {
-    return apiRequest<RequestListResult>(`/api/requests?${query.toString()}`, {
-      cache: "no-store",
-      signal,
-    });
+    const key = `requests:list:${query.toString()}`;
+    // Avoid sharing an in-flight request tied to a caller's abort signal.
+    if (signal) {
+      return apiRequest<RequestListResult>(`/api/requests?${query.toString()}`, {
+        cache: "no-store",
+        signal,
+      });
+    }
+    return cachedRequest(key, () =>
+      apiRequest<RequestListResult>(`/api/requests?${query.toString()}`, {
+        cache: "no-store",
+      }),
+    );
   },
 
-  create(input: RequestDraft) {
-    return apiRequest<RequestRecord>("/api/requests", json("POST", input));
+  async create(input: RequestDraft) {
+    const result = await apiRequest<RequestRecord>("/api/requests", json("POST", input));
+    invalidateRequestCache();
+    return result;
   },
 
-  update(id: string, input: Partial<RequestDraft>) {
-    return apiRequest<RequestRecord>(
+  async update(id: string, input: Partial<RequestDraft>) {
+    const result = await apiRequest<RequestRecord>(
       `/api/requests/${encodeURIComponent(id)}`,
       { ...json("PATCH", input) },
     );
+    invalidateRequestCache();
+    return result;
   },
 
-  transition(id: string, input: TransitionRequestInput) {
-    return apiRequest<RequestRecord>(
+  async transition(id: string, input: TransitionRequestInput) {
+    const result = await apiRequest<RequestRecord>(
       `/api/requests/${encodeURIComponent(id)}/transition`,
       json("POST", input),
     );
+    invalidateRequestCache();
+    return result;
   },
 
-  addNote(id: string, body: string, author = "Operations team") {
-    return apiRequest<RequestNote>(
+  async addNote(id: string, body: string, author = "Operations team") {
+    const result = await apiRequest<RequestNote>(
       `/api/requests/${encodeURIComponent(id)}/notes`,
       json("POST", { body, author }),
     );
+    invalidateRequestCache();
+    return result;
   },
 
-  archive(id: string) {
-    return apiRequest<{ id: string; archived: boolean }>(
+  async archive(id: string) {
+    const result = await apiRequest<{ id: string; archived: boolean }>(
       `/api/requests/${encodeURIComponent(id)}`,
       { method: "DELETE" },
     );
+    invalidateRequestCache();
+    return result;
   },
 };
