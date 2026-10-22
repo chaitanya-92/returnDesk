@@ -16,6 +16,7 @@ export const EMPTY_REQUEST_DRAFT: RequestDraft = {
   orderItemId: "",
   itemName: "",
   itemSku: "",
+  productPrice: null,
   quantity: 1,
   customerName: "",
   customerEmail: "",
