@@ -4,12 +4,10 @@ import { useMemo } from "react";
 import {
   ArrowUpRight,
   CheckCircle2,
-
   Inbox,
-
   RefreshCw,
   ShieldAlert,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
@@ -22,7 +20,7 @@ import {
   formatDurationHours,
   getMaximumReasonCount,
   getReasonBarWidth,
-  humanizeDashboardValue
+  humanizeDashboardValue,
 } from "@/features/dashboard/dashboard-utils";
 
 function Panel({
