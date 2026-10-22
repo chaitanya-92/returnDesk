@@ -80,7 +80,6 @@ export default function RequestDetailsPage() {
         showToast("Request moved to In Review", "success");
         await load();
       } catch (cause) {
-        if (cancelled) return;
         const message = cause instanceof Error ? cause.message : "Could not start request review";
         setError(message);
         showToast(message, "error");
