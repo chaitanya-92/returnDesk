@@ -2,6 +2,7 @@ export const REQUEST_STATUSES = [
   "OPEN",
   "IN_REVIEW",
   "APPROVED",
+  "PROCESSING",
   "REJECTED",
   "COMPLETED",
 ] as const;
@@ -40,7 +41,8 @@ export const ACTIVE_STATUSES = [
 export const ALLOWED_TRANSITIONS: Record<RequestStatus, RequestStatus[]> = {
   OPEN: ["IN_REVIEW"],
   IN_REVIEW: ["APPROVED", "REJECTED"],
-  APPROVED: ["COMPLETED"],
+  APPROVED: ["PROCESSING"],
+  PROCESSING: ["COMPLETED"],
   REJECTED: [],
   COMPLETED: [],
 };
