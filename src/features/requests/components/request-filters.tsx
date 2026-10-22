@@ -36,7 +36,7 @@ export function RequestFilters(props: Props) {
           <fieldset className="mb-4"><legend className="mb-2 text-xs font-semibold text-gray-600">Status</legend><div className="grid grid-cols-2 gap-2">{REQUEST_STATUS_FILTER_OPTIONS.filter((s) => s !== "ALL").map((s) => <label key={s} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-[#FFFCF0]"><input type="checkbox" checked={props.statuses.includes(s as RequestStatusFilter)} onChange={() => toggle(props.statuses, s as RequestStatusFilter, props.onStatusesChange)} className="accent-[#D7A400]"/>{s.replaceAll("_", " ")}</label>)}</div></fieldset>
           <fieldset className="mb-4"><legend className="mb-2 text-xs font-semibold text-gray-600">Reason</legend><div className="space-y-1">{REQUEST_REASON_OPTIONS.map((o) => <label key={o.value} className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-[#FFFCF0]"><input type="checkbox" checked={props.reasons.includes(o.value)} onChange={() => toggle(props.reasons, o.value, props.onReasonsChange)} className="accent-[#D7A400]"/>{o.label}</label>)}</div></fieldset>
           <label className="block text-xs font-semibold text-gray-600">Created date<input type="date" value={props.createdDate} onChange={(e) => props.onCreatedDateChange(e.target.value)} className={field + " mt-1.5 w-full"}/></label>
-          <div className="mt-4 flex gap-2 border-t border-gray-100 pt-3"><button type="button" onClick={clear} className="min-h-10 flex-1 rounded-lg border border-[rgb(var(--border))] text-sm">Clear all</button><button type="button" onClick={() => setFilterOpen(false)} className="min-h-10 flex-1 rounded-lg bg-[#EAB308] text-sm font-semibold text-[#231F10]">Done</button></div>
+          <div className="mt-4 flex gap-2 border-t border-gray-100 pt-3"><button type="button" onClick={clear} className="min-h-10 flex-1 rounded-lg border border-[rgb(var(--border))] text-sm">Clear all</button><button type="button" onClick={() => setFilterOpen(false)} className="min-h-10 flex-1 rounded-lg bg-[#EAB308] text-sm font-semibold text-[#231F10]">Apply</button></div>
         </div>}
       </div>
       <div className="relative">
@@ -51,6 +51,7 @@ export function RequestFilters(props: Props) {
               <button type="button" onClick={() => props.onSortOrderChange("desc")} className={"rounded-lg border px-3 py-2 text-sm " + (props.sortOrder === "desc" ? "border-[#D7A400] bg-[#FFF4C2] font-semibold" : "border-gray-200 hover:bg-gray-50")}>Descending</button>
             </div>
           </div>
+          <button type="button" onClick={() => setSortOpen(false)} className="mt-3 min-h-10 w-full rounded-lg bg-[#EAB308] px-3 text-sm font-semibold text-[#231F10] hover:bg-[#F2B719]">Apply</button>
         </div>}
       </div>
       {(props.query || activeCount > 0) && <button type="button" onClick={clear} className="inline-flex min-h-10 items-center gap-1 px-2 text-xs font-semibold text-[#7A5B00]"><X size={13}/> Clear filters</button>}
